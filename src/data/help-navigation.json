@@ -397,6 +397,10 @@
       "icon": "MonitorSmartphone"
     },
     {
+      "path": "/requests",
+      "icon": "ClipboardCheck"
+    },
+    {
       "path": "/reports",
       "icon": "BarChart3"
     },
