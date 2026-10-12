@@ -379,6 +379,32 @@
       "icon": "Map"
     }
   ],
+  "runly.attendance": [
+    {
+      "path": "/",
+      "icon": "LayoutDashboard"
+    },
+    {
+      "path": "/people",
+      "icon": "Users"
+    },
+    {
+      "path": "/punches",
+      "icon": "ClipboardList"
+    },
+    {
+      "path": "/kiosks",
+      "icon": "MonitorSmartphone"
+    },
+    {
+      "path": "/reports",
+      "icon": "BarChart3"
+    },
+    {
+      "path": "/setup",
+      "icon": "Settings"
+    }
+  ],
   "runly.chat": [
     {
       "path": "/chat/inbox",

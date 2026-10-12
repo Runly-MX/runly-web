@@ -102,7 +102,14 @@ function syncNavigation() {
 
 // Developer documentation (docs/developers/*.md in the runly repo): published
 // at /documentacion/desarrolladores, plus /llms.txt and Markdown copies for AI
-// assistants. Same one-way copy as the help content.
+// assistants.
+//
+// NON-DESTRUCTIVE on purpose: some pages (MCP, community catalog, edited front matter)
+// live only in this repo. The sync never deletes a page, never overwrites a page that
+// differs from the runly copy unless asked, and reports both cases:
+//   node scripts/sync-help-content.mjs                 new pages are added, identical ones skipped
+//   node scripts/sync-help-content.mjs --force-dev=componentes.md,librerias.md
+//   node scripts/sync-help-content.mjs --force-dev     overwrite every differing page
 function syncDeveloperDocs() {
   const devSource = path.join(runlyRepoPath, "docs/developers");
   const devDest = path.join(repoRoot, "src/content/developers");
@@ -110,11 +117,25 @@ function syncDeveloperDocs() {
     console.warn(`[sync-help-content] No existe ${devSource}; se omite la documentación de desarrolladores.`);
     return;
   }
-  fs.rmSync(devDest, { recursive: true, force: true });
   fs.mkdirSync(devDest, { recursive: true });
+  const forceArg = process.argv.find((arg) => arg === "--force-dev" || arg.startsWith("--force-dev="));
+  const forceAll = forceArg === "--force-dev";
+  const forced = new Set(forceArg?.includes("=") ? forceArg.split("=")[1].split(",").map((n) => n.trim()).filter(Boolean) : []);
+  const norm = (text) => text.replace(/\r\n/g, "\n");
   const files = fs.readdirSync(devSource).filter((name) => name.endsWith(".md"));
-  for (const name of files) fs.copyFileSync(path.join(devSource, name), path.join(devDest, name));
-  console.log(`[sync-help-content] ${files.length} páginas de desarrolladores copiadas a ${devDest}`);
+  const added = [], updated = [], same = [], diverged = [];
+  for (const name of files) {
+    const from = path.join(devSource, name);
+    const to = path.join(devDest, name);
+    if (!fs.existsSync(to)) { fs.copyFileSync(from, to); added.push(name); continue; }
+    if (norm(fs.readFileSync(from, "utf8")) === norm(fs.readFileSync(to, "utf8"))) { same.push(name); continue; }
+    if (forceAll || forced.has(name)) { fs.copyFileSync(from, to); updated.push(name); continue; }
+    diverged.push(name);
+  }
+  const webOnly = fs.readdirSync(devDest).filter((name) => name.endsWith(".md") && !files.includes(name));
+  console.log(`[sync-help-content] Desarrolladores: ${added.length} nuevas, ${updated.length} actualizadas, ${same.length} idénticas.`);
+  if (diverged.length) console.warn(`[sync-help-content] ${diverged.length} páginas difieren y NO se sobrescribieron (revisa y usa --force-dev=nombre.md): ${diverged.join(", ")}`);
+  if (webOnly.length) console.log(`[sync-help-content] Páginas que solo existen en la web (se conservan): ${webOnly.join(", ")}`);
 }
 
 main();

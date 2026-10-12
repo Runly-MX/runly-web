@@ -91,13 +91,101 @@ Encabezado de la ficha de un registro.
 
 ### FilterBar
 
-Filtros en forma de chips para listas.
+Filtros en forma de chips (píldoras) para listas con 1 a 3 filtros rápidos de una sola elección. Para más filtros, selección múltiple o móvil usa `FilterMenu`.
 
 | Prop | Tipo | Qué hace |
 |---|---|---|
 | `filters` | `[{ key, label, options: [{ value, label }] }]` | Filtros (`type: 'daterange'` con `fromKey`/`toKey` para rangos de fecha) |
 | `value` | objeto | Valores activos `{ [key]: value }` |
 | `onChange` | `(nuevoValor) => void` | Recibe el objeto completo de filtros |
+
+### FilterToolbar
+
+Barra de búsqueda y filtros para listas. En escritorio es una sola fila (buscador, filtros y acciones); en móvil muestra el buscador y un botón "Filtros" (con el número de filtros activos) que abre los filtros en una hoja inferior.
+
+| Prop | Tipo | Qué hace |
+|---|---|---|
+| `search` | ReactNode | Normalmente un `SearchInput` |
+| `filters` | ReactNode | Controles de filtro (`FilterBar`, `DateRangeFilter`, `ToggleFilter`...) |
+| `actions` | ReactNode | Acciones de la pantalla. En móvil van en una segunda fila: la última es la principal y ocupa el ancho disponible; las anteriores deben ser solo icono (etiqueta en un `<span className="max-sm:sr-only">` más `aria-label`/`title`) para no desbordar |
+| `activeCount` | number | Filtros activos (se muestra en el botón móvil) |
+| `onClear` | `() => void` | Limpia todos los filtros |
+
+### ToggleFilter
+
+Interruptor en forma de píldora para filtros de sí/no.
+
+| Prop | Tipo | Qué hace |
+|---|---|---|
+| `label` | string | Texto |
+| `checked` | boolean | Estado |
+| `onChange` | `(checked) => void` | Cambio |
+
+### DateRangeFilter
+
+Selector de rango de fechas en forma de chip: atajos (Hoy, Últimos 7 días, Este mes...), calendario con vista previa del rango y botón "Quitar rango". Es el mismo que usa `FilterBar` cuando un filtro es `type: 'daterange'`; úsalo suelto cuando solo necesitas el rango (por ejemplo junto a un buscador).
+
+| Prop | Tipo | Qué hace |
+|---|---|---|
+| `filter` | `{ key, label, fromKey, toKey }` | `label` es el texto del chip; `fromKey`/`toKey` son las claves donde se escribe cada extremo |
+| `value` | objeto | `{ [fromKey]: 'YYYY-MM-DD', [toKey]: 'YYYY-MM-DD' }` (vacío = sin límite) |
+| `onChange` | `(nuevoValor) => void` | Recibe el objeto completo, con ambas claves |
+
+```jsx
+import { DateRangeFilter } from '@runly/ui'
+
+<DateRangeFilter
+  filter={{ key: 'fecha', label: 'Fecha', fromKey: 'desde', toKey: 'hasta' }}
+  value={{ desde, hasta }}
+  onChange={(v) => { setDesde(v.desde); setHasta(v.hasta) }}
+/>
+```
+
+### FilterMenu
+
+Un solo botón "Filtros" (con contador de filtros activos) que sustituye una fila de chips de filtro. En escritorio abre un panel con las categorías a la izquierda y las opciones a la derecha; en móvil, una hoja inferior con dos pasos (categorías, luego opciones). `DataTable` ya lo usa por defecto con su prop `filters` (`filtersLayout: 'menu'`).
+
+**Cuándo usarlo:** cuando la lista tiene varios filtros (4 o más), de tipos mezclados (opciones, selección múltiple, interruptores, rangos de fecha) o cuando la pantalla se usa en móvil. Para 1 a 3 filtros rápidos de una sola elección usa las píldoras de `FilterBar` (en `DataTable`: `filtersLayout="pills"`, que solo admite `select`, `combobox` y `daterange`).
+
+| Prop | Tipo | Qué hace |
+|---|---|---|
+| `filters` | `[{ key, label, type?, options?, icon?, fromKey?, toKey?, allLabel?, description?, value?, onChange? }]` | `type`: `select` (por defecto), `multiselect` (cualquiera de las opciones elegidas), `daterange` (usa `fromKey`/`toKey`), `toggle`, `combobox` (con búsqueda). `icon` (componente lucide) aparece en la lista de categorías y en el chip |
+| `filters[].options` | `[{ value, label, icon?, color? }]` | `icon` (lucide) o `color` (punto de color) se muestran junto a cada opción y en el chip cuando hay una sola elegida |
+| `value` | objeto plano | `key -> string \| string[] \| boolean`; para rangos, `fromKey`/`toKey` |
+| `onChange` | `(nuevoValor) => void` | Recibe el objeto completo con el cambio aplicado |
+
+Con `DataTable`, un filtro que trae su propio `value` y `onChange` es controlado (por ejemplo para filtrar en el servidor); los demás filtran las filas en el cliente comparando `String(row[key])` (en `multiselect`, cualquiera de los valores elegidos) o con `match(row, valor)`. Los chips de `multiselect` muestran todas las opciones ("Tipo: Interno, Contratista").
+
+```jsx
+import { CircleCheck, CircleOff, HardHat, Shapes, UserCheck, Users } from 'lucide-react'
+import { ActiveFilterChips, FilterMenu } from '@runly/ui'
+
+const filters = [
+  {
+    key: 'tipo', label: 'Tipo', type: 'multiselect', icon: Shapes,
+    options: [{ value: 'interno', label: 'Interno', icon: Users }, { value: 'contratista', label: 'Contratista', icon: HardHat }],
+  },
+  {
+    key: 'estado', label: 'Estado', icon: UserCheck,
+    options: [{ value: 'activo', label: 'Activo', icon: CircleCheck }, { value: 'inactivo', label: 'Inactivo', icon: CircleOff }],
+  },
+  { key: 'fechas', label: 'Fechas', type: 'daterange', fromKey: 'desde', toKey: 'hasta' },
+]
+<FilterMenu filters={filters} value={value} onChange={setValue} />
+<ActiveFilterChips filters={filters} value={value} onChange={setValue} />
+```
+
+### Migrar de FilterBar o MobileFiltersSheet a FilterMenu
+
+Cambia `<FilterBar filters value onChange />` por `<FilterMenu filters value onChange />` (misma forma de `value` y `onChange`, así que el estado, los parámetros de la API y los enlaces con filtros no cambian), añade `<ActiveFilterChips />` debajo de la fila y elimina el `MobileFiltersSheet` duplicado: `FilterMenu` ya se adapta al móvil. Puedes darle `icon` a cada filtro y `icon` o `color` a las opciones. Usa `multiselect` solo si el filtro admite varios valores. Con 1 o 2 filtros rápidos de una sola elección, `FilterBar` sigue siendo válido. Las tablas `RunlyTable` basadas en blueprint ya usan `FilterMenu`; en `filters` del blueprint acepta `icon` y opciones con `icon` o `color`.
+
+### ActiveFilterChips
+
+Chips quitables ("Tipo: Alfa", o "Tipo: Alfa, Beta" con varias opciones; con el icono del filtro y de la opción) de los filtros activos de un `FilterMenu`; no muestra nada si no hay filtros activos. Props: `filters`, `value`, `onChange` (los mismos que `FilterMenu`).
+
+### DateRangePanel
+
+Cuerpo del selector de rango (atajos, cajas Desde/Hasta y calendario) que usan `DateRangeFilter` y `FilterMenu`. Props: `from`, `to`, `onChange(from, to)`, `layout` (`side` o `stacked`).
 
 ### EntityTable
 
@@ -252,7 +340,7 @@ Pie de `Card`, normalmente con acciones (`justify-end`).
 
 ### Tabs
 
-Pestañas (Radix). Se compone con `TabsList`, `TabsTrigger` y `TabsContent`.
+Pestañas (Radix). Por defecto se muestran como píldoras animadas. Se compone con `TabsList`, `TabsTrigger` y `TabsContent`.
 
 | Prop (`Tabs`) | Tipo | Qué hace |
 |---|---|---|
@@ -278,6 +366,32 @@ Pestaña individual; `value` debe coincidir con su `TabsContent`.
 ### TabsContent
 
 Contenido de una pestaña.
+
+### ChipTabs y ChipTabPanel
+
+Pestañas controladas en forma de chips de color con indicador deslizante y, opcionalmente, la explicación de la pestaña activa (por defecto en un botón "?" que abre un popover). Úsalas cuando quieras controlar la pestaña (por ejemplo, guardarla en la URL).
+
+| Prop (`ChipTabs`) | Tipo | Qué hace |
+|---|---|---|
+| `tabs` | `[{ value, label, icon, description, badge }]` | Pestañas; `description` se muestra según `descriptionMode`, `badge` es un contador |
+| `value` / `onChange` | string / `(value) => void` | Pestaña activa y cambio |
+| `tone` | `teal` (por defecto), `blue`, `violet`, `amber`, `rose` | Color |
+| `ariaLabel` | string | Etiqueta accesible |
+| `descriptionMode` | `popover` (por defecto), `banner`, `none` | `popover`: botón "?" al final de los chips con icono, título y descripción; `banner`: recuadro siempre visible bajo los chips |
+| `showDescription` | boolean | `false` equivale a `descriptionMode="none"` (compatibilidad) |
+
+```jsx
+import { ChipTabs, ChipTabPanel } from '@runly/ui'
+
+<ChipTabs
+  ariaLabel="Secciones"
+  tabs={[{ value: 'general', label: 'General', description: 'Datos básicos.' }, { value: 'historial', label: 'Historial', badge: 3 }]}
+  value={tab}
+  onChange={setTab}
+/>
+<ChipTabPanel value="general" active={tab === 'general'}>...</ChipTabPanel>
+<ChipTabPanel value="historial" active={tab === 'historial'}>...</ChipTabPanel>
+```
 
 ## Acciones e indicadores
 
@@ -450,6 +564,13 @@ Tabla con orden, búsqueda, filtros y paginación (TanStack Table).
 | `emptyTitle`, `emptyDescription`, `emptyIcon`, `emptyAction` | | Estado vacío |
 | `pageSize` | number | Filas por página (10) |
 | `getRowId` | `(row) => id` | Id estable de cada fila |
+| `viewModes` | `['table','cards']` (o con `'grid'`) | Activa el conmutador Tabla / Tarjetas en la barra (junto al botón Filtros en móvil). Requiere `renderCard`. Sin esta prop la tabla se comporta igual que siempre |
+| `renderCard` | `(row, tableRow) => nodo` | Tarjeta de cada fila; con el modo tarjetas se aplican la misma búsqueda, filtros, paginación y estados vacío/error/carga |
+| `viewMode` / `onViewModeChange` | string / `(mode) => void` | Modo controlado |
+| `viewStorageKey`, `defaultViewMode` | string | Modo no controlado: se guarda en localStorage con esa clave; `defaultViewMode` es el inicial (el primero de `viewModes` si se omite) |
+| `cardGridClassName` | string | Clases de la cuadrícula de tarjetas (por defecto 1/2/3 columnas) |
+
+Los filtros de `filters` comparan `String(row[key])` con la opción elegida, o usan `match(row, value)` si lo defines; para valores calculados agrega campos derivados a los datos que pasas.
 
 ```jsx
 const columns = [
@@ -586,3 +707,10 @@ const titulo = resolveRecordLabel(registro, [findEntityBlueprint(blueprints, 'DE
 ```js
 const res = await fetch(`${apiBaseUrl}/visitas/visitas?pageSize=50`, { headers: buildApiHeaders(token, companyId) })
 ```
+
+
+## Modales: animación y Enter para enviar
+
+`Dialog` y `Sheet` animan su entrada y salida por defecto (el panel lateral se desliza, el diálogo se desvanece y escala; se respeta `prefers-reduced-motion`). Las utilidades `animate-in`, `fade-in-*`, `zoom-in-*` y `slide-in-from-*` ya están definidas en el tema compartido, así que también puedes usarlas en tus propios componentes con `data-[state=open]:`.
+
+Dentro de un modal, pulsar **Enter** en un campo de texto ejecuta la acción principal del pie (el último botón de variante principal o destructiva dentro de `DialogFooter`/`SheetFooter`), como lo haría un formulario. No se activa en áreas de texto, casillas, selectores ni campos de búsqueda con sugerencias. Para desactivarlo en todo el modal usa `submitOnEnter={false}` en `DialogContent`/`SheetContent`; para excluir un campo o una zona, márcala con `data-no-enter-submit`. Si construyes un pie propio, márcalo con `data-dialog-footer`.
