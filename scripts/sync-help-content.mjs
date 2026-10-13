@@ -12,6 +12,7 @@
 //
 // See docs/superpowers/specs/2026-09-27-public-help-docs-runly-web-design.md
 // in the runly repo for the full design.
+import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -21,7 +22,7 @@ import { extractModuleNavigation } from "./lib/help-navigation.mjs";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.join(here, "..");
 
-const runlyRepoPath = path.resolve(repoRoot, process.argv[2] ?? "../runly");
+const runlyRepoPath = path.resolve(repoRoot, process.argv.slice(2).find((arg) => !arg.startsWith("--")) ?? "../runly");
 const sourceDir = path.join(runlyRepoPath, "apps/api/src/manifests/official/help");
 const destDir = path.join(repoRoot, "src/content/help");
 
@@ -104,12 +105,14 @@ function syncNavigation() {
 // at /documentacion/desarrolladores, plus /llms.txt and Markdown copies for AI
 // assistants.
 //
-// NON-DESTRUCTIVE on purpose: some pages (MCP, community catalog, edited front matter)
-// live only in this repo. The sync never deletes a page, never overwrites a page that
-// differs from the runly copy unless asked, and reports both cases:
-//   node scripts/sync-help-content.mjs                 new pages are added, identical ones skipped
-//   node scripts/sync-help-content.mjs --force-dev=componentes.md,librerias.md
-//   node scripts/sync-help-content.mjs --force-dev     overwrite every differing page
+// SOURCE OF TRUTH: runly/docs/developers. These pages (and the Developer Hub's MCP copy,
+// synced from here by runly-developer-hub/scripts/sync-mcp-docs.mjs) are generated copies:
+// never edit them in this repo. `.sync-manifest.json` records the hash of every page as
+// last synced; the sync refuses to run when a copy no longer matches it (hand-edited
+// here) or when a page exists only here, instead of silently losing or keeping a fork.
+// Move that change into runly/docs/developers, then sync again.
+//   node scripts/sync-help-content.mjs                 mirror runly/docs/developers
+//   node scripts/sync-help-content.mjs ../runly --force-dev   overwrite hand edits / drop web-only pages
 function syncDeveloperDocs() {
   const devSource = path.join(runlyRepoPath, "docs/developers");
   const devDest = path.join(repoRoot, "src/content/developers");
@@ -118,24 +121,38 @@ function syncDeveloperDocs() {
     return;
   }
   fs.mkdirSync(devDest, { recursive: true });
-  const forceArg = process.argv.find((arg) => arg === "--force-dev" || arg.startsWith("--force-dev="));
-  const forceAll = forceArg === "--force-dev";
-  const forced = new Set(forceArg?.includes("=") ? forceArg.split("=")[1].split(",").map((n) => n.trim()).filter(Boolean) : []);
+  const force = process.argv.includes("--force-dev");
   const norm = (text) => text.replace(/\r\n/g, "\n");
+  const hash = (text) => crypto.createHash("sha256").update(norm(text)).digest("hex");
+  const manifestPath = path.join(devDest, ".sync-manifest.json");
+  const manifest = fs.existsSync(manifestPath) ? JSON.parse(fs.readFileSync(manifestPath, "utf8")) : { files: {} };
   const files = fs.readdirSync(devSource).filter((name) => name.endsWith(".md"));
-  const added = [], updated = [], same = [], diverged = [];
-  for (const name of files) {
-    const from = path.join(devSource, name);
-    const to = path.join(devDest, name);
-    if (!fs.existsSync(to)) { fs.copyFileSync(from, to); added.push(name); continue; }
-    if (norm(fs.readFileSync(from, "utf8")) === norm(fs.readFileSync(to, "utf8"))) { same.push(name); continue; }
-    if (forceAll || forced.has(name)) { fs.copyFileSync(from, to); updated.push(name); continue; }
-    diverged.push(name);
-  }
   const webOnly = fs.readdirSync(devDest).filter((name) => name.endsWith(".md") && !files.includes(name));
-  console.log(`[sync-help-content] Desarrolladores: ${added.length} nuevas, ${updated.length} actualizadas, ${same.length} idénticas.`);
-  if (diverged.length) console.warn(`[sync-help-content] ${diverged.length} páginas difieren y NO se sobrescribieron (revisa y usa --force-dev=nombre.md): ${diverged.join(", ")}`);
-  if (webOnly.length) console.log(`[sync-help-content] Páginas que solo existen en la web (se conservan): ${webOnly.join(", ")}`);
+  const handEdited = files.filter((name) => {
+    const to = path.join(devDest, name);
+    const recorded = manifest.files?.[name];
+    return recorded && fs.existsSync(to) && hash(fs.readFileSync(to, "utf8")) !== recorded;
+  });
+  if (!force && (handEdited.length || webOnly.length)) {
+    if (handEdited.length) console.error(`[sync-help-content] Editadas a mano aquí (no vienen de runly/docs/developers): ${handEdited.join(", ")}`);
+    if (webOnly.length) console.error(`[sync-help-content] Solo existen en la web: ${webOnly.join(", ")}`);
+    console.error("[sync-help-content] Pasa esos cambios a runly/docs/developers y vuelve a sincronizar, o usa --force-dev para descartarlos.");
+    process.exit(1);
+  }
+  const added = [], updated = [], same = [];
+  const next = {};
+  for (const name of files) {
+    const text = norm(fs.readFileSync(path.join(devSource, name), "utf8"));
+    const to = path.join(devDest, name);
+    next[name] = hash(text);
+    if (!fs.existsSync(to)) added.push(name);
+    else if (norm(fs.readFileSync(to, "utf8")) === text) { same.push(name); continue; }
+    else updated.push(name);
+    fs.writeFileSync(to, text);
+  }
+  for (const name of webOnly) fs.rmSync(path.join(devDest, name));
+  fs.writeFileSync(manifestPath, JSON.stringify({ source: "runly/docs/developers", files: next }, null, 2) + "\n");
+  console.log(`[sync-help-content] Desarrolladores: ${added.length} nuevas, ${updated.length} actualizadas, ${same.length} idénticas${webOnly.length ? `, ${webOnly.length} eliminadas (solo web)` : ""}.`);
 }
 
 main();

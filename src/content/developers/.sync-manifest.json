@@ -1,0 +1,23 @@
+{
+  "source": "runly/docs/developers",
+  "files": {
+    "api-modulos.md": "1d8fba3f177887dfec05ebe0f170f335e87d220793b2d6644c19902bd8b48d39",
+    "automatizaciones.md": "b484373a40c2f905e80681949cc32f813f096b59c9a5ff96e6e11ef94e2d1dd6",
+    "campos.md": "00b1e118be6aa1eb6f6f8cf23c48b88d6bbcb863fe3b4cfaa975243ef5525c46",
+    "catalogo-comunitario.md": "243be5948974d1b602be2f4d8803591fd2ea2aaaa73c3a1a6d7a9d6753a0678e",
+    "catalogo.md": "af531391bcd2741d1b54fe0bb6ea65f1dc3828db2776d45a6a6649505bc44274",
+    "componentes.md": "feacba601d662e56c6d7a34913ca7b94a6ccfb3fd2ee8bebfe8aca6e735b4a4b",
+    "conexiones.md": "e43a609f4680f83f1db68b395e95d7ed28e8481216d8cfa10118e2f6e7ca84bc",
+    "enlaces-publicos.md": "a2ca23af7c603dd3dfa5799b54cf91d5744c3710b2e0e818f14a4d072252aa84",
+    "flujo-zip.md": "6f334db8f1d7dc2ca95eac369b814c3989ab3d131210d4c9c439f6e3d5187141",
+    "ia.md": "53b93c89f00ca231f2cf07ed8d07b4e5db401d5b2c88403aaeb90d74b7e08bf4",
+    "iconos.md": "93a3a7f4b0253d8118777a68bdc932b98f0743a3dec307a3c6ab14ee85306c32",
+    "index.md": "89b95b0bb92fb7d062cc0b9e0f62cc8d10d9ecf779306ac4fd33131eed3d72c7",
+    "librerias.md": "e4a14ba13f763500e4ae1392a783b4138786642ded23c355abcb781919c5928c",
+    "mcp.md": "a6e6967aacd3597fb35426c159a78510e46baa52ebb826472d92ebe8ce9bb5e1",
+    "pantallas-react.md": "61f694d1ba63ff8ec9bc2e2f46dec06a8b9d94b3364f4a3f1c26187b93dcf1ed",
+    "relaciones.md": "dbf4f03fe990e3433c5a96dcd43c07277c2c62891750ee1384f1554421944c3e",
+    "servicios-y-eventos.md": "048c08f6ef2ffb421ec5cde7ba5c7dfe78c7f8ea5de7d60003395ebe911b165c",
+    "solucion-problemas.md": "ee24af6e4dd47a8f424c8717fe1fc07be21afa4f6a02ee3aa15560a6c8ad1c99"
+  }
+}
