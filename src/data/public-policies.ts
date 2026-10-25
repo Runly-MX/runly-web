@@ -7,7 +7,7 @@ export const developerPage: LegalPageDictionary = {
   metaDescription: "Crea, modifica y valida módulos RME3 con Runly Developer. Conoce el portal, la conexión MCP con OAuth y las acciones que requieren aprobación humana.",
   eyebrow: "Runly Developer",
   title: "Desarrollo de módulos RME3",
-  lastUpdated,
+  lastUpdated: "Última actualización: 23 de octubre de 2026",
   intro: "Runly Developer es el producto de Runly para crear, modificar, validar y preparar módulos declarativos RME3. Está dirigido a quienes desarrollan y mantienen módulos con acceso autorizado a sus espacios de trabajo.",
   sections: [
     {
@@ -18,6 +18,10 @@ export const developerPage: LegalPageDictionary = {
     {
       heading: "Portal y conexión MCP",
       paragraphs: ["El portal de Runly Developer está en devs.runly.mx. La integración MCP está disponible en https://mcp.devs.runly.mx/ y usa autenticación OAuth. Al conectarla, revisa la cuenta, el espacio de trabajo y los permisos que autorizas; las operaciones dependen de tus accesos."],
+    },
+    {
+      heading: "Compatibilidad y documentación",
+      paragraphs: ["Runly Developer MCP gestiona proyectos de desarrollo; el MCP de Runly ERP es una integración distinta para trabajar con datos empresariales autorizados. Conectar uno no concede acceso al otro.", "El compilador del Hub puede usar una revisión fijada de los contratos y librerías RME3. Consulta los contratos de la conexión activa antes de usar componentes nuevos del ERP: compilar, mostrar una vista previa y ejecutar un módulo son comprobaciones diferentes.", "Consulta las guías en /documentacion/desarrolladores y la guía MCP de esa sección para empezar. En clientes compatibles, como ChatGPT y Codex, la disponibilidad depende de la conexión autorizada, el paquete instalado y las herramientas descubiertas; no implica publicación o aprobación del plugin por OpenAI."],
     },
     {
       heading: "Aprobaciones y alcance",

@@ -98,6 +98,13 @@ Los servicios marcados como **propios** solo actúan sobre lo que tu módulo cre
 | `runly.files` `files.save({ name, mimeType, contentBase64, shareWithCompany, sourceEntityId })` | Guarda el archivo en **Archivos** del usuario (privado salvo `shareWithCompany: true`). Máximo 10 MB; imagen, PDF, texto u oficina | `files.assets.create` |
 | `runly.files` `files.signedUrl({ id })` | Enlace temporal de descarga de un archivo **propio** | `files.assets.read` |
 | `runly.notifications` `notifications.send({ userIds, title, body, link, priority, sourceEntityId })` | Notifica a usuarios de la empresa (los demás se ignoran); `priority`: `low, medium, high, critical` | Ninguno: basta ser miembro de la empresa |
+| `runly.notifications` `email.send({ userIds, to, subject, body, fileId, sourceEntityId })` | Envía un correo con el SMTP de la empresa (o el de la plataforma) a personas de la empresa (`userIds`, hasta 20) y/o a una dirección externa (`to`); `fileId` adjunta un archivo de la empresa (máx. 10 MB). Solo para automatizaciones y eventos (`system`). Devuelve `sent`, `failed` | Ninguno |
+| `runly.chat` `messages.post({ channel, text, title, link, buttons, approvalId, sourceEntityId })` | Publica un mensaje en un **canal** de chat de la empresa (por su nombre exacto o su id). El mensaje aparece como una *integración* con el nombre del módulo (o de la automatización) que lo envía, nunca como una persona, y no dispara automatizaciones. Hasta 4000 caracteres; `link` solo `https`/`http` o una ruta de Runly; máx. 30 mensajes por minuto por canal. `buttons` (texto JSON, hasta 3 `{ "label", "url" }` con `https`/`http` o una ruta de Runly) agrega botones de enlace; `approvalId` (una aprobación de automatizaciones pendiente) agrega los botones **Aprobar** y **Rechazar**, que solo pueden usar quienes aprueban. Solo para automatizaciones y eventos (`system`). Devuelve `id, conversationId, channel` | Ninguno |
+| `runly.documents` `documents.generate({ kind, templateId, sourceId, values, output, name, sourceEntityId })` | Llena una plantilla de **Documentos** y guarda el resultado en **Archivos** de la empresa. `kind` es el tipo (`fleet.vehicle`, `hr.employee`, `general.manual`, un tipo de un módulo del Builder…); `sourceId` el registro de origen, o `values` (objeto, o texto JSON) para el documento general; sin `templateId` se usa la plantilla predeterminada de la empresa del tipo (o el formato estándar si existe); `output: 'pdf'` convierte a PDF cuando se puede. Usa solo plantillas de la empresa (las personales solo las usa su dueño); el tipo debe pertenecer a un módulo activo en la empresa y el usuario necesita el permiso del tipo (en automatizaciones y eventos, `system`, basta la autorización del servicio). Devuelve `id, name, mimeType, sizeBytes` (el `id` sirve como *Archivo adjunto* de `email.send`) | El del tipo de documento |
+| `runly.documents` `templates.list({ kind })` | Lista las plantillas que se pueden usar (`id, kind, name, format, visibility, isDefault, published`); sin `kind`, las de todos los tipos disponibles. Solo `system` además de usuarios | El del tipo de documento |
+| `runly.files` `report.generate({ source, format, search, name, shareWithCompany, sourceEntityId })` | Genera un reporte `csv` o `xlsx` (hasta 1000 filas) de `contacts`, `items` o `vehicles` y lo guarda en **Archivos** de la empresa (compartido salvo `shareWithCompany: false`). Solo para automatizaciones y eventos (`system`). Devuelve `id, name, mimeType, sizeBytes` | `files.assets.create` |
+| `runly.purchases` `requests.create({ title, justification, priority, currency, neededBy, sourceEntityId })` | Crea una solicitud de compra en borrador (sin solicitante: se crea por el sistema). Falla con un mensaje claro si el flujo de Compras tiene las solicitudes desactivadas. Disponible para automatizaciones y eventos (`system`). Devuelve `id, number, status` | `purchases.request.create` |
+| `runly.hr` `employees.search({ search, status, limit })` | Busca colaboradores activos por nombre o área y devuelve solo `id, name, department, status` (nunca datos de contacto, sueldo ni identificaciones). Disponible en segundo plano (`system`) | `hr.employee.read` |
 | `runly.ledger` `accounts.list()` | Cuentas que el usuario puede ver: `id, name, bank, currency, balance` | `ledger.accounts.read` |
 | `runly.ledger` `categories.list()` | Categorías: `id, name, kind, system` | `ledger.categories.read` |
 | `runly.ledger` `transactions.create({ accountId \| accountName, fecha, nombre, referencia, concepto, numero, deposito, retiro, categoryId })` | Registra un depósito o retiro (uno de los dos mayor a cero). El usuario debe poder escribir en esa cuenta | `ledger.transactions.create` |
@@ -143,6 +150,42 @@ consumes: {
 },
 ```
 
+## Ofrecer un tipo de documento a Documentos
+
+Un módulo del Builder puede ofrecer una de sus entidades como **tipo de documento**: los usuarios suben su propio formato (Word, Excel, PowerPoint o PDF) en **Documentos**, y Runly lo llena con los datos de un registro. En la definición del módulo (ZIP o Builder):
+
+```json
+"documentKinds": [
+  { "name": "factura", "label": "Factura", "entity": "factura", "permission": "facturas.factura.read", "formats": ["docx", "pdf"], "fields": ["folio", "total", "emitida"] }
+]
+```
+
+- `name` (snake_case) y `label` identifican el tipo; Runly lo registra como `<clave del módulo>.<name>` (por ejemplo `custom.facturas.factura`).
+- `entity` es la entidad de la que se leen los datos. `permission` (opcional) es el permiso que se exige para ver y generar; por omisión, el de lectura de la entidad.
+- `fields` (opcional) son los campos disponibles como etiquetas `{{campo}}`; por omisión, todos los de texto, número, fecha, lista de opciones y sí/no (los archivos, relaciones y JSON no se ofrecen). `formats` (opcional) limita los formatos de plantilla.
+- En `module.manifest.js` el contrato equivalente es `documentKinds: [{ name, label, model, permission, formats?, fields: [{ tag, label, type }] }]` con `type` `text`, `number` o `date`; hasta 10 tipos por módulo y 60 campos por tipo.
+
+El tipo está disponible mientras el módulo esté instalado, activo y no desactivado para la empresa; al desactivarlo o desinstalarlo desaparece de Documentos y las plantillas ya subidas se conservan. Solo se leen los campos declarados, del registro de la empresa activa (y no desactivado).
+
+## Poner un resumen de tu módulo en Inicio
+
+Un módulo del Builder puede mostrar en **Inicio** un contador o una lista corta de una de sus entidades, sin escribir código:
+
+```json
+"homeWidgets": [
+  { "key": "abiertas", "label": "Órdenes abiertas", "entity": "orden", "kind": "count",
+    "when": { "field": "estado", "op": "not_equals", "value": "cerrada" } },
+  { "key": "recientes", "label": "Últimas órdenes", "entity": "orden", "kind": "list",
+    "titleField": "folio", "detailField": "cliente", "sort": { "field": "monto", "dir": "desc" }, "limit": 5 }
+]
+```
+
+- `kind`: `count` (un número grande con el total) o `list` (hasta 10 registros con título y una línea de detalle). Máximo 5 widgets por módulo.
+- `when` (opcional, hasta 5 condiciones que deben cumplirse todas): `equals`, `not_equals`, `contains`, `gt`, `lt` (solo campos numéricos) y `filled`. Los registros desactivados nunca cuentan.
+- `permission` (opcional): el permiso que hace falta para ver el widget; por omisión, el de lectura de la entidad. Quien no lo tiene no ve el widget en «Personalizar».
+- El total es exacto (se cuenta en la base de datos, no sobre una página). Al hacer clic se abre tu módulo. Cada persona puede ocultarlo desde **Personalizar**.
+- En `module.manifest.js` el contrato equivalente es `homeWidgets: [{ key, label, kind, model, permission, where?, titleField?, detailField?, sortField?, sortDir?, limit? }]`. Si un campo ya no existe, el widget responde con un error claro en vez de mostrar datos incorrectos.
+
 El contrato completo (argumentos, tipos, límites y campos de respuesta) se publica en `@runly/module-engine/contracts` como `SERVICE_CONTRACTS`; el Developer Hub simula los servicios con ese mismo contrato.
 
 ## Eventos
@@ -183,6 +226,18 @@ Desde un evento solo funcionan los servicios que no necesitan a una persona: not
 | `files.file.created` | `{ id, name, mimeType }` (solo archivos subidos a Archivos, no adjuntos de registros) |
 | `fleet.vehicle.created` | `{ id, plate, status }` |
 | `fleet.vehicle.updated` | `{ id, plate, status }` |
+| `projects.task.completed` | `{ id, projectId, title }` (al pasar a un estado de tipo hecho) |
+| `projects.task.rescheduled` | `{ id, projectId, title, startDate, dueDate }` (fechas AAAA-MM-DD o `null`; al cambiar el inicio o la entrega, desde el formulario, el Gantt o la IA) |
+| `projects.time.logged` | `{ id, taskId, projectId, minutes }` (al registrar tiempo a mano o al detener el cronómetro) |
+| `hr.employee.created` | `{ id, firstName, lastName }` |
+| `purchases.order.approved` | `{ id, caseId, status }` |
+| `purchases.order.issued` | `{ id, caseId, status }` |
+| `contacts.contact.updated` | `{ id }` |
+| `purchases.request.created` | `{ id, caseId, status }` |
+| `purchases.order.cancelled` | `{ id, caseId, status }` |
+| `purchases.invoice.paid` | `{ id, caseId, status }` (al quedar pagada por completo) |
+| `ledger.transaction.created` | `{ id, accountId, deposito, retiro }` (un movimiento registrado a mano o desde la app; las importaciones masivas no lo publican; sin nombres de cuenta ni de personas) |
+| `lms.enrollment.completed` | `{ id, courseId, learnerId }` (al completar el último requisito del curso) |
 
 Con `sourceModule` sabes si un evento de calendario lo creó tu módulo (por ejemplo, para marcar tu orden como reagendada cuando alguien mueve la cita desde el calendario). Libro de cuentas y Finanzas personales no publican eventos: su información depende del acceso por cuenta o cartera de cada persona.
 

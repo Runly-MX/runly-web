@@ -83,6 +83,10 @@
   ],
   "runly.fleet": [
     {
+      "path": "/app/m/runly.fleet/summary",
+      "icon": "LayoutDashboard"
+    },
+    {
       "path": "/app/m/runly.fleet/vehicles",
       "icon": "Truck"
     },
@@ -155,16 +159,20 @@
       "icon": "Boxes"
     },
     {
-      "path": "/inventory/intake",
-      "icon": "Sparkles"
+      "path": "/inventory/deregistrations",
+      "icon": "PackageMinus"
     },
     {
-      "path": "/inventory/assignments",
-      "icon": "UserCheck"
+      "path": "/inventory/media",
+      "icon": "Images"
     },
     {
       "path": "/inventory/catalogs",
       "icon": "FolderOpen"
+    },
+    {
+      "path": "/inventory/areas",
+      "icon": "FolderTree"
     },
     {
       "path": "/inventory/connections",
@@ -227,8 +235,18 @@
       "icon": "Users"
     },
     {
+      "path": "/notes/archive",
+      "icon": "Archive"
+    },
+    {
       "path": "/notes/trash",
       "icon": "Trash2"
+    }
+  ],
+  "runly.automations": [
+    {
+      "path": "/",
+      "icon": "Zap"
     }
   ],
   "runly.pfm": [
@@ -407,6 +425,24 @@
     {
       "path": "/setup",
       "icon": "Settings"
+    }
+  ],
+  "runly.lms": [
+    {
+      "path": "/",
+      "icon": "GraduationCap"
+    },
+    {
+      "path": "/courses",
+      "icon": "BookOpen"
+    },
+    {
+      "path": "/review",
+      "icon": "ClipboardCheck"
+    },
+    {
+      "path": "/certificates",
+      "icon": "Award"
     }
   ],
   "runly.chat": [

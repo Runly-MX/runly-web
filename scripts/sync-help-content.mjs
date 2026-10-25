@@ -13,6 +13,7 @@
 // See docs/superpowers/specs/2026-09-27-public-help-docs-runly-web-design.md
 // in the runly repo for the full design.
 import crypto from "node:crypto";
+import { execFileSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -41,6 +42,11 @@ function listMarkdownFilesRecursive(dir, baseDir = dir) {
 }
 
 function main() {
+  // Developer-only publication must not rewrite unrelated module help/navigation.
+  if (process.argv.includes("--developers-only")) {
+    syncDeveloperDocs();
+    return;
+  }
   if (!fs.existsSync(sourceDir)) {
     console.error(`[sync-help-content] No existe: ${sourceDir}`);
     console.error(
@@ -151,7 +157,9 @@ function syncDeveloperDocs() {
     fs.writeFileSync(to, text);
   }
   for (const name of webOnly) fs.rmSync(path.join(devDest, name));
-  fs.writeFileSync(manifestPath, JSON.stringify({ source: "runly/docs/developers", files: next }, null, 2) + "\n");
+  const revision = execFileSync("git", ["-C", runlyRepoPath, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+  const dirty = Boolean(execFileSync("git", ["-C", runlyRepoPath, "status", "--porcelain", "--", "docs/developers"], { encoding: "utf8" }).trim());
+  fs.writeFileSync(manifestPath, JSON.stringify({ source: "runly/docs/developers", revision, dirty, files: next }, null, 2) + "\n");
   console.log(`[sync-help-content] Desarrolladores: ${added.length} nuevas, ${updated.length} actualizadas, ${same.length} idénticas${webOnly.length ? `, ${webOnly.length} eliminadas (solo web)` : ""}.`);
 }
 

@@ -3,7 +3,7 @@ viewKey: /chat/inbox
 title: Chat
 summary: "Tus conversaciones: mensajes directos, grupos, canales y MirAI."
 ---
-Aqui ves todas tus conversaciones activas, ordenadas por la mas reciente.
+Aqui ves todas tus conversaciones activas, agrupadas en secciones.
 
 - Busca una conversacion o un contacto por nombre para no perder tiempo desplazandote por la lista.
 - Puedes iniciar una conversacion directa, crear un grupo o unirte a un canal.
@@ -11,3 +11,42 @@ Aqui ves todas tus conversaciones activas, ordenadas por la mas reciente.
 - Las llamadas de voz/video se inician desde una conversacion; si tienes permiso, puedes grabarlas y pedir su transcripcion despues.
 - La conversacion con **MirAI** siempre aparece en tu lista; si la instancia no tiene IA configurada, el cuadro de escritura de esa conversacion muestra "no configurado" en vez de bloquearse por completo.
 - Puedes fijar mensajes importantes y reenviar mensajes entre conversaciones.
+
+## Secciones y filtros
+
+- La lista se agrupa en **Destacados** (las que fijas), **Canales**, **Mensajes directos** (incluye grupos), **Reuniones** y **Soporte externo**. MirAI queda siempre arriba. Toca el titulo de una seccion para plegarla; Runly recuerda cuales dejaste plegadas.
+- Los canales creados por una llamada grupal van a **Reuniones** (plegada al inicio) y se archivan solos tras 14 dias sin mensajes ni llamadas; los encuentras en Archivados y puedes restaurarlos.
+- Crea tus propias secciones con **+ > Nueva seccion** (nombre e icono). Para mover una conversacion usa el menu de la fila (clic derecho o deslizar) > **Mover a seccion...**, o arrastrala sobre el titulo de la seccion. Al eliminar una seccion, sus conversaciones vuelven a su seccion automatica.
+- Debajo de la busqueda, los filtros **Todo / Sin leer** limitan la lista; a su derecha, la campana abre **Menciones y actividad** y el marcador abre **Guardados**.
+- **Menciones y actividad** (la campana) junta lo ultimo de 7 dias que va dirigido a ti: menciones, respuestas en tus hilos, reacciones a tus mensajes e invitaciones a canales.
+
+## Integraciones
+
+Quien administra un canal puede crear **Integraciones** en la informacion del canal: una direccion secreta con la que otro sistema publica mensajes (aparecen con la insignia Integracion). La direccion se muestra una sola vez y se puede regenerar.
+
+## Estado y No molestar
+
+- En el menu de tu avatar (arriba a la derecha) elige **Establecer estado**: un emoji, un texto corto y cuanto dura (30 minutos, 1 hora, hoy, esta semana). Los demas lo ven junto a tu nombre: en la lista, en el encabezado del chat directo y en tus mensajes, y se actualiza en el momento.
+- **No molestar** (mismo menu) detiene los correos y avisos push por 30 minutos, 1 hora o hasta manana a las 8:00; los avisos dentro de Runly se guardan y los criticos siempre llegan. Tu avatar muestra una luna y tu punto de presencia se pone rojo.
+- En **Notificaciones > Horario silencioso** defines horas y dias fijos (por ejemplo de 22:00 a 07:00 de lunes a viernes).
+- Si escribes a alguien con No molestar, ves un aviso bajo el cuadro de escritura: el mensaje se entrega igual, solo sin aviso en su telefono ni por correo. El resumen por correo tambien espera.
+
+## Guardar y recordar
+
+- En el menu de un mensaje elige **Guardar para despues** para tenerlo a la mano, o **Recordarme...** para que Runly te avise en 20 minutos, 1 hora, 3 horas, manana a las 9:00, el lunes o en una semana.
+- **Guardados** (el marcador) lista lo que guardaste, primero lo que tiene recordatorio. Desde ahi abres el mensaje, lo marcas como hecho o lo quitas.
+- El aviso del recordatorio llega dentro de Runly y, segun tus preferencias, por push o correo; con No molestar solo se guarda dentro de Runly.
+
+## Comandos con /
+
+Escribe `/` al inicio de un mensaje para ver los comandos y presiona Enter para ejecutarlos:
+- `/estado 🍽️ Comiendo` cambia tu estado (`/estado limpiar` lo quita).
+- `/nomolestar 30m`, `1h`, `mañana` u `off` activa o apaga No molestar.
+- `/tarea Llamar al cliente` crea una tarea en Mis tareas con un enlace a la conversacion.
+- `/llamar` inicia una llamada en la conversacion y `/ayuda` muestra esta lista.
+Los atajos `/inventario:texto` para insertar registros siguen funcionando en cualquier parte del mensaje.
+
+## Mensajes con botones
+
+Algunas integraciones y automatizaciones publican mensajes con botones: enlaces que abren un informe o una pantalla de Runly, o **Aprobar / Rechazar** una solicitud. Solo las personas que deben aprobar pueden usar esos botones; al decidir, la tarjeta muestra quien lo hizo y se cierra para todos.
+Si en Compras > Configuracion eliges un canal en **Aprobaciones en el chat**, cada aprobacion de compra pendiente aparece alli como tarjeta con **Aprobar** y **Rechazar** (solo para quien tiene el permiso de aprobar compras); la tarjeta se cierra tambien si se decide desde Compras.
