@@ -1,7 +1,7 @@
 {
   "source": "runly/docs/developers",
-  "revision": "a19b1c9fac3b1b78a72951b45c1c3f2d039a283e",
-  "dirty": true,
+  "revision": "efd1cec209aec4b217ff97a4b892b59a4eea6b79",
+  "dirty": false,
   "files": {
     "api-modulos.md": "1d8fba3f177887dfec05ebe0f170f335e87d220793b2d6644c19902bd8b48d39",
     "automatizaciones.md": "f8f830c5ac0a6a0817ba56386773d6b75f62087153b9a81269a4328a78e87579",
