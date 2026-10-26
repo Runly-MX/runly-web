@@ -1,10 +1,10 @@
 {
   "source": "runly/docs/developers",
-  "revision": "0c95253c7202f5c7c38a6b335e47ab1d3ff4d1ba",
-  "dirty": false,
+  "revision": "a19b1c9fac3b1b78a72951b45c1c3f2d039a283e",
+  "dirty": true,
   "files": {
     "api-modulos.md": "1d8fba3f177887dfec05ebe0f170f335e87d220793b2d6644c19902bd8b48d39",
-    "automatizaciones.md": "ad1a6b6378b0677aa9cf71baecadf768e42a978d95853702762556d970d9cf7b",
+    "automatizaciones.md": "f8f830c5ac0a6a0817ba56386773d6b75f62087153b9a81269a4328a78e87579",
     "campos.md": "3e35cbda0c30704b1d3ad54524e88c3cb7424a9bbe4f9f508586fee36a51ed76",
     "catalogo-comunitario.md": "243be5948974d1b602be2f4d8803591fd2ea2aaaa73c3a1a6d7a9d6753a0678e",
     "catalogo.md": "af531391bcd2741d1b54fe0bb6ea65f1dc3828db2776d45a6a6649505bc44274",
