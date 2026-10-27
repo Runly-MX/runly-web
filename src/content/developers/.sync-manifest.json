@@ -1,6 +1,6 @@
 {
   "source": "runly/docs/developers",
-  "revision": "efd1cec209aec4b217ff97a4b892b59a4eea6b79",
+  "revision": "0c870ba22caeb3d4229b4e283a64b4423b68405d",
   "dirty": false,
   "files": {
     "api-modulos.md": "1d8fba3f177887dfec05ebe0f170f335e87d220793b2d6644c19902bd8b48d39",
@@ -14,12 +14,13 @@
     "flujo-zip.md": "6f334db8f1d7dc2ca95eac369b814c3989ab3d131210d4c9c439f6e3d5187141",
     "ia.md": "53b93c89f00ca231f2cf07ed8d07b4e5db401d5b2c88403aaeb90d74b7e08bf4",
     "iconos.md": "93a3a7f4b0253d8118777a68bdc932b98f0743a3dec307a3c6ab14ee85306c32",
-    "index.md": "2612c9c358388188b104ec5209719d0f162549bb5a8a6e55033a33661d6c4925",
+    "index.md": "b38760b7774e40ff9bda39c3776d2896daefc2374ff4bac86aecf929a6565a3d",
     "librerias.md": "26b73bce869c6a04617aeda0935c93c1ef832d318c8264ba5a6c3fbba6377901",
     "mcp.md": "d3462990ff52b824a2119e6e8371a61c8a4b83d0bbc85a4854e9fff88cb6754b",
     "pantallas-react.md": "61f694d1ba63ff8ec9bc2e2f46dec06a8b9d94b3364f4a3f1c26187b93dcf1ed",
     "relaciones.md": "d406a832bfa144f38f80bb16a59f862d00bfd17ce03bdf41fff60c9a28c2968f",
     "servicios-y-eventos.md": "b5ff7204f22cd15abf212b2b52edab1d71158475418d238e73b93b66afd28f58",
-    "solucion-problemas.md": "ee24af6e4dd47a8f424c8717fe1fc07be21afa4f6a02ee3aa15560a6c8ad1c99"
+    "solucion-problemas.md": "ee24af6e4dd47a8f424c8717fe1fc07be21afa4f6a02ee3aa15560a6c8ad1c99",
+    "studio-template-package.md": "4aea1b75c674054b9ce02d77701b1c04c77f2a007e4ad07eabb0f8a4d46de4d0"
   }
 }
