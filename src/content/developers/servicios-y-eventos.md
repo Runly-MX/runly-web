@@ -78,13 +78,15 @@ Los servicios marcados como **propios** solo actúan sobre lo que tu módulo cre
 
 ### Catálogo
 
+Las búsquedas que devuelven `{ items, total }` declaran en su contrato `itemReturns`: los campos de cada elemento, que son los que un bloque *Para cada uno* de una automatización ofrece como `{{elemento_<campo>}}`.
+
 | Servicio | Qué hace | Permiso del usuario |
 |---|---|---|
 | `runly.inventory` `items.read({ id })` | Un artículo: `id, name, assetTag, status` | `inventory.item.read` |
-| `runly.inventory` `items.search({ search, limit })` | `{ items, total }` | `inventory.item.read` |
+| `runly.inventory` `items.search({ search, limit })` | `{ items, total }`; cada elemento: `id, name, assetTag, status, enabled` | `inventory.item.read` |
 | `runly.inventory` `items.update({ id, name, description, status, locationId, notes })` | Actualiza el artículo; `status` solo `available` o `maintenance` | `inventory.item.update` |
 | `runly.contacts` `contacts.read({ id })` | Un contacto: `id, name, type, email, phone` | `contacts.contacts.read` |
-| `runly.contacts` `contacts.search({ search, limit })` | `{ items, total }` | `contacts.contacts.read` |
+| `runly.contacts` `contacts.search({ search, limit })` | `{ items, total }`; cada elemento: `id, name, type, email, phone` | `contacts.contacts.read` |
 | `runly.contacts` `contacts.create({ name, type, email, phone })` | Crea y devuelve el contacto | `contacts.contacts.create` |
 | `runly.contacts` `contacts.update({ id, name, type, email, phone })` | Actualiza y devuelve el contacto | `contacts.contacts.update` |
 | `runly.projects` `tasks.read({ id })` | Una tarea | `projects.task.read` |
@@ -97,7 +99,8 @@ Los servicios marcados como **propios** solo actúan sobre lo que tu módulo cre
 | `runly.calendar` `events.cancel({ id })` | Cancela un evento **propio** (el usuario debe ser dueño o administrador del calendario) | `calendar.events.update` |
 | `runly.files` `files.save({ name, mimeType, contentBase64, shareWithCompany, sourceEntityId })` | Guarda el archivo en **Archivos** del usuario (privado salvo `shareWithCompany: true`). Máximo 10 MB; imagen, PDF, texto u oficina | `files.assets.create` |
 | `runly.files` `files.signedUrl({ id })` | Enlace temporal de descarga de un archivo **propio** | `files.assets.read` |
-| `runly.notifications` `notifications.send({ userIds, title, body, link, priority, sourceEntityId })` | Notifica a usuarios de la empresa (los demás se ignoran); `priority`: `low, medium, high, critical` | Ninguno: basta ser miembro de la empresa |
+| `runly.identity` `people.read({ id })` | Nombre y correo de un miembro activo de la empresa: `id, name, email` (404 si no lo es) | Ninguno: basta ser miembro de la empresa |
+| `runly.notifications` `notifications.send({ userIds, title, body, link, priority, sourceEntityId })` | Notifica a usuarios de la empresa (los demás se ignoran); `priority`: `low, medium, high, critical`; `link` debe ser una ruta de Runly (`/app/...`) o una URL `https`, cualquier otro valor (un id o un nombre) se descarta | Ninguno: basta ser miembro de la empresa |
 | `runly.notifications` `email.send({ userIds, to, subject, body, fileId, sourceEntityId })` | Envía un correo con el SMTP de la empresa (o el de la plataforma) a personas de la empresa (`userIds`, hasta 20) y/o a una dirección externa (`to`); `fileId` adjunta un archivo de la empresa (máx. 10 MB). Solo para automatizaciones y eventos (`system`). Devuelve `sent`, `failed` | Ninguno |
 | `runly.chat` `messages.post({ channel, text, title, link, buttons, approvalId, sourceEntityId })` | Publica un mensaje en un **canal** de chat de la empresa (por su nombre exacto o su id). El mensaje aparece como una *integración* con el nombre del módulo (o de la automatización) que lo envía, nunca como una persona, y no dispara automatizaciones. Hasta 4000 caracteres; `link` solo `https`/`http` o una ruta de Runly; máx. 30 mensajes por minuto por canal. `buttons` (texto JSON, hasta 3 `{ "label", "url" }` con `https`/`http` o una ruta de Runly) agrega botones de enlace; `approvalId` (una aprobación de automatizaciones pendiente) agrega los botones **Aprobar** y **Rechazar**, que solo pueden usar quienes aprueban. Solo para automatizaciones y eventos (`system`). Devuelve `id, conversationId, channel` | Ninguno |
 | `runly.documents` `documents.generate({ kind, templateId, sourceId, values, output, name, sourceEntityId })` | Llena una plantilla de **Documentos** y guarda el resultado en **Archivos** de la empresa. `kind` es el tipo (`fleet.vehicle`, `hr.employee`, `general.manual`, un tipo de un módulo del Builder…); `sourceId` el registro de origen, o `values` (objeto, o texto JSON) para el documento general; sin `templateId` se usa la plantilla predeterminada de la empresa del tipo (o el formato estándar si existe); `output: 'pdf'` convierte a PDF cuando se puede. Usa solo plantillas de la empresa (las personales solo las usa su dueño); el tipo debe pertenecer a un módulo activo en la empresa y el usuario necesita el permiso del tipo (en automatizaciones y eventos, `system`, basta la autorización del servicio). Devuelve `id, name, mimeType, sizeBytes` (el `id` sirve como *Archivo adjunto* de `email.send`) | El del tipo de documento |
@@ -181,7 +184,7 @@ Un módulo del Builder puede mostrar en **Inicio** un contador o una lista corta
 ```
 
 - `kind`: `count` (un número grande con el total) o `list` (hasta 10 registros con título y una línea de detalle). Máximo 5 widgets por módulo.
-- `when` (opcional, hasta 5 condiciones que deben cumplirse todas): `equals`, `not_equals`, `contains`, `gt`, `lt` (solo campos numéricos) y `filled`. Los registros desactivados nunca cuentan.
+- `when` (opcional, hasta 5 condiciones que deben cumplirse todas): `equals`, `not_equals`, `contains`, `not_contains`, `gt`, `gte`, `lt`, `lte` (solo campos numéricos), `filled` y `empty`. Los registros desactivados nunca cuentan.
 - `permission` (opcional): el permiso que hace falta para ver el widget; por omisión, el de lectura de la entidad. Quien no lo tiene no ve el widget en «Personalizar».
 - El total es exacto (se cuenta en la base de datos, no sobre una página). Al hacer clic se abre tu módulo. Cada persona puede ocultarlo desde **Personalizar**.
 - En `module.manifest.js` el contrato equivalente es `homeWidgets: [{ key, label, kind, model, permission, where?, titleField?, detailField?, sortField?, sortDir?, limit? }]`. Si un campo ya no existe, el widget responde con un error claro en vez de mostrar datos incorrectos.
@@ -216,27 +219,44 @@ Desde un evento solo funcionan los servicios que no necesitan a una persona: not
 
 | Evento | `payload` |
 |---|---|
-| `inventory.item.created` | `{ id, name, assetTag }` |
-| `inventory.item.updated` | `{ id, name }` |
-| `contacts.contact.created` | `{ id }` |
-| `projects.task.created` | `{ id, projectId, title }` |
-| `calendar.event.created` | `{ id, title, startAt, sourceModule, sourceEntityId }` |
-| `calendar.event.updated` | `{ id, title, startAt, sourceModule, sourceEntityId }` |
-| `calendar.event.cancelled` | `{ id, title, startAt, sourceModule, sourceEntityId }` |
-| `files.file.created` | `{ id, name, mimeType }` (solo archivos subidos a Archivos, no adjuntos de registros) |
-| `fleet.vehicle.created` | `{ id, plate, status }` |
-| `fleet.vehicle.updated` | `{ id, plate, status }` |
-| `projects.task.completed` | `{ id, projectId, title }` (al pasar a un estado de tipo hecho) |
-| `projects.task.rescheduled` | `{ id, projectId, title, startDate, dueDate }` (fechas AAAA-MM-DD o `null`; al cambiar el inicio o la entrega, desde el formulario, el Gantt o la IA) |
+| `inventory.item.created` | `{ id, name, assetTag, status, serialNumber, categoryId, categoryName, brandName, locationId, locationName }` |
+| `inventory.item.updated` | `{ id, name, assetTag, status, serialNumber, categoryId, categoryName, brandName, locationId, locationName }` |
+| `inventory.item.deleted` | `{ id, name, assetTag, status, serialNumber, categoryId, categoryName, brandName, locationId, locationName }` (los nombres de tipo, marca y ubicación vienen vacíos) |
+| `contacts.contact.created` | `{ id, name, type, email, phone }` |
+| `contacts.contact.updated` | `{ id, name, type, email, phone }` |
+| `contacts.contact.deactivated` | `{ id, name, type, email, phone }` |
+| `contacts.contact.deleted` | `{ id, name, type, email, phone }` (eliminación definitiva) |
+| `projects.task.created` | `{ id, projectId, title, statusId, assigneeId, priority, startDate, dueDate }` |
+| `projects.task.updated` | `{ id, projectId, title, statusId, assigneeId, priority, startDate, dueDate }` |
+| `projects.task.deleted` | `{ id, projectId, title, statusId, assigneeId, priority, startDate, dueDate }` |
+| `projects.task.completed` | `{ id, projectId, title, statusId, assigneeId, priority, startDate, dueDate }` (al pasar a un estado de tipo hecho) |
+| `projects.task.rescheduled` | `{ id, projectId, title, statusId, assigneeId, priority, startDate, dueDate }` (fechas AAAA-MM-DD o `null`; al cambiar el inicio o la entrega, desde el formulario, el Gantt o la IA) |
 | `projects.time.logged` | `{ id, taskId, projectId, minutes }` (al registrar tiempo a mano o al detener el cronómetro) |
-| `hr.employee.created` | `{ id, firstName, lastName }` |
-| `purchases.order.approved` | `{ id, caseId, status }` |
-| `purchases.order.issued` | `{ id, caseId, status }` |
-| `contacts.contact.updated` | `{ id }` |
-| `purchases.request.created` | `{ id, caseId, status }` |
-| `purchases.order.cancelled` | `{ id, caseId, status }` |
-| `purchases.invoice.paid` | `{ id, caseId, status }` (al quedar pagada por completo) |
-| `ledger.transaction.created` | `{ id, accountId, deposito, retiro }` (un movimiento registrado a mano o desde la app; las importaciones masivas no lo publican; sin nombres de cuenta ni de personas) |
+| `calendar.event.created` | `{ id, title, startAt, endAt, location, sourceModule, sourceEntityId }` |
+| `calendar.event.updated` | `{ id, title, startAt, endAt, location, sourceModule, sourceEntityId }` |
+| `calendar.event.cancelled` | `{ id, title, startAt, endAt, location, sourceModule, sourceEntityId }` |
+| `files.file.created` | `{ id, name, mimeType, sizeBytes }` (solo archivos subidos a Archivos, no adjuntos de registros) |
+| `files.file.deleted` | `{ id, name, mimeType, sizeBytes }` (solo archivos de Archivos) |
+| `fleet.vehicle.created` | `{ id, plate, status, brand, model, year, color }` |
+| `fleet.vehicle.updated` | `{ id, plate, status, brand, model, year, color }` |
+| `fleet.vehicle.deactivated` | `{ id, plate, status, brand, model, year, color }` |
+| `hr.employee.created` | `{ id, firstName, lastName, employeeCode, workEmail, jobTitle, department, status }` |
+| `hr.employee.updated` | `{ id, firstName, lastName, employeeCode, workEmail, jobTitle, department, status }` |
+| `hr.employee.deactivated` | `{ id, firstName, lastName, employeeCode, workEmail, jobTitle, department, status }` |
+| `purchases.request.created` | `{ id, caseId, status, number, total, currency, supplierId }` (`total` es el estimado y `supplierId` viene vacío) |
+| `purchases.order.approved` | `{ id, caseId, status, number, total, currency, supplierId }` |
+| `purchases.order.issued` | `{ id, caseId, status, number, total, currency, supplierId }` |
+| `purchases.order.updated` | `{ id, caseId, status, number, total, currency, supplierId }` (al editar una orden en borrador) |
+| `purchases.order.cancelled` | `{ id, caseId, status, number, total, currency, supplierId }` |
+| `purchases.invoice.paid` | `{ id, caseId, status, number, total, currency, supplierId }` (al quedar pagada por completo) |
+| `purchases.order.corrected` | `{ id, caseId, status, number, total, currency, supplierId }` (corrección administrativa de una orden registrada; el detalle queda en su historial de revisiones) |
+| `purchases.invoice.corrected` | `{ id, caseId, status, number, total, currency, supplierId }` (corrección administrativa de una factura registrada) |
+| `purchases.receipt.reversed` | `{ id, receiptId, orderId, caseId, orderStatus, number }` (reverso total o parcial de una recepción; la original se conserva) |
+| `purchases.invoice.payment.recorded` | `{ id, invoiceId, caseId, kind, amount, currency, invoiceStatus, paidAmount, balance }` (cada abono o pago; un reintento con la misma clave de operación no lo repite) |
+| `purchases.invoice.payment.reversed` | `{ id, invoiceId, caseId, kind, amount, currency, invoiceStatus, paidAmount, balance }` (`kind` es `REVERSAL` y `amount` es negativo; el pago original se conserva) |
+| `ledger.transaction.created` | `{ id, accountId, deposito, retiro, fecha, categoryId }` (un movimiento registrado a mano o desde la app; las importaciones masivas no lo publican; sin nombres de cuenta ni de personas) |
+| `ledger.transaction.updated` | `{ id, accountId, deposito, retiro, fecha, categoryId }` |
+| `ledger.transaction.deleted` | `{ id, accountId, deposito, retiro, fecha, categoryId }` (al mandar el movimiento a la papelera) |
 | `lms.enrollment.completed` | `{ id, courseId, learnerId }` (al completar el último requisito del curso) |
 
 Con `sourceModule` sabes si un evento de calendario lo creó tu módulo (por ejemplo, para marcar tu orden como reagendada cuando alguien mueve la cita desde el calendario). Libro de cuentas y Finanzas personales no publican eventos: su información depende del acceso por cuenta o cartera de cada persona.

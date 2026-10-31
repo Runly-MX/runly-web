@@ -1,10 +1,10 @@
 {
   "source": "runly/docs/developers",
-  "revision": "0c870ba22caeb3d4229b4e283a64b4423b68405d",
+  "revision": "07562725efd1520acf634ce8381513b65b5dbd30",
   "dirty": false,
   "files": {
     "api-modulos.md": "1d8fba3f177887dfec05ebe0f170f335e87d220793b2d6644c19902bd8b48d39",
-    "automatizaciones.md": "f8f830c5ac0a6a0817ba56386773d6b75f62087153b9a81269a4328a78e87579",
+    "automatizaciones.md": "420eea9784a5033ca30fd4d6a17cfb6fe9b02d98c315b628b6578371673f7773",
     "campos.md": "3e35cbda0c30704b1d3ad54524e88c3cb7424a9bbe4f9f508586fee36a51ed76",
     "catalogo-comunitario.md": "243be5948974d1b602be2f4d8803591fd2ea2aaaa73c3a1a6d7a9d6753a0678e",
     "catalogo.md": "af531391bcd2741d1b54fe0bb6ea65f1dc3828db2776d45a6a6649505bc44274",
@@ -19,7 +19,7 @@
     "mcp.md": "d3462990ff52b824a2119e6e8371a61c8a4b83d0bbc85a4854e9fff88cb6754b",
     "pantallas-react.md": "61f694d1ba63ff8ec9bc2e2f46dec06a8b9d94b3364f4a3f1c26187b93dcf1ed",
     "relaciones.md": "d406a832bfa144f38f80bb16a59f862d00bfd17ce03bdf41fff60c9a28c2968f",
-    "servicios-y-eventos.md": "b5ff7204f22cd15abf212b2b52edab1d71158475418d238e73b93b66afd28f58",
+    "servicios-y-eventos.md": "ba726f7367cebb409fbfc21c3b5ccd7e29a580a108ce4f9fe13fa5050bb9c820",
     "solucion-problemas.md": "ee24af6e4dd47a8f424c8717fe1fc07be21afa4f6a02ee3aa15560a6c8ad1c99",
     "studio-template-package.md": "4aea1b75c674054b9ce02d77701b1c04c77f2a007e4ad07eabb0f8a4d46de4d0"
   }

@@ -185,16 +185,12 @@
       "icon": "LayoutDashboard"
     },
     {
-      "path": "/purchases/cases",
-      "icon": "FolderKanban"
+      "path": "/purchases/approvals",
+      "icon": "BadgeCheck"
     },
     {
       "path": "/purchases/requests",
       "icon": "FilePlus2"
-    },
-    {
-      "path": "/purchases/approvals",
-      "icon": "BadgeCheck"
     },
     {
       "path": "/purchases/orders",
@@ -211,6 +207,10 @@
     {
       "path": "/purchases/payments",
       "icon": "Wallet"
+    },
+    {
+      "path": "/purchases/cases",
+      "icon": "FolderKanban"
     },
     {
       "path": "/purchases/suppliers",
