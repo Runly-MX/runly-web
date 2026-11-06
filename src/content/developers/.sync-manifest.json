@@ -1,14 +1,14 @@
 {
   "source": "runly/docs/developers",
-  "revision": "516e31ffc1b333b635f0f087a33b49b110dee5de",
+  "revision": "6b2256831f8bd75147eed15db371e312f1464c03",
   "dirty": false,
   "files": {
-    "api-modulos.md": "1d8fba3f177887dfec05ebe0f170f335e87d220793b2d6644c19902bd8b48d39",
+    "api-modulos.md": "ddc327802950dc04161275fadae130133900b0287871e77fa20804edeb4797a0",
     "automatizaciones.md": "b915570aa2bc4d3d0676e810abbd7f51e1b99ba9e549c215c259ee3cffa921f2",
     "campos.md": "3e35cbda0c30704b1d3ad54524e88c3cb7424a9bbe4f9f508586fee36a51ed76",
     "catalogo-comunitario.md": "243be5948974d1b602be2f4d8803591fd2ea2aaaa73c3a1a6d7a9d6753a0678e",
     "catalogo.md": "af531391bcd2741d1b54fe0bb6ea65f1dc3828db2776d45a6a6649505bc44274",
-    "componentes.md": "9eb11fe660af8a3b9220e51eccf63f5ef632e1036ebf463589b2e448cdbcd191",
+    "componentes.md": "e7d82aa37cc0868b229242b4e5c5ee605b0824e71d3e2f59e16fb607902e0d3f",
     "conexiones.md": "21702adabebcb7cff6647dc294f78d1619373dcd74719ecabc4c02dc1d5f7577",
     "enlaces-publicos.md": "a2ca23af7c603dd3dfa5799b54cf91d5744c3710b2e0e818f14a4d072252aa84",
     "flujo-zip.md": "6f334db8f1d7dc2ca95eac369b814c3989ab3d131210d4c9c439f6e3d5187141",

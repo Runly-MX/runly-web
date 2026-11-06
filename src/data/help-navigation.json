@@ -133,6 +133,10 @@
       "icon": "BadgeDollarSign"
     },
     {
+      "path": "/app/m/runly.pos/pos/citas",
+      "icon": "CalendarClock"
+    },
+    {
       "path": "/app/m/runly.pos/pos/comandero",
       "icon": "Armchair"
     },
@@ -165,6 +169,10 @@
     {
       "path": "/inventory/media",
       "icon": "Images"
+    },
+    {
+      "path": "/inventory/map",
+      "icon": "MapPinned"
     },
     {
       "path": "/inventory/catalogs",
@@ -307,34 +315,6 @@
     {
       "path": "/",
       "icon": "Globe"
-    },
-    {
-      "path": "/pages",
-      "icon": "FileText"
-    },
-    {
-      "path": "/blog",
-      "icon": "BookOpen"
-    },
-    {
-      "path": "/theme",
-      "icon": "Palette"
-    },
-    {
-      "path": "/templates",
-      "icon": "LayoutTemplate"
-    },
-    {
-      "path": "/forms",
-      "icon": "FormInput"
-    },
-    {
-      "path": "/payments",
-      "icon": "CreditCard"
-    },
-    {
-      "path": "/settings",
-      "icon": "Settings"
     }
   ],
   "runly.growth": [
