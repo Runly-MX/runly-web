@@ -1,6 +1,6 @@
 {
   "source": "runly/docs/developers",
-  "revision": "79eb25af3d3d9ae967de6f249cbfd36a05e6f9ae",
+  "revision": "034fbece0055e6dbaed2fdd483539e9e9facd2ad",
   "dirty": false,
   "files": {
     "api-modulos.md": "ddc327802950dc04161275fadae130133900b0287871e77fa20804edeb4797a0",
@@ -17,7 +17,7 @@
     "iconos.md": "93a3a7f4b0253d8118777a68bdc932b98f0743a3dec307a3c6ab14ee85306c32",
     "index.md": "9f228626af7d0843dc2f7849433abf569a7a317b188dc2aa171418656b607d95",
     "librerias.md": "26b73bce869c6a04617aeda0935c93c1ef832d318c8264ba5a6c3fbba6377901",
-    "mcp.md": "d3462990ff52b824a2119e6e8371a61c8a4b83d0bbc85a4854e9fff88cb6754b",
+    "mcp.md": "bb8141fd13dc51d4c74eb98e25e675ebee2e388c103265ca79e3f7e8d4e9b5f7",
     "pantallas-react.md": "edd0665247dff8cecaad129c9a95c01bbedf75bb1baaec78df22eeca5b53873c",
     "relaciones.md": "d406a832bfa144f38f80bb16a59f862d00bfd17ce03bdf41fff60c9a28c2968f",
     "servicios-y-eventos.md": "ba261a3ef28c7293ecec3b99a096ad7eb0abef3c70e49bfc54943fedfc3bb799",
