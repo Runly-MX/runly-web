@@ -124,8 +124,8 @@ describe("filters and routes", () => {
     expect(hasStaticPage("hub", items[0])).toBe(true);
     expect(hasStaticPage("hub", hidden)).toBe(false);
     expect(hasStaticPage("fixtures", hidden)).toBe(true);
-    expect(pageIsIndexable("fixtures", items[0])).toBe(false);
-    expect(pageIsIndexable("hub", items[0])).toBe(true);
+    expect(pageIsIndexable("fixtures", true, items[0])).toBe(false);
+    expect(pageIsIndexable("hub", true, items[0])).toBe(true);
   });
 });
 

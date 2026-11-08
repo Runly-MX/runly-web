@@ -6,14 +6,16 @@
 // inside Runly). Used by the static pages and by the runtime loader.
 import { useEffect, useState } from "react";
 import { createHubSource, previewUrl } from "../../../lib/marketplace-resources/client";
+import { liveStateFrom, liveView, type LiveState } from "../../../lib/marketplace-resources/live";
 import { categoryLabel } from "../../../lib/marketplace-resources/filters";
 import { MARKETPLACE_BASE, publisherPath, resourcePath, typePath } from "../../../lib/marketplace-resources/routes";
 import { T, TYPE_TEXT } from "../../../lib/marketplace-resources/text";
-import type { Availability, ResourceDetail } from "../../../lib/marketplace-resources/types";
+import type { ResourceDetail } from "../../../lib/marketplace-resources/types";
 import { AvailabilityChip, Panel, TrustBadge, TypeChip } from "./parts";
 import ResourceStateBlock from "./ResourceStateBlock";
 
 const d = T.detail;
+const L = T.live;
 const date = (iso: string) => new Date(iso).toLocaleDateString("es-MX", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
 const bytes = (n: number) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : n >= 1024 ? `${Math.round(n / 1024)} KB` : `${n} B`);
 
@@ -46,38 +48,46 @@ function Meta({ label, children }: { label: string; children: React.ReactNode })
   );
 }
 
-// Static pages are built once: a release withdrawn or revoked after the build
-// would still read as available. `checkLive` asks the Hub once on load and, only
-// when it answers gone (410) or not found (404), downgrades the page and hides
-// the install guidance. Any other outcome (offline, error) keeps the built page.
-type Live = { availability: Exclude<Availability, "available">; replacement: { resourceKey: string; version: string } | null } | null;
-function useLiveAvailability(r: ResourceDetail, hubUrl: string | null | undefined, enabled: boolean): Live {
-  const [live, setLive] = useState<Live>(null);
+// Static pages are built once, so `checkLive` asks the Hub for the CURRENT
+// availability before presenting the resource as usable (see live.ts).
+function useLiveState(r: ResourceDetail, hubUrl: string | null | undefined, enabled: boolean): [LiveState, () => void] {
+  const [state, setState] = useState<LiveState>(enabled ? { phase: "checking" } : { phase: "not_required" });
+  const [attempt, setAttempt] = useState(0);
   useEffect(() => {
     if (!enabled) return;
     let alive = true;
-    createHubSource({ hubUrl }).detail(r.type, r.slug).then((result) => {
-      if (!alive) return;
-      if (result.status === "gone") setLive({ availability: result.availability === "revoked" ? "revoked" : "withdrawn", replacement: result.replacement });
-      else if (result.status === "not_found") setLive({ availability: "withdrawn", replacement: null });
-    });
+    setState({ phase: "checking" });
+    createHubSource({ hubUrl }).detail(r.type, r.slug)
+      .then((result) => { if (alive) setState(liveStateFrom(result)); })
+      .catch(() => { if (alive) setState({ phase: "error" }); });
     return () => { alive = false; };
-  }, [enabled, hubUrl, r.type, r.slug]);
-  return live;
+  }, [enabled, hubUrl, r.type, r.slug, attempt]);
+  return [state, () => setAttempt((n) => n + 1)];
+}
+
+function LiveNotice({ kind, onRetry }: { kind: "checking" | "missing" | "error"; onRetry: () => void }) {
+  const copy = { checking: [L.checkingTitle, L.checkingBody, "border-slate-200 bg-slate-50 text-slate-700"], missing: [L.missingTitle, L.missingBody, "border-slate-200 bg-slate-50 text-slate-700"], error: [L.errorTitle, L.errorBody, "border-amber-200 bg-amber-50 text-amber-900"] }[kind];
+  return (
+    <div className={`rounded-3xl border p-4 ${copy[2]}`} role={kind === "error" ? "alert" : "status"} aria-live="polite" data-live-notice={kind}>
+      <p className="font-bold">{copy[0]}</p>
+      <p className="mt-1 text-sm">{copy[1]}</p>
+      {kind === "error" && <button type="button" onClick={onRetry} className="mt-3 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">{T.states.retry}</button>}
+    </div>
+  );
 }
 
 export default function ResourceDetailView({ resource: built, hubUrl, backHref, checkLive = false }: { resource: ResourceDetail; hubUrl?: string | null; backHref?: string; checkLive?: boolean }) {
-  const live = useLiveAvailability(built, hubUrl, checkLive);
-  const r: ResourceDetail = live ? { ...built, availability: live.availability, trust: live.availability === "revoked" ? "revoked" : built.trust } : built;
+  const [live, retry] = useLiveState(built, hubUrl, checkLive);
+  const view = liveView(built, live);
+  const r = view.resource;
   const req = r.requirements;
   const requirementRows = ([[d.modules, req.modules], [d.fonts, req.fonts], [d.permissions, req.permissions], [d.services, req.services]] as const).filter(([, v]) => v.length > 0);
   const hasRequirements = requirementRows.length > 0 || !!req.builder;
   const paragraphs = r.description.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
-  const unavailable = r.availability !== "available";
   const sol = r.solution;
 
   return (
-    <article data-resource={r.resourceKey} data-availability={r.availability} data-live-checked={live ? "changed" : undefined}>
+    <article data-resource={r.resourceKey} data-availability={r.availability} data-live={live.phase}>
       <nav aria-label="Ruta" className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-slate-500">
         <a href={`${MARKETPLACE_BASE}/`} className="font-semibold text-orange-600 hover:underline">{T.breadcrumbHome}</a>
         <span aria-hidden="true">/</span>
@@ -102,9 +112,11 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
         </p>
       </header>
 
-      {unavailable && (
+      {view.notice && (
         <div className="mt-6 max-w-3xl">
-          <ResourceStateBlock kind={r.availability === "revoked" ? "revoked" : "withdrawn"} replacement={live?.replacement ?? undefined} compact />
+          {view.notice === "withdrawn" || view.notice === "revoked"
+            ? <ResourceStateBlock kind={view.notice} replacement={view.replacement} compact />
+            : <LiveNotice kind={view.notice} onRetry={retry} />}
         </div>
       )}
 
@@ -179,12 +191,13 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
 
           {r.versions.length > 0 && (
             <Panel title={d.versions}>
+              {!view.versionStatuses && <p data-versions-history>{L.versionsHistory}</p>}
               <ul className="space-y-3">
                 {r.versions.map((v) => (
                   <li key={v.releaseId} className="rounded-2xl border border-slate-200 p-3" data-version={v.version} data-status={v.status}>
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <p className="font-semibold text-slate-900">{T.version(v.version)}</p>
-                      <p className="text-xs text-slate-500">{d.status[v.status]} · {date(v.publishedAt)} · {bytes(v.size)}</p>
+                      <p className="text-xs text-slate-500">{view.versionStatuses ? `${d.status[v.status]} · ` : ""}{date(v.publishedAt)} · {bytes(v.size)}</p>
                     </div>
                     {v.changelog && <p className="mt-1 whitespace-pre-line">{v.changelog}</p>}
                     {v.replacement && <p className="mt-1 font-medium text-amber-800">{d.replacedBy(v.replacement.version)}</p>}
@@ -196,7 +209,7 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
-          {r.install && !unavailable && (
+          {r.install && view.showInstall && (
             <section className="rounded-3xl border border-orange-200 bg-orange-50/60 p-5" aria-labelledby="usar-en-runly">
               <h2 id="usar-en-runly" className="text-lg font-bold text-slate-900">{d.howTo}</h2>
               <p className="mt-1 text-sm text-slate-600">{d.howToIntro}</p>

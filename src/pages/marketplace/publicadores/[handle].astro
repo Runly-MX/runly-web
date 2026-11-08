@@ -7,7 +7,7 @@ import CatalogShell from "../../../components/marketplace/resources/CatalogShell
 import ResourceCatalog from "../../../components/marketplace/resources/ResourceCatalog.astro";
 import { publishersWithPages, typesWithResources } from "../../../lib/marketplace-resources/filters";
 import { MARKETPLACE_BASE, pageIsIndexable, publisherPath } from "../../../lib/marketplace-resources/routes";
-import { getBuildSource, loadCatalogForBuild, sourceKind } from "../../../lib/marketplace-resources/source";
+import { indexingAuthorized, getBuildSource, loadCatalogForBuild, sourceKind } from "../../../lib/marketplace-resources/source";
 import { T } from "../../../lib/marketplace-resources/text";
 import type { PublisherProfile, ResourceSummary, ResourceType } from "../../../lib/marketplace-resources/types";
 
@@ -38,7 +38,7 @@ const since = new Date(profile.memberSince).toLocaleDateString("es-MX", { year: 
   description={T.resourcesBy(profile.displayName)}
   path={publisherPath(profile.handle).replace(/\/$/, "")}
   source={source}
-  noindex={!pageIsIndexable(source) || profile.state === "revoked"}
+  noindex={!pageIsIndexable(source, indexingAuthorized()) || profile.state === "revoked" || !items.some((r) => pageIsIndexable(source, true, r))}
   types={types}
   active={null}
 >

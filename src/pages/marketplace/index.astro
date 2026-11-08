@@ -12,7 +12,7 @@ import ResourceStateBlock from "../../components/marketplace/resources/ResourceS
 import { resolveIcon } from "../../lib/icons";
 import { publishersWithPages, typesWithResources } from "../../lib/marketplace-resources/filters";
 import { pageIsIndexable, typePath } from "../../lib/marketplace-resources/routes";
-import { loadCatalogForBuild, sourceKind } from "../../lib/marketplace-resources/source";
+import { indexingAuthorized, loadCatalogForBuild, sourceKind } from "../../lib/marketplace-resources/source";
 import { T, TYPE_TEXT } from "../../lib/marketplace-resources/text";
 import type { ResourceType } from "../../lib/marketplace-resources/types";
 
@@ -26,7 +26,7 @@ const types = typesWithResources(items);
 const publishers = publishersWithPages(items, source);
 const ICON: Record<ResourceType, string> = { studio_template: "Palette", automation: "Workflow", website_template: "Globe", solution: "Package" };
 const TINT: Record<ResourceType, string> = { studio_template: "bg-violet-50 text-violet-700", automation: "bg-amber-50 text-amber-700", website_template: "bg-sky-50 text-sky-700", solution: "bg-emerald-50 text-emerald-700" };
-const noindex = !pageIsIndexable(source) || items.length === 0;
+const noindex = !pageIsIndexable(source, indexingAuthorized()) || items.length === 0;
 ---
 
 <CatalogShell

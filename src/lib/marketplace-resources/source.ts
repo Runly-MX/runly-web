@@ -20,6 +20,9 @@ export function resolveSourceKind(env: { MARKETPLACE_SOURCE?: string; DEV?: bool
   return requested;
 }
 
+/** Explicit authorization to index the Marketplace (shared with the sitemap filter). Off by default. */
+export const indexingAuthorized = () => import.meta.env.MARKETPLACE_SITEMAP === "1";
+
 export const sourceKind = (): DataSource => resolveSourceKind({ MARKETPLACE_SOURCE: import.meta.env.MARKETPLACE_SOURCE, DEV: import.meta.env.DEV, MARKETPLACE_ALLOW_FIXTURE_BUILD: import.meta.env.MARKETPLACE_ALLOW_FIXTURE_BUILD });
 
 let source: Promise<CatalogSource> | null = null;

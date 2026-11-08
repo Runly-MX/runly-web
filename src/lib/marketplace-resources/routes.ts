@@ -31,8 +31,13 @@ export const runtimeResourcePath = (type: ResourceType, slug: string) => `${MARK
 export const hasStaticPage = (source: DataSource, resource: ResourceSummary) =>
   source === "fixtures" || (resource.indexable && resource.listed && resource.availability === "available");
 
-/** Fixture data and an unpublished catalog must never be indexed. */
-export const pageIsIndexable = (source: DataSource, resource?: ResourceSummary) =>
-  source === "hub" && (resource ? resource.indexable && resource.listed && resource.availability === "available" : true);
+/**
+ * Same opt-in as the sitemap (MARKETPLACE_SITEMAP=1, see scripts/marketplace-sitemap-filter.mjs):
+ * without that explicit authorization every /marketplace/* page is noindex, even with real
+ * Hub data. With it, only Hub data is indexed, and a resource only when it is indexable,
+ * listed and available. Fixture data is never indexed.
+ */
+export const pageIsIndexable = (source: DataSource, authorized: boolean, resource?: ResourceSummary) =>
+  authorized && source === "hub" && (resource ? resource.indexable && resource.listed && resource.availability === "available" : true);
 
 export const pathForSummary = (r: ResourceSummary) => resourcePath(r.type, r.slug);

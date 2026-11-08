@@ -7,7 +7,7 @@ import CatalogShell from "../../../components/marketplace/resources/CatalogShell
 import ResourceCatalog from "../../../components/marketplace/resources/ResourceCatalog.astro";
 import { typesWithResources } from "../../../lib/marketplace-resources/filters";
 import { MARKETPLACE_BASE, TYPE_SEGMENT, pageIsIndexable } from "../../../lib/marketplace-resources/routes";
-import { loadCatalogForBuild, sourceKind } from "../../../lib/marketplace-resources/source";
+import { indexingAuthorized, loadCatalogForBuild, sourceKind } from "../../../lib/marketplace-resources/source";
 import { T, TYPE_TEXT } from "../../../lib/marketplace-resources/text";
 import type { ResourceSummary, ResourceType } from "../../../lib/marketplace-resources/types";
 
@@ -29,7 +29,7 @@ const text = TYPE_TEXT[type];
   description={text.description}
   path={`${MARKETPLACE_BASE}/${TYPE_SEGMENT[type]}`}
   source={source}
-  noindex={!pageIsIndexable(source)}
+  noindex={!pageIsIndexable(source, indexingAuthorized())}
   types={types}
   active={type}
 >

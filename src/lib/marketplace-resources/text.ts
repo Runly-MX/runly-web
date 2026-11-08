@@ -67,6 +67,15 @@ export const T = {
     fixtureBody: "Estás viendo recursos ficticios de desarrollo. No son reales, no se pueden instalar y esta página no se indexa.",
     snapshotAt: (when: string) => `Catálogo del ${when}.`,
   },
+  live: {
+    checkingTitle: "Comprobando la disponibilidad actual",
+    checkingBody: "Consultamos el catálogo antes de mostrar cómo usar este recurso en Runly.",
+    missingTitle: "Este recurso ya no está disponible",
+    missingBody: "Ya no aparece en el catálogo público. Por ahora no se puede usar desde Runly.",
+    errorTitle: "No se pudo verificar la disponibilidad actual",
+    errorBody: "No pudimos consultar el catálogo. Mientras tanto no lo presentamos como disponible; la información general sigue abajo.",
+    versionsHistory: "Historial de versiones publicadas. Ninguna está disponible ahora.",
+  },
   detail: {
     description: "Descripción",
     requirements: "Requisitos",

@@ -8,7 +8,7 @@ import CatalogShell from "../../../components/marketplace/resources/CatalogShell
 import ResourceDetailView from "../../../components/marketplace/resources/ResourceDetailView";
 import { typesWithResources } from "../../../lib/marketplace-resources/filters";
 import { TYPE_SEGMENT, hasStaticPage, pageIsIndexable, resourcePath } from "../../../lib/marketplace-resources/routes";
-import { getBuildSource, loadCatalogForBuild, sourceKind } from "../../../lib/marketplace-resources/source";
+import { indexingAuthorized, getBuildSource, loadCatalogForBuild, sourceKind } from "../../../lib/marketplace-resources/source";
 import type { ResourceDetail } from "../../../lib/marketplace-resources/types";
 
 export const prerender = true;
@@ -36,7 +36,7 @@ const source = sourceKind();
   description={resource.summary}
   path={resourcePath(resource.type, resource.slug).replace(/\/$/, "")}
   source={source}
-  noindex={!pageIsIndexable(source, resource)}
+  noindex={!pageIsIndexable(source, indexingAuthorized(), resource)}
   types={types}
   active={resource.type}
 >
