@@ -4,12 +4,12 @@
 // ResourceDetail: all text is rendered as React text nodes (never HTML), the
 // only action is "copy release id" (no downloads, no installs: those happen
 // inside Runly). Used by the static pages and by the runtime loader.
-import { useState } from "react";
-import { previewUrl } from "../../../lib/marketplace-resources/client";
+import { useEffect, useState } from "react";
+import { createHubSource, previewUrl } from "../../../lib/marketplace-resources/client";
 import { categoryLabel } from "../../../lib/marketplace-resources/filters";
 import { MARKETPLACE_BASE, publisherPath, resourcePath, typePath } from "../../../lib/marketplace-resources/routes";
 import { T, TYPE_TEXT } from "../../../lib/marketplace-resources/text";
-import type { ResourceDetail } from "../../../lib/marketplace-resources/types";
+import type { Availability, ResourceDetail } from "../../../lib/marketplace-resources/types";
 import { AvailabilityChip, Panel, TrustBadge, TypeChip } from "./parts";
 import ResourceStateBlock from "./ResourceStateBlock";
 
@@ -46,7 +46,29 @@ function Meta({ label, children }: { label: string; children: React.ReactNode })
   );
 }
 
-export default function ResourceDetailView({ resource: r, hubUrl, backHref }: { resource: ResourceDetail; hubUrl?: string | null; backHref?: string }) {
+// Static pages are built once: a release withdrawn or revoked after the build
+// would still read as available. `checkLive` asks the Hub once on load and, only
+// when it answers gone (410) or not found (404), downgrades the page and hides
+// the install guidance. Any other outcome (offline, error) keeps the built page.
+type Live = { availability: Exclude<Availability, "available">; replacement: { resourceKey: string; version: string } | null } | null;
+function useLiveAvailability(r: ResourceDetail, hubUrl: string | null | undefined, enabled: boolean): Live {
+  const [live, setLive] = useState<Live>(null);
+  useEffect(() => {
+    if (!enabled) return;
+    let alive = true;
+    createHubSource({ hubUrl }).detail(r.type, r.slug).then((result) => {
+      if (!alive) return;
+      if (result.status === "gone") setLive({ availability: result.availability === "revoked" ? "revoked" : "withdrawn", replacement: result.replacement });
+      else if (result.status === "not_found") setLive({ availability: "withdrawn", replacement: null });
+    });
+    return () => { alive = false; };
+  }, [enabled, hubUrl, r.type, r.slug]);
+  return live;
+}
+
+export default function ResourceDetailView({ resource: built, hubUrl, backHref, checkLive = false }: { resource: ResourceDetail; hubUrl?: string | null; backHref?: string; checkLive?: boolean }) {
+  const live = useLiveAvailability(built, hubUrl, checkLive);
+  const r: ResourceDetail = live ? { ...built, availability: live.availability, trust: live.availability === "revoked" ? "revoked" : built.trust } : built;
   const req = r.requirements;
   const requirementRows = ([[d.modules, req.modules], [d.fonts, req.fonts], [d.permissions, req.permissions], [d.services, req.services]] as const).filter(([, v]) => v.length > 0);
   const hasRequirements = requirementRows.length > 0 || !!req.builder;
@@ -55,7 +77,7 @@ export default function ResourceDetailView({ resource: r, hubUrl, backHref }: { 
   const sol = r.solution;
 
   return (
-    <article data-resource={r.resourceKey} data-availability={r.availability}>
+    <article data-resource={r.resourceKey} data-availability={r.availability} data-live-checked={live ? "changed" : undefined}>
       <nav aria-label="Ruta" className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-slate-500">
         <a href={`${MARKETPLACE_BASE}/`} className="font-semibold text-orange-600 hover:underline">{T.breadcrumbHome}</a>
         <span aria-hidden="true">/</span>
@@ -82,7 +104,7 @@ export default function ResourceDetailView({ resource: r, hubUrl, backHref }: { 
 
       {unavailable && (
         <div className="mt-6 max-w-3xl">
-          <ResourceStateBlock kind={r.availability === "revoked" ? "revoked" : "withdrawn"} compact />
+          <ResourceStateBlock kind={r.availability === "revoked" ? "revoked" : "withdrawn"} replacement={live?.replacement ?? undefined} compact />
         </div>
       )}
 

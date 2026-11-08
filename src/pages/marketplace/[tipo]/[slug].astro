@@ -41,6 +41,6 @@ const source = sourceKind();
   active={resource.type}
 >
   <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-    <ResourceDetailView resource={resource} hubUrl={import.meta.env.PUBLIC_RUNLY_HUB_URL} client:load />
+    <ResourceDetailView resource={resource} hubUrl={import.meta.env.PUBLIC_RUNLY_HUB_URL} checkLive={source === "hub"} client:load />
   </div>
 </CatalogShell>

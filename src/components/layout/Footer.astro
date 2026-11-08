@@ -2,6 +2,7 @@
 // src/components/layout/Footer.astro
 import type { FooterDictionary } from "../../i18n/types";
 import { COMPANY_NAME, COMPANY_URL } from "../../consts";
+import { MARKETPLACE_NAV_HREF, marketplaceNavEnabled } from "../../lib/marketplace-nav";
 
 interface Props {
   locale: "es" | "en";
@@ -29,6 +30,7 @@ const prefix = locale === "es" ? "" : "/en";
         <h4 class="text-xs font-bold text-white uppercase tracking-wider mb-4">{footer.platformHeading}</h4>
         <ul class="space-y-2.5 text-xs text-slate-400">
           <li><a class="hover:text-orange-400 transition-colors" href={`${prefix}/modulos`}>{footer.links.modulesCatalog}</a></li>
+          {marketplaceNavEnabled() && <li><a class="hover:text-orange-400 transition-colors" href={MARKETPLACE_NAV_HREF}>{footer.links.marketplace}</a></li>}
           <li><a class="hover:text-orange-400 transition-colors" href={`${prefix}/arquitectura`}>{footer.links.rm3Architecture}</a></li>
           <li><a class="hover:text-orange-400 transition-colors" href={`${prefix}/mirai`}>{footer.links.mirai}</a></li>
           <li><a class="hover:text-orange-400 transition-colors" href="/runly-developer">Runly Developer</a></li>

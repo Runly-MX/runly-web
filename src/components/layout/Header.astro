@@ -15,9 +15,11 @@ import {
   LayoutGrid,
   CodeXml,
   Braces,
+  Store,
 } from "@lucide/astro";
 import type { NavDictionary } from "../../i18n/types";
 import NavMenuItem from "./NavMenuItem.astro";
+import { MARKETPLACE_NAV_HREF, marketplaceNavEnabled } from "../../lib/marketplace-nav";
 
 interface Props {
   locale: "es" | "en";
@@ -38,6 +40,8 @@ const productLinks = [
   { href: `${prefix}/modulos`, label: nav.modules, description: nav.descriptions.modules, icon: Blocks },
   { href: `${prefix}/arquitectura`, label: nav.rm3, description: nav.descriptions.rm3, icon: Layers },
   { href: `${prefix}/mirai`, label: nav.mirai, description: nav.descriptions.mirai, icon: Sparkles, badge: "IA" },
+  // Off by default (PUBLIC_MARKETPLACE_NAV=1): not announced on the production site yet.
+  ...(marketplaceNavEnabled() ? [{ href: MARKETPLACE_NAV_HREF, label: nav.marketplace, description: nav.descriptions.marketplace, icon: Store }] : []),
 ];
 
 // Documentation is Spanish-only for now, so these hrefs carry no locale prefix.

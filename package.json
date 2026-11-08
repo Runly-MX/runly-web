@@ -12,7 +12,8 @@
     "test": "vitest run",
     "catalog:prepare": "node scripts/prepare-catalog.mjs",
     "catalog:prepare:v2": "node scripts/prepare-catalog-v2.mjs",
-    "deploy:static": "node scripts/deploy-static.mjs"
+    "deploy:static": "node scripts/deploy-static.mjs",
+    "marketplace:feed-check": "node scripts/marketplace-feed-check.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^6.0.6",
