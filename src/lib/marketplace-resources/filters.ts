@@ -1,5 +1,6 @@
 // src/lib/marketplace-resources/filters.ts
-import { RESOURCE_TYPES, type ResourceSummary, type ResourceType } from "./types";
+import { hasStaticPage } from "./routes";
+import { RESOURCE_TYPES, type DataSource, type ResourceSummary, type ResourceType } from "./types";
 
 export interface ResourceFilters { query?: string; type?: ResourceType | "all"; trust?: string; category?: string }
 
@@ -33,3 +34,6 @@ export const groupPublishers = (items: ResourceSummary[]) => {
   }
   return [...map.values()].sort((a, b) => b.count - a.count || a.publisher.displayName.localeCompare(b.publisher.displayName));
 };
+
+/** Publishers that really get a profile page: only those with a statically generated resource (same rule as the profile route). */
+export const publishersWithPages = (items: ResourceSummary[], source: DataSource) => groupPublishers(items.filter((r) => hasStaticPage(source, r)));

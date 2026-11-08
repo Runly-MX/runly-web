@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
 import { createHubSource } from "../client";
-import { filterResources, typesWithResources } from "../filters";
+import { filterResources, publishersWithPages, typesWithResources } from "../filters";
 import { createFixtureSource, FIXTURE_MARK } from "../fixtures";
 import { parseResourceDetail, parseResourceSummary } from "../parse";
 import { TYPE_SEGMENT, hasStaticPage, pageIsIndexable, typeFromSegment } from "../routes";
@@ -161,5 +161,38 @@ describe("states", () => {
     const revokedHtml = renderToStaticMarkup(createElement(ResourceDetailView, { resource: revoked.status === "ok" ? revoked.resource : (null as never) }));
     expect(revokedHtml).toContain('data-state="revoked"');
     expect(revokedHtml).not.toContain("usar-en-runly");
+  });
+});
+
+describe("v1 corrections", () => {
+  const withPublisher = (slug: string, handle: string, availability: "available" | "withdrawn" | "revoked") =>
+    parseResourceSummary({ ...example(), resourceKey: `studio.${slug}`, slug, availability, trust: availability === "revoked" ? "revoked" : "community-verified", publisher: { handle, displayName: handle, verified: true } })!;
+
+  it("only links publishers whose profile page will exist (none for withdrawn/revoked-only publishers)", () => {
+    const items = [withPublisher("uno-activo", "pub-activo", "available"), withPublisher("dos-retirado", "pub-retirado", "withdrawn"), withPublisher("tres-revocado", "pub-revocado", "revoked")];
+    expect(publishersWithPages(items, "hub").map((p) => p.publisher.handle)).toEqual(["pub-activo"]);
+    // Development fixtures generate every page, so every publisher is linkable there.
+    expect(publishersWithPages(items, "fixtures")).toHaveLength(3);
+  });
+
+  it("fails closed when the page budget ends with a cursor still pending", async () => {
+    let calls = 0;
+    const source = createHubSource({ maxPages: 2, fetchImpl: async () => res(200, { schemaVersion: 1, total: 500, nextCursor: `c${++calls}`, items: [example()] }) });
+    const list = await source.list();
+    expect(calls).toBe(2);
+    expect(list).toMatchObject({ status: "unavailable", reason: "incomplete_pagination", items: [] });
+    // Finishing within the budget still succeeds.
+    const done = await createHubSource({ maxPages: 2, fetchImpl: async () => res(200, { schemaVersion: 1, total: 1, nextCursor: null, items: [example()] }) }).list();
+    expect(done.status).toBe("ok");
+  });
+
+  it("does not assert 'imported paused' unless the producer says so", () => {
+    const risk = { services: [], httpHosts: [], externalEmailCount: 0, hasChatChannels: false, hasAttachments: false, hasApprovals: false };
+    const detail = (riskSummary: object | undefined) => parseResourceDetail({ ...example(), resourceKey: "automation.aviso", type: "automation", slug: "aviso", format: { name: "automation", version: 1 }, description: "", riskSummary })!;
+    expect(detail({ ...risk, importsPaused: true })!.riskSummary).not.toBeNull();
+    for (const importsPaused of [false, undefined, "true", 1]) expect(detail({ ...risk, importsPaused })!.riskSummary).toBeNull();
+    const html = renderToStaticMarkup(createElement(ResourceDetailView, { resource: detail({ ...risk, importsPaused: false })! }));
+    expect(html).not.toContain("Se importa en pausa");
+    expect(html).not.toContain("Qué hace esta automatización");
   });
 });

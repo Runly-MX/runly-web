@@ -10,7 +10,7 @@ import ResourceCatalog from "../../components/marketplace/resources/ResourceCata
 import PublisherCard from "../../components/marketplace/resources/PublisherCard.astro";
 import ResourceStateBlock from "../../components/marketplace/resources/ResourceStateBlock";
 import { resolveIcon } from "../../lib/icons";
-import { groupPublishers, typesWithResources } from "../../lib/marketplace-resources/filters";
+import { publishersWithPages, typesWithResources } from "../../lib/marketplace-resources/filters";
 import { pageIsIndexable, typePath } from "../../lib/marketplace-resources/routes";
 import { loadCatalogForBuild, sourceKind } from "../../lib/marketplace-resources/source";
 import { T, TYPE_TEXT } from "../../lib/marketplace-resources/text";
@@ -22,7 +22,8 @@ const list = await loadCatalogForBuild();
 const source = sourceKind();
 const items = list.status === "ok" ? list.items : [];
 const types = typesWithResources(items);
-const publishers = groupPublishers(items);
+// Only publishers whose profile page exists are linked (no links to withdrawn-only publishers).
+const publishers = publishersWithPages(items, source);
 const ICON: Record<ResourceType, string> = { studio_template: "Palette", automation: "Workflow", website_template: "Globe", solution: "Package" };
 const TINT: Record<ResourceType, string> = { studio_template: "bg-violet-50 text-violet-700", automation: "bg-amber-50 text-amber-700", website_template: "bg-sky-50 text-sky-700", solution: "bg-emerald-50 text-emerald-700" };
 const noindex = !pageIsIndexable(source) || items.length === 0;

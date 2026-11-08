@@ -56,6 +56,9 @@ export function createHubSource({ hubUrl, fetchImpl = fetch as unknown as FetchL
           cursor = typeof body.nextCursor === "string" && body.nextCursor ? body.nextCursor : null;
           if (!cursor) break;
         }
+        // Page budget exhausted with a cursor still pending: the catalog is incomplete.
+        // Fail closed so a build never publishes a partial catalog as if it were whole.
+        if (cursor) return { status: "unavailable", source: "hub", fetchedAt, reason: "incomplete_pagination", items: [] };
         return { status: "ok", source: "hub", fetchedAt, feed, total, truncated, items };
       } catch (error) {
         return { status: "unavailable", source: "hub", fetchedAt, reason: reason(error), items: [] };

@@ -102,7 +102,8 @@ function parseRequirements(raw: unknown): Requirements {
 function parseRisk(raw: unknown): RiskSummary | null {
   const r = obj(raw);
   const count = r && int(r.externalEmailCount);
-  if (!r || count === null || typeof r.hasChatChannels !== "boolean" || typeof r.hasAttachments !== "boolean" || typeof r.hasApprovals !== "boolean") return null;
+  // The "imported paused" guarantee must be asserted by the producer; never assume it.
+  if (!r || count === null || r.importsPaused !== true || typeof r.hasChatChannels !== "boolean" || typeof r.hasAttachments !== "boolean" || typeof r.hasApprovals !== "boolean") return null;
   return { services: strings(r.services, 100, 160), httpHosts: strings(r.httpHosts, 50, 255), externalEmailCount: count, hasChatChannels: r.hasChatChannels, hasAttachments: r.hasAttachments, hasApprovals: r.hasApprovals, importsPaused: true };
 }
 

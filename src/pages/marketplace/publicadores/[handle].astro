@@ -5,8 +5,8 @@
 // statically-rendered resource (D-W4 recommendation: no empty profiles).
 import CatalogShell from "../../../components/marketplace/resources/CatalogShell.astro";
 import ResourceCatalog from "../../../components/marketplace/resources/ResourceCatalog.astro";
-import { groupPublishers, typesWithResources } from "../../../lib/marketplace-resources/filters";
-import { MARKETPLACE_BASE, hasStaticPage, pageIsIndexable, publisherPath } from "../../../lib/marketplace-resources/routes";
+import { publishersWithPages, typesWithResources } from "../../../lib/marketplace-resources/filters";
+import { MARKETPLACE_BASE, pageIsIndexable, publisherPath } from "../../../lib/marketplace-resources/routes";
 import { getBuildSource, loadCatalogForBuild, sourceKind } from "../../../lib/marketplace-resources/source";
 import { T } from "../../../lib/marketplace-resources/text";
 import type { PublisherProfile, ResourceSummary, ResourceType } from "../../../lib/marketplace-resources/types";
@@ -20,7 +20,7 @@ export async function getStaticPaths() {
   const catalog = await getBuildSource();
   const types = typesWithResources(list.items);
   const paths = [];
-  for (const { publisher } of groupPublishers(list.items.filter((r) => hasStaticPage(source, r)))) {
+  for (const { publisher } of publishersWithPages(list.items, source)) {
     const result = await catalog.publisher(publisher.handle);
     if (result.status === "ok") paths.push({ params: { handle: publisher.handle }, props: { profile: result.publisher, items: result.items, types } });
   }
