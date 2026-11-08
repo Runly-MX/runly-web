@@ -1,0 +1,92 @@
+---
+// src/pages/marketplace/index.astro
+//
+// Runly Marketplace home. Static output: the catalog is read once at build time
+// from the Developer Hub projections (or from clearly marked fixtures in local
+// development). Types without published resources are not announced; an
+// unpublished or unreachable catalog renders an honest empty/unavailable state.
+import CatalogShell from "../../components/marketplace/resources/CatalogShell.astro";
+import ResourceCatalog from "../../components/marketplace/resources/ResourceCatalog.astro";
+import PublisherCard from "../../components/marketplace/resources/PublisherCard.astro";
+import ResourceStateBlock from "../../components/marketplace/resources/ResourceStateBlock";
+import { resolveIcon } from "../../lib/icons";
+import { groupPublishers, typesWithResources } from "../../lib/marketplace-resources/filters";
+import { pageIsIndexable, typePath } from "../../lib/marketplace-resources/routes";
+import { loadCatalogForBuild, sourceKind } from "../../lib/marketplace-resources/source";
+import { T, TYPE_TEXT } from "../../lib/marketplace-resources/text";
+import type { ResourceType } from "../../lib/marketplace-resources/types";
+
+export const prerender = true;
+
+const list = await loadCatalogForBuild();
+const source = sourceKind();
+const items = list.status === "ok" ? list.items : [];
+const types = typesWithResources(items);
+const publishers = groupPublishers(items);
+const ICON: Record<ResourceType, string> = { studio_template: "Palette", automation: "Workflow", website_template: "Globe", solution: "Package" };
+const TINT: Record<ResourceType, string> = { studio_template: "bg-violet-50 text-violet-700", automation: "bg-amber-50 text-amber-700", website_template: "bg-sky-50 text-sky-700", solution: "bg-emerald-50 text-emerald-700" };
+const noindex = !pageIsIndexable(source) || items.length === 0;
+---
+
+<CatalogShell
+  title="Marketplace de recursos | RUNLY"
+  description="Plantillas Studio, automatizaciones, plantillas Website y Solutions para Runly, publicadas por Runly y por la comunidad."
+  path="/marketplace"
+  source={source}
+  noindex={noindex}
+  types={types}
+  active="overview"
+>
+  <section class="relative overflow-hidden border-b border-slate-200 bg-grid-pattern">
+    <div class="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
+      <p class="text-sm font-bold uppercase tracking-widest text-orange-600">{T.eyebrow}</p>
+      <h1 class="mt-3 max-w-3xl text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">{T.title}</h1>
+      <p class="mt-4 max-w-2xl text-base text-slate-600 sm:text-lg">{T.description}</p>
+      <p class="mt-6 text-sm text-slate-500">¿Buscas módulos para instalar? <a class="font-semibold text-orange-600 hover:underline" href="/modulos">Ver el catálogo de módulos</a>.</p>
+    </div>
+  </section>
+
+  <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    {list.status !== "ok" && <ResourceStateBlock kind="unavailable" />}
+    {list.status === "ok" && items.length === 0 && <ResourceStateBlock kind="empty" />}
+
+    {items.length > 0 && (
+      <>
+        <section aria-label={T.typeFilter} class="mb-12">
+          <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {types.map((type) => {
+              const Icon = resolveIcon(ICON[type]);
+              const count = items.filter((r) => r.type === type && r.availability === "available").length;
+              return (
+                <li>
+                  <a href={typePath(type)} class="group flex h-full flex-col gap-3 rounded-3xl border border-slate-200 bg-white p-5 transition-all hover:-translate-y-0.5 hover:border-orange-300 hover:shadow-glass">
+                    <span class={`flex h-11 w-11 items-center justify-center rounded-2xl ${TINT[type]}`}><Icon class="h-5 w-5" aria-hidden="true" /></span>
+                    <span class="font-bold text-slate-900 group-hover:text-orange-600">{TYPE_TEXT[type].plural}</span>
+                    <span class="flex-1 text-sm text-slate-600">{TYPE_TEXT[type].description}</span>
+                    <span class="text-xs font-semibold text-slate-500">{T.results(count)}</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+
+        <ResourceCatalog items={items} source={source} />
+
+        {publishers.length > 0 && (
+          <section class="mt-16" aria-labelledby="publicadores">
+            <h2 id="publicadores" class="text-2xl font-extrabold tracking-tight text-slate-900">{T.publishers}</h2>
+            <ul class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {publishers.map(({ publisher, count }) => <li><PublisherCard publisher={publisher} count={count} /></li>)}
+            </ul>
+          </section>
+        )}
+      </>
+    )}
+
+    <div class="mt-16 rounded-2xl border border-orange-200 bg-orange-50/60 p-5 text-sm text-slate-700">
+      <p class="font-semibold text-slate-900">Se instala desde dentro de Runly</p>
+      <p class="mt-1">Esta página es solo el escaparate: no ofrece descargas. Cada recurso se verifica dentro de Runly antes de aplicarse. {T.footerNote}</p>
+    </div>
+  </div>
+</CatalogShell>

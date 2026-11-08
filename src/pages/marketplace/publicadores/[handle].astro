@@ -1,0 +1,65 @@
+---
+// src/pages/marketplace/publicadores/[handle].astro
+//
+// Publisher profile. Generated only for publishers with at least one listed,
+// statically-rendered resource (D-W4 recommendation: no empty profiles).
+import CatalogShell from "../../../components/marketplace/resources/CatalogShell.astro";
+import ResourceCatalog from "../../../components/marketplace/resources/ResourceCatalog.astro";
+import { groupPublishers, typesWithResources } from "../../../lib/marketplace-resources/filters";
+import { MARKETPLACE_BASE, hasStaticPage, pageIsIndexable, publisherPath } from "../../../lib/marketplace-resources/routes";
+import { getBuildSource, loadCatalogForBuild, sourceKind } from "../../../lib/marketplace-resources/source";
+import { T } from "../../../lib/marketplace-resources/text";
+import type { PublisherProfile, ResourceSummary, ResourceType } from "../../../lib/marketplace-resources/types";
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const list = await loadCatalogForBuild();
+  if (list.status !== "ok") return [];
+  const source = sourceKind();
+  const catalog = await getBuildSource();
+  const types = typesWithResources(list.items);
+  const paths = [];
+  for (const { publisher } of groupPublishers(list.items.filter((r) => hasStaticPage(source, r)))) {
+    const result = await catalog.publisher(publisher.handle);
+    if (result.status === "ok") paths.push({ params: { handle: publisher.handle }, props: { profile: result.publisher, items: result.items, types } });
+  }
+  return paths;
+}
+
+const { profile, items, types } = Astro.props as { profile: PublisherProfile; items: ResourceSummary[]; types: ResourceType[] };
+const source = sourceKind();
+const initials = profile.displayName.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("");
+const since = new Date(profile.memberSince).toLocaleDateString("es-MX", { year: "numeric", month: "long", timeZone: "UTC" });
+---
+
+<CatalogShell
+  title={`${profile.displayName} | Marketplace RUNLY`}
+  description={T.resourcesBy(profile.displayName)}
+  path={publisherPath(profile.handle).replace(/\/$/, "")}
+  source={source}
+  noindex={!pageIsIndexable(source) || profile.state === "revoked"}
+  types={types}
+  active={null}
+>
+  <section class="border-b border-slate-200 bg-grid-pattern">
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+      <a href={`${MARKETPLACE_BASE}/`} class="text-sm font-semibold text-orange-600 hover:underline">&larr; {T.breadcrumbHome}</a>
+      <div class="mt-5 flex items-center gap-4">
+        <span class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xl font-bold text-white" aria-hidden="true">{initials}</span>
+        <div class="min-w-0">
+          <h1 class="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{profile.displayName}</h1>
+          <p class="mt-1 text-sm text-slate-500">
+            {profile.verified ? `${T.verifiedPublisher} · ` : ""}{T.memberSince} {since} · {T.results(profile.resourceCount)}
+          </p>
+        </div>
+      </div>
+      {profile.state === "revoked" && <p class="mt-4 inline-block rounded-full bg-red-50 px-3 py-1 text-sm font-semibold text-red-700 ring-1 ring-inset ring-red-200">{T.availability.revoked}</p>}
+      {profile.bio && <p class="mt-4 max-w-2xl text-base text-slate-600">{profile.bio}</p>}
+    </div>
+  </section>
+  <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <h2 class="mb-5 text-xl font-bold text-slate-900">{T.resourcesBy(profile.displayName)}</h2>
+    <ResourceCatalog items={items} source={source} />
+  </div>
+</CatalogShell>

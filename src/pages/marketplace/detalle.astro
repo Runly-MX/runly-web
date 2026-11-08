@@ -1,0 +1,19 @@
+---
+// src/pages/marketplace/detalle.astro
+//
+// Runtime-resolved resource page (/marketplace/detalle/?type=...&slug=...) for
+// releases published after the last build and for hidden links. noindex, not in
+// the sitemap, always talks to the Hub (never to fixtures). Shows the loading,
+// not-found, withdrawn, revoked and unavailable states.
+import CatalogShell from "../../components/marketplace/resources/CatalogShell.astro";
+import RuntimeResource from "../../components/marketplace/resources/RuntimeResource";
+import { sourceKind } from "../../lib/marketplace-resources/source";
+
+export const prerender = true;
+---
+
+<CatalogShell title="Recurso del Marketplace | RUNLY" description="Detalle de un recurso del Marketplace de Runly." path="/marketplace/detalle" source={sourceKind()} noindex>
+  <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+    <RuntimeResource client:only="react" hubUrl={import.meta.env.PUBLIC_RUNLY_HUB_URL} />
+  </div>
+</CatalogShell>

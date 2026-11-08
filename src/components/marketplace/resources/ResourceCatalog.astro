@@ -1,0 +1,106 @@
+---
+// src/components/marketplace/resources/ResourceCatalog.astro
+//
+// Search + filters + card grid. Cards are rendered at build time (works without
+// JavaScript); the script only hides/shows them and updates the result count.
+import ResourceCard from "./ResourceCard.astro";
+import { categoryFacets, categoryLabel, typesWithResources } from "../../../lib/marketplace-resources/filters";
+import { T, TYPE_TEXT } from "../../../lib/marketplace-resources/text";
+import type { DataSource, ResourceSummary } from "../../../lib/marketplace-resources/types";
+
+interface Props { items: ResourceSummary[]; source: DataSource; showTypeFilter?: boolean }
+const { items, source, showTypeFilter = true } = Astro.props;
+const types = typesWithResources(items);
+const categories = categoryFacets(items);
+const trusts = (["official", "community-verified", "community"] as const).filter((t) => items.some((r) => r.trust === t));
+const field = "h-11 rounded-full border border-slate-200 bg-white px-4 text-sm text-slate-800 focus:border-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-200";
+---
+
+<section data-mk-catalog aria-label={T.eyebrow}>
+  <form class="mb-6 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto_auto]" role="search" data-mk-form>
+    <label class="relative block">
+      <span class="sr-only">{T.search}</span>
+      <input type="search" maxlength="80" data-mk-q placeholder={T.searchPlaceholder} class={`${field} w-full`} />
+    </label>
+    {showTypeFilter && types.length > 1 && (
+      <label class="block">
+        <span class="sr-only">{T.typeFilter}</span>
+        <select data-mk-type class={`${field} w-full md:w-auto`}>
+          <option value="all">{T.allTypes}</option>
+          {types.map((type) => <option value={type}>{TYPE_TEXT[type].plural}</option>)}
+        </select>
+      </label>
+    )}
+    {trusts.length > 1 && (
+      <label class="block">
+        <span class="sr-only">{T.trustFilter}</span>
+        <select data-mk-trust class={`${field} w-full md:w-auto`}>
+          <option value="all">{T.trustFilter}: {T.all.toLowerCase()}</option>
+          {trusts.map((t) => <option value={t}>{T.trust[t]}</option>)}
+        </select>
+      </label>
+    )}
+    {categories.length > 0 && (
+      <label class="block">
+        <span class="sr-only">{T.categoryFilter}</span>
+        <select data-mk-category class={`${field} w-full md:w-auto`}>
+          <option value="">{T.allCategories}</option>
+          {categories.map((c) => <option value={c}>{categoryLabel(c)}</option>)}
+        </select>
+      </label>
+    )}
+  </form>
+
+  <p class="mb-4 text-sm font-medium text-slate-500" data-mk-count role="status" aria-live="polite">{T.results(items.length)}</p>
+
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3" data-mk-grid>
+    {items.map((resource) => <ResourceCard resource={resource} source={source} />)}
+  </div>
+
+  <div data-mk-empty hidden class="mt-4">
+    <div class="rounded-3xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center text-sm text-slate-600">
+      <p>{T.noResults}</p>
+      <button type="button" data-mk-clear class="mt-3 rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">{T.clearFilters}</button>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Mirrors filterResources() in lib/marketplace-resources/filters.ts over data attributes.
+  import { T } from "../../../lib/marketplace-resources/text";
+
+  const fold = (value: string) => value.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+  document.querySelectorAll<HTMLElement>("[data-mk-catalog]").forEach((root) => {
+    const q = root.querySelector<HTMLInputElement>("[data-mk-q]");
+    const type = root.querySelector<HTMLSelectElement>("[data-mk-type]");
+    const trust = root.querySelector<HTMLSelectElement>("[data-mk-trust]");
+    const category = root.querySelector<HTMLSelectElement>("[data-mk-category]");
+    const count = root.querySelector<HTMLElement>("[data-mk-count]")!;
+    const empty = root.querySelector<HTMLElement>("[data-mk-empty]")!;
+    const cards = [...root.querySelectorAll<HTMLElement>(".mk-card")];
+    root.querySelector("[data-mk-form]")?.addEventListener("submit", (event) => event.preventDefault());
+    const apply = () => {
+      const needle = fold(q?.value.trim() ?? "");
+      let visible = 0;
+      for (const card of cards) {
+        const match = (!type || type.value === "all" || card.dataset.type === type.value)
+          && (!trust || trust.value === "all" || card.dataset.trust === trust.value)
+          && (!category || !category.value || (card.dataset.categories ?? "").split("|").includes(category.value))
+          && (!needle || (card.dataset.search ?? "").includes(needle));
+        card.hidden = !match;
+        if (match) visible++;
+      }
+      count.textContent = T.results(visible);
+      empty.hidden = visible > 0;
+    };
+    q?.addEventListener("input", apply);
+    [type, trust, category].forEach((el) => el?.addEventListener("change", apply));
+    root.querySelector("[data-mk-clear]")?.addEventListener("click", () => {
+      if (q) q.value = "";
+      if (type) type.value = "all";
+      if (trust) trust.value = "all";
+      if (category) category.value = "";
+      apply();
+    });
+  });
+</script>

@@ -1,0 +1,51 @@
+---
+// src/components/marketplace/resources/CatalogShell.astro
+//
+// Page frame for every /marketplace/* page: site header/footer, the sample-data
+// banner (fixtures only) and a catalog sub-navigation that lists ONLY the types
+// that really have published resources.
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import Header from "../../layout/Header.astro";
+import Footer from "../../layout/Footer.astro";
+import { getDictionary } from "../../../i18n";
+import { MARKETPLACE_BASE, typePath } from "../../../lib/marketplace-resources/routes";
+import { T, TYPE_TEXT } from "../../../lib/marketplace-resources/text";
+import type { DataSource, ResourceType } from "../../../lib/marketplace-resources/types";
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  source: DataSource;
+  noindex?: boolean;
+  /** Types with at least one available resource (others are not announced). */
+  types?: ResourceType[];
+  active?: ResourceType | "overview" | null;
+}
+const { title, description, path, source, noindex = false, types = [], active = null } = Astro.props;
+const dict = getDictionary("es");
+const pill = (on: boolean) => `inline-flex whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-semibold transition-colors ${on ? "bg-slate-900 text-white" : "text-slate-600 hover:bg-slate-100"}`;
+---
+
+<BaseLayout title={title} description={description} locale="es" path={path} hasEnglish={false} noindex={noindex || source === "fixtures"}>
+  <Header locale="es" nav={dict.nav} />
+  {source === "fixtures" && (
+    <div class="border-b border-violet-200 bg-violet-50 px-4 py-2 text-center text-xs font-semibold text-violet-900 sm:text-sm" data-fixture-banner role="note">
+      {T.states.fixtureTitle}: {T.states.fixtureBody}
+    </div>
+  )}
+  <main class="bg-white">
+    {types.length > 0 && (
+      <nav aria-label={T.nav.sections} class="border-b border-slate-200 bg-white/90">
+        <ul class="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 py-2 sm:px-6 lg:px-8 [scrollbar-width:none]">
+          <li><a href={`${MARKETPLACE_BASE}/`} aria-current={active === "overview" ? "page" : undefined} class={pill(active === "overview")}>{T.nav.overview}</a></li>
+          {types.map((type) => (
+            <li><a href={typePath(type)} aria-current={active === type ? "page" : undefined} class={pill(active === type)}>{TYPE_TEXT[type].plural}</a></li>
+          ))}
+        </ul>
+      </nav>
+    )}
+    <slot />
+  </main>
+  <Footer locale="es" footer={dict.footer} />
+</BaseLayout>
