@@ -5,7 +5,8 @@
 // only action is "copy release id" (no downloads, no installs: those happen
 // inside Runly). Used by the static pages and by the runtime loader.
 import { useEffect, useState } from "react";
-import { createHubSource, previewUrl } from "../../../lib/marketplace-resources/client";
+import { createHubSource } from "../../../lib/marketplace-resources/client";
+import PreviewGallery from "./PreviewGallery";
 import { liveStateFrom, liveView, type LiveState } from "../../../lib/marketplace-resources/live";
 import { categoryLabel } from "../../../lib/marketplace-resources/filters";
 import { MARKETPLACE_BASE, publisherPath, resourcePath, typePath } from "../../../lib/marketplace-resources/routes";
@@ -58,7 +59,7 @@ function useLiveState(r: ResourceDetail, hubUrl: string | null | undefined, enab
     let alive = true;
     setState({ phase: "checking" });
     createHubSource({ hubUrl }).detail(r.type, r.slug)
-      .then((result) => { if (alive) setState(liveStateFrom(result)); })
+      .then((result) => { if (alive) setState(liveStateFrom(result, r)); })
       .catch(() => { if (alive) setState({ phase: "error" }); });
     return () => { alive = false; };
   }, [enabled, hubUrl, r.type, r.slug, attempt]);
@@ -120,13 +121,7 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
         </div>
       )}
 
-      {r.previews.length > 0 && (
-        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" aria-label="Vistas previas">
-          {r.previews.map((p) => (
-            <img key={p.sha256} src={previewUrl(hubUrl, p)} alt={p.alt} width={p.width} height={p.height} loading="lazy" decoding="async" className="aspect-[4/3] w-full rounded-2xl border border-slate-200 bg-slate-100 object-cover" />
-          ))}
-        </div>
-      )}
+      <PreviewGallery previews={r.previews} hubUrl={hubUrl} />
 
       <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="space-y-6">
