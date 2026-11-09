@@ -161,7 +161,7 @@ export const capabilityFacets = (modules: MarketplaceModule[]) => [...new Set(mo
 
 export const MARKETPLACE_TEXT = {
   es: {
-    eyebrow: "Marketplace",
+    eyebrow: "Catálogo comunitario",
     title: "Módulos para instalar en Runly",
     description: "Catálogo publicado en Runly Developer Hub: módulos oficiales de Runly y de publicadores de la comunidad. Se instalan desde Runly, en Módulos > Marketplace.",
     builtInTitle: "Incluidos en Runly",
