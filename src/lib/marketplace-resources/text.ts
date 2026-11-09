@@ -92,6 +92,9 @@ export const T = {
   },
   detail: {
     description: "Descripción",
+    noPreview: "El publicador no incluyó vistas previas.",
+    publishedBy: "Publicado por",
+    version: "Versión",
     requirements: "Requisitos",
     modules: "Módulos necesarios",
     fonts: "Fuentes",

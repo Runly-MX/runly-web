@@ -14,6 +14,13 @@ export const TYPE_STYLE: Record<ResourceType, { bg: string; text: string; ring: 
   solution: { bg: "bg-emerald-50", text: "text-emerald-700", ring: "ring-emerald-200" },
 };
 
+export const TYPE_COVER: Record<ResourceType, string> = {
+  studio_template: "from-violet-100 to-violet-50 text-violet-700",
+  automation: "from-amber-100 to-amber-50 text-amber-700",
+  website_template: "from-sky-100 to-sky-50 text-sky-700",
+  solution: "from-emerald-100 to-emerald-50 text-emerald-700",
+};
+
 const TRUST_STYLE: Record<TrustLevel, string> = {
   official: "bg-sky-50 text-sky-700 ring-sky-200",
   "community-verified": "bg-emerald-50 text-emerald-700 ring-emerald-200",

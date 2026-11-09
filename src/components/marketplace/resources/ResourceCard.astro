@@ -5,7 +5,7 @@
 // ResourceCatalog.astro (search text is precomputed by searchKey()).
 import MarketplaceTrustBadge from "../MarketplaceTrustBadge.astro";
 import { resolveIcon } from "../../../lib/icons";
-import { searchKey } from "../../../lib/marketplace-resources/filters";
+import { categoryLabel, searchKey } from "../../../lib/marketplace-resources/filters";
 import { hasStaticPage, resourcePath, runtimeResourcePath } from "../../../lib/marketplace-resources/routes";
 import { previewUrl } from "../../../lib/marketplace-resources/client";
 import { T, TYPE_TEXT } from "../../../lib/marketplace-resources/text";
@@ -15,6 +15,7 @@ interface Props { resource: ResourceSummary; source: DataSource }
 const { resource: r, source } = Astro.props;
 const ICON: Record<ResourceType, string> = { studio_template: "Palette", automation: "Workflow", website_template: "Globe", solution: "Package" };
 const TINT: Record<ResourceType, string> = { studio_template: "bg-violet-50 text-violet-700", automation: "bg-amber-50 text-amber-700", website_template: "bg-sky-50 text-sky-700", solution: "bg-emerald-50 text-emerald-700" };
+const COVER: Record<ResourceType, string> = { studio_template: "from-violet-100 to-violet-50 text-violet-700", automation: "from-amber-100 to-amber-50 text-amber-700", website_template: "from-sky-100 to-sky-50 text-sky-700", solution: "from-emerald-100 to-emerald-50 text-emerald-700" };
 const Icon = resolveIcon(ICON[r.type]);
 const href = hasStaticPage(source, r) ? resourcePath(r.type, r.slug) : runtimeResourcePath(r.type, r.slug);
 const unavailable = r.availability !== "available";
@@ -31,15 +32,11 @@ const hub = import.meta.env.PUBLIC_RUNLY_HUB_URL;
   data-search={searchKey(r)}
   data-availability={r.availability}
 >
-  {preview && (
-    <div class="relative -mx-1 -mt-1 aspect-[16/10] overflow-hidden rounded-2xl border border-slate-100 bg-slate-50" data-mk-preview>
-      <img src={previewUrl(hub, preview)} alt={preview.alt} width={preview.width} height={preview.height} loading="lazy" decoding="async" class="h-full w-full object-contain transition-transform duration-300 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100" />
-      <span hidden data-mk-preview-fallback class={`absolute inset-0 flex items-center justify-center ${TINT[r.type]}`}><Icon class="h-7 w-7" aria-hidden="true" /></span>
-    </div>
-  )}
-  <div class="flex items-start justify-between gap-3">
-    {!preview && <span class={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${TINT[r.type]}`} data-mk-icon><Icon class="h-5 w-5" aria-hidden="true" /></span>}
-    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{TYPE_TEXT[r.type].singular}</span>
+  <div class={`relative -mx-1 -mt-1 aspect-[16/10] overflow-hidden rounded-2xl border border-slate-100 ${preview ? "bg-slate-50" : `bg-gradient-to-br ${COVER[r.type]}`}`} data-mk-preview>
+    {preview && <img src={previewUrl(hub, preview)} alt={preview.alt} width={preview.width} height={preview.height} loading="lazy" decoding="async" class="h-full w-full object-contain transition-transform duration-300 ease-out group-hover:scale-[1.02] motion-reduce:transition-none motion-reduce:group-hover:scale-100" />}
+    {/* Fallback cover: type icon only (never an invented screenshot). Also shown when the preview fails to load. */}
+    <span hidden={!!preview} data-mk-preview-fallback class={`absolute inset-0 flex items-center justify-center ${preview ? TINT[r.type] : ""}`}><Icon class="h-10 w-10 opacity-80" aria-hidden="true" /></span>
+    <span class="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200/70"><Icon class="h-3 w-3" aria-hidden="true" />{TYPE_TEXT[r.type].singular}</span>
   </div>
   <div class="min-w-0">
     <h3 class="font-bold leading-snug text-slate-900">
@@ -52,7 +49,11 @@ const hub = import.meta.env.PUBLIC_RUNLY_HUB_URL;
     <MarketplaceTrustBadge trust={r.trust} locale="es" />
     {unavailable && r.trust !== "revoked" && <span class={`rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${r.availability === "revoked" ? "bg-red-50 text-red-700 ring-red-200" : "bg-amber-50 text-amber-800 ring-amber-200"}`} data-slot="availability">{T.availability[r.availability]}</span>}
   </div>
-  <p class="text-[11px] text-slate-400">{T.licenseLabel}: {r.license} · {T.locale[r.locale]}</p>
+  <p class="text-[11px] text-slate-500">
+    {r.categories[0] && <span class="font-semibold text-slate-600">{categoryLabel(r.categories[0])} · </span>}
+    {r.compatibility && <span>{T.detail.requiresRunly(r.compatibility.runly.min, r.compatibility.runly.max)} · </span>}
+    {T.licenseLabel}: {r.license} · {T.locale[r.locale]}
+  </p>
 </article>
 
 <script>

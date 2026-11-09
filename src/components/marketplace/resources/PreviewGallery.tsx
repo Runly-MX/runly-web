@@ -46,7 +46,7 @@ export default function PreviewGallery({ previews, hubUrl }: { previews: Preview
   const open = () => { if (!failed[current.sha256]) dialog.current?.showModal(); };
 
   return (
-    <section className="mt-8" aria-label={G.label} data-gallery data-count={items.length}>
+    <section aria-label={G.label} data-gallery data-count={items.length}>
       <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50">
         <button type="button" onClick={open} className="group relative block w-full cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2" aria-label={G.enlarge(current.alt)} disabled={!!failed[current.sha256]}>
           <Shot key={current.sha256} preview={current} hubUrl={hubUrl} failed={!!failed[current.sha256]} onFail={fail(current.sha256)} className="mx-auto aspect-[4/3] w-full object-contain" sizes="(min-width: 1024px) 66vw, 100vw" eager />

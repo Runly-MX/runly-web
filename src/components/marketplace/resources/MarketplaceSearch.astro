@@ -1,0 +1,63 @@
+---
+// src/components/marketplace/resources/MarketplaceSearch.astro
+//
+// Hero search over everything public on the site: official modules (built-in
+// data) and published resources (build-time catalog). Pure client-side filter
+// over an inline JSON index; no network, no invented entries.
+
+export interface SearchEntry { kind: string; title: string; text: string; href: string }
+interface Props { entries: SearchEntry[] }
+const { entries } = Astro.props;
+const index = entries.map((e) => ({ ...e, key: `${e.title} ${e.text}`.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase() }));
+---
+
+<div class="relative w-full max-w-2xl" data-mks>
+  <form role="search" data-mks-form class="relative">
+    <label for="mks-q" class="sr-only">Buscar módulos y recursos</label>
+    <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
+    <input id="mks-q" type="search" maxlength="80" autocomplete="off" data-mks-q placeholder="Busca un módulo, una plantilla o una automatización" class="h-14 w-full rounded-full border border-slate-300 bg-white pl-12 pr-5 text-base text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-orange-400 focus:outline-none focus:ring-4 focus:ring-orange-100" />
+  </form>
+  <p class="sr-only" role="status" aria-live="polite" data-mks-status></p>
+  <ul hidden data-mks-results class="absolute left-0 right-0 top-full z-20 mt-2 max-h-80 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-1.5 text-left shadow-glass"></ul>
+  <script type="application/json" data-mks-index set:html={JSON.stringify(index).replace(/</g, "\u003c")} />
+</div>
+
+<script>
+  type Entry = { kind: string; title: string; text: string; href: string; key: string };
+  const root = document.querySelector<HTMLElement>("[data-mks]");
+  if (root) {
+    const entries: Entry[] = JSON.parse(root.querySelector("[data-mks-index]")!.textContent || "[]");
+    const input = root.querySelector<HTMLInputElement>("[data-mks-q]")!;
+    const list = root.querySelector<HTMLElement>("[data-mks-results]")!;
+    const status = root.querySelector<HTMLElement>("[data-mks-status]")!;
+    const fold = (v: string) => v.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+    const render = () => {
+      const needle = fold(input.value.trim());
+      list.replaceChildren();
+      if (needle.length < 2) { list.hidden = true; status.textContent = ""; return; }
+      const hits = entries.filter((e) => e.key.includes(needle)).slice(0, 8);
+      for (const e of hits) {
+        const li = document.createElement("li");
+        const a = document.createElement("a");
+        a.href = e.href;
+        a.className = "flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm hover:bg-orange-50 focus:bg-orange-50 focus:outline-none";
+        const name = document.createElement("span"); name.className = "min-w-0 truncate font-semibold text-slate-900"; name.textContent = e.title;
+        const kind = document.createElement("span"); kind.className = "shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600"; kind.textContent = e.kind;
+        a.append(name, kind); li.append(a); list.append(li);
+      }
+      if (!hits.length) { const li = document.createElement("li"); li.className = "px-3 py-3 text-sm text-slate-500"; li.textContent = "Sin coincidencias. Prueba con otro término."; list.append(li); }
+      list.hidden = false;
+      status.textContent = hits.length ? `${hits.length} resultados` : "Sin coincidencias";
+    };
+    root.querySelector("[data-mks-form]")!.addEventListener("submit", (ev) => { ev.preventDefault(); list.querySelector<HTMLAnchorElement>("a")?.click(); });
+    input.addEventListener("input", render);
+    input.addEventListener("keydown", (ev) => { if (ev.key === "Escape") { list.hidden = true; } else if (ev.key === "ArrowDown") { list.querySelector<HTMLAnchorElement>("a")?.focus(); ev.preventDefault(); } });
+    list.addEventListener("keydown", (ev) => {
+      const links = [...list.querySelectorAll<HTMLAnchorElement>("a")]; const i = links.indexOf(document.activeElement as HTMLAnchorElement);
+      if (ev.key === "ArrowDown") { links[Math.min(i + 1, links.length - 1)]?.focus(); ev.preventDefault(); }
+      else if (ev.key === "ArrowUp") { (i > 0 ? links[i - 1] : input).focus(); ev.preventDefault(); }
+      else if (ev.key === "Escape") { list.hidden = true; input.focus(); }
+    });
+    document.addEventListener("click", (ev) => { if (!root.contains(ev.target as Node)) list.hidden = true; });
+  }
+</script>

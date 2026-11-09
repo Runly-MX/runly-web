@@ -137,7 +137,7 @@ describe("preview gallery", () => {
 });
 
 describe("catalog card", () => {
-  it("shows the first authentic preview, otherwise the type icon; links and labels unchanged", async () => {
+  it("shows the first authentic preview, otherwise a type-icon cover (never an invented image); links and labels unchanged", async () => {
     const container = await AstroContainer.create();
     const withPreview = await container.renderToString(ResourceCard, { props: { resource: hubDetail({ previews: [shot("a", "Portada del menú"), shot("b", "Otra")] }), source: "hub" } });
     expect(withPreview).toContain("data-mk-preview");
@@ -148,8 +148,8 @@ describe("catalog card", () => {
     expect(withPreview).toContain('href="/marketplace/plantillas-studio/menu-restaurante/"');
     expect(withPreview).toContain('data-search=');
     const without = await container.renderToString(ResourceCard, { props: { resource: hubDetail({ previews: [] }), source: "hub" } });
-    expect(without).toContain("data-mk-icon");
-    expect(without).not.toContain("data-mk-preview");
+    expect(without).toContain("data-mk-preview-fallback");
+    expect(without).not.toContain("<img");
   });
 });
 

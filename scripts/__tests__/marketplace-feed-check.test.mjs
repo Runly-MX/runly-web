@@ -21,9 +21,9 @@ describe("marketplace feed.sequence rebuild check", () => {
 });
 
 describe("Marketplace navigation entry", () => {
-  it("is off by default and only on with PUBLIC_MARKETPLACE_NAV=1", () => {
-    expect(marketplaceNavEnabled({})).toBe(false);
-    expect(marketplaceNavEnabled({ PUBLIC_MARKETPLACE_NAV: "true" })).toBe(false);
+  it("is on by default and off only with PUBLIC_MARKETPLACE_NAV=0", () => {
+    expect(marketplaceNavEnabled({})).toBe(true);
     expect(marketplaceNavEnabled({ PUBLIC_MARKETPLACE_NAV: "1" })).toBe(true);
+    expect(marketplaceNavEnabled({ PUBLIC_MARKETPLACE_NAV: "0" })).toBe(false);
   });
 });

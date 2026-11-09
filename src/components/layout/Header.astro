@@ -37,12 +37,26 @@ const langSwitcher = [
 // desktop so the top-level nav doesn't grow past what fits the lg breakpoint
 // as more standalone pages get added.
 const productLinks = [
-  { href: `${prefix}/modulos`, label: nav.modules, description: nav.descriptions.modules, icon: Blocks },
+  { href: `${prefix}/modulos`, label: "Módulos oficiales", description: nav.descriptions.modules, icon: Blocks },
   { href: `${prefix}/arquitectura`, label: nav.rm3, description: nav.descriptions.rm3, icon: Layers },
   { href: `${prefix}/mirai`, label: nav.mirai, description: nav.descriptions.mirai, icon: Sparkles, badge: "IA" },
-  // Off by default (PUBLIC_MARKETPLACE_NAV=1): not announced on the production site yet.
-  ...(marketplaceNavEnabled() ? [{ href: MARKETPLACE_NAV_HREF, label: nav.marketplace, description: nav.descriptions.marketplace, icon: Store }] : []),
 ];
+
+// Marketplace is its own menu: official modules live under "Producto"; this
+// menu is the community/resource side (Spanish-only pages, so no locale prefix).
+// The English site has no localized Marketplace: labels are English but each
+// description says the destination is in Spanish (same convention as the docs).
+const marketplaceLinks = locale === "es"
+  ? [
+      { href: MARKETPLACE_NAV_HREF, label: "Recursos del Marketplace", description: "Plantillas Studio, automatizaciones, plantillas Website y Solutions.", icon: Store },
+      { href: "/modulos#marketplace", label: "Catálogo comunitario de módulos", description: "Módulos publicados en Developer Hub, con su nivel de confianza.", icon: Blocks },
+      { href: "/runly-developer", label: "Publicar en Runly", description: "Crea y publica tus propios módulos y recursos.", icon: CodeXml },
+    ]
+  : [
+      { href: MARKETPLACE_NAV_HREF, label: "Marketplace resources", description: "Studio and Website templates, automations and Solutions (in Spanish).", icon: Store },
+      { href: "/en/modulos#marketplace", label: "Community module catalog", description: "Modules published on Developer Hub, with their trust level.", icon: Blocks },
+      { href: "/runly-developer", label: "Publish on Runly", description: "Build and publish your own modules and resources (in Spanish).", icon: CodeXml },
+    ];
 
 // Documentation is Spanish-only for now, so these hrefs carry no locale prefix.
 // The docs home (/documentacion/modulos) hosts the guides and modules sections.
@@ -60,6 +74,7 @@ const docsLinks = [
 // featured entry.
 const dropdowns = [
   { id: "product", label: nav.product, items: productLinks, columns: 1 },
+  ...(marketplaceNavEnabled() ? [{ id: "marketplace", label: nav.marketplace, items: marketplaceLinks, columns: 1 }] : []),
   { id: "docs", label: nav.docs, items: docsLinks, columns: 2 },
 ];
 
@@ -82,7 +97,7 @@ const mobileRoot = [
     <a aria-label="RUNLY" class="flex items-center gap-2" href={`${prefix}/`}>
       <img alt="RUNLY - Business in motion" class="h-9 w-auto object-contain" src="/brand/runly-logo-light.png" width="140" height="36" />
     </a>
-    <nav class="relative hidden lg:flex items-center gap-5 xl:gap-7 text-sm font-semibold text-slate-600" id="desktopNav">
+    <nav class="relative hidden lg:flex items-center gap-4 xl:gap-7 text-sm font-semibold text-slate-600" id="desktopNav">
       <a class="nav-plain-link hover:text-runly-orange transition-colors whitespace-nowrap" href={`${prefix}/#hero`}>{nav.platform}</a>
       {dropdowns.map((dropdown) => (
         <button

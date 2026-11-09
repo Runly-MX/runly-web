@@ -12,7 +12,7 @@ import { categoryLabel } from "../../../lib/marketplace-resources/filters";
 import { MARKETPLACE_BASE, publisherPath, resourcePath, typePath } from "../../../lib/marketplace-resources/routes";
 import { T, TYPE_TEXT } from "../../../lib/marketplace-resources/text";
 import type { ResourceDetail } from "../../../lib/marketplace-resources/types";
-import { AvailabilityChip, Panel, TrustBadge, TypeChip } from "./parts";
+import { AvailabilityChip, Panel, TrustBadge, TYPE_COVER, TypeChip } from "./parts";
 import ResourceStateBlock from "./ResourceStateBlock";
 
 const d = T.detail;
@@ -97,33 +97,74 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
         <span className="text-slate-700">{r.title}</span>
       </nav>
 
-      <header className="max-w-3xl">
-        <div className="flex flex-wrap items-center gap-2">
-          <TypeChip type={r.type} />
-          <TrustBadge trust={r.trust} />
-          <AvailabilityChip availability={r.availability} trust={r.trust} />
-        </div>
-        <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{r.title}</h1>
-        <p className="mt-3 text-base text-slate-600 sm:text-lg">{r.summary}</p>
-        <p className="mt-3 text-sm text-slate-500">
-          {T.by}{" "}
-          <a href={publisherPath(r.publisher.handle)} className="font-semibold text-slate-800 hover:text-orange-600">{r.publisher.displayName}</a>
-          {r.publisher.verified && <span className="ml-1.5 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">{T.verifiedPublisher}</span>}
-          {r.latest && <span> · {T.version(r.latest.version)}</span>}
-        </p>
-      </header>
-
       {view.notice && (
-        <div className="mt-6 max-w-3xl">
+        <div className="mb-6">
           {view.notice === "withdrawn" || view.notice === "revoked"
             ? <ResourceStateBlock kind={view.notice} replacement={view.replacement} compact />
             : <LiveNotice kind={view.notice} onRetry={retry} />}
         </div>
       )}
 
-      <PreviewGallery previews={r.previews} hubUrl={hubUrl} />
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start" data-detail-hero>
+        <div>
+          {r.previews.length > 0
+            ? <PreviewGallery previews={r.previews} hubUrl={hubUrl} />
+            : (
+              <div className={`flex aspect-[16/10] flex-col items-center justify-center gap-2 rounded-3xl border border-slate-200 bg-gradient-to-br ${TYPE_COVER[r.type]}`} data-cover-fallback role="img" aria-label={TYPE_TEXT[r.type].singular}>
+                <span className="text-2xl font-extrabold tracking-tight sm:text-3xl">{TYPE_TEXT[r.type].singular}</span>
+                <span className="text-xs font-medium opacity-80">{d.noPreview}</span>
+              </div>
+            )}
+        </div>
 
-      <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="space-y-5">
+          <header>
+            <div className="flex flex-wrap items-center gap-2">
+              <TypeChip type={r.type} />
+              <TrustBadge trust={r.trust} />
+              <AvailabilityChip availability={r.availability} trust={r.trust} />
+            </div>
+            <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{r.title}</h1>
+            <p className="mt-3 text-base text-slate-600">{r.summary}</p>
+          </header>
+
+          <a href={publisherPath(r.publisher.handle)} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 transition-colors hover:border-orange-300 hover:bg-orange-50/40" data-publisher>
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-bold text-white" aria-hidden="true">{r.publisher.displayName.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("")}</span>
+            <span className="min-w-0">
+              <span className="block text-xs text-slate-500">{d.publishedBy}</span>
+              <span className="block truncate font-bold text-slate-900">{r.publisher.displayName}</span>
+            </span>
+            {r.publisher.verified && <span className="ml-auto shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">{T.verifiedPublisher}</span>}
+          </a>
+
+          <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-slate-200 bg-slate-200 text-sm" data-facts>
+            {([
+              [d.version, r.latest ? T.version(r.latest.version) : "—"],
+              [d.compatibility, r.compatibility ? d.requiresRunly(r.compatibility.runly.min, r.compatibility.runly.max) : "—"],
+              [T.licenseLabel, r.license],
+              [T.languageLabel, T.locale[r.locale]],
+            ] as const).map(([label, value]) => (
+              <div key={label} className="bg-white p-3">
+                <dt className="text-xs text-slate-500">{label}</dt>
+                <dd className="mt-0.5 font-semibold text-slate-900">{value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          {r.install && view.showInstall && (
+            <section className="rounded-3xl border border-orange-200 bg-orange-50/60 p-5" aria-labelledby="usar-en-runly">
+              <h2 id="usar-en-runly" className="text-lg font-bold text-slate-900">{d.howTo}</h2>
+              <p className="mt-1 text-sm text-slate-600">{d.howToIntro}</p>
+              <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-slate-700">
+                {d.steps(r.install.resourcePath).map((s) => <li key={s}>{s}</li>)}
+              </ol>
+              <div className="mt-4"><CopyField label={d.releaseId} value={r.install.releaseId} /></div>
+            </section>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
         <div className="space-y-6">
           <Panel title={d.description}>
             {paragraphs.length ? paragraphs.map((p, i) => <p key={i} className="whitespace-pre-line leading-relaxed">{p}</p>) : <p>{r.summary}</p>}
@@ -204,21 +245,8 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
         </div>
 
         <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
-          {r.install && view.showInstall && (
-            <section className="rounded-3xl border border-orange-200 bg-orange-50/60 p-5" aria-labelledby="usar-en-runly">
-              <h2 id="usar-en-runly" className="text-lg font-bold text-slate-900">{d.howTo}</h2>
-              <p className="mt-1 text-sm text-slate-600">{d.howToIntro}</p>
-              <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-slate-700">
-                {d.steps(r.install.resourcePath).map((s) => <li key={s}>{s}</li>)}
-              </ol>
-              <div className="mt-4"><CopyField label={d.releaseId} value={r.install.releaseId} /></div>
-            </section>
-          )}
           <section className="rounded-3xl border border-slate-200 bg-white p-5">
             <dl>
-              <Meta label={T.licenseLabel}>{r.license}</Meta>
-              <Meta label={T.languageLabel}>{T.locale[r.locale]}</Meta>
-              {r.compatibility && <Meta label={d.compatibility}>{d.requiresRunly(r.compatibility.runly.min, r.compatibility.runly.max)}</Meta>}
               <Meta label="Formato">{d.format(r.format.name, r.format.version)}</Meta>
               {r.latest && <Meta label={d.published}>{date(r.latest.publishedAt)}</Meta>}
             </dl>
