@@ -88,6 +88,7 @@ function main() {
   console.log(`[sync-help-content] Destino: ${destDir}`);
 
   syncNavigation();
+  syncCapabilities();
   syncDeveloperDocs();
 }
 
@@ -105,6 +106,20 @@ function syncNavigation() {
   const navDest = path.join(repoRoot, "src/data/help-navigation.json");
   fs.writeFileSync(navDest, `${JSON.stringify(navigation, null, 2)}\n`);
   console.log(`[sync-help-content] Navegación de ${Object.keys(navigation).length} módulos escrita en ${navDest}`);
+}
+
+// "Lo que puedes hacer" highlights + compatibility chips per module, authored in
+// runly (help/capabilities.json, next to the long-form help) and rendered at the
+// top of each module docs page. Never edit src/data/module-capabilities.json here.
+function syncCapabilities() {
+  const from = path.join(sourceDir, "capabilities.json");
+  if (!fs.existsSync(from)) {
+    console.error(`[sync-help-content] Falta ${from}`);
+    process.exitCode = 1;
+    return;
+  }
+  fs.copyFileSync(from, path.join(repoRoot, "src/data/module-capabilities.json"));
+  console.log("[sync-help-content] capabilities.json copiado a src/data/module-capabilities.json");
 }
 
 // Developer documentation (docs/developers/*.md in the runly repo): published

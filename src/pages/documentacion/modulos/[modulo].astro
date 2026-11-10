@@ -10,7 +10,7 @@
 export const prerender = true;
 
 import { getCollection, render } from "astro:content";
-import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, Hash, Route } from "@lucide/astro";
+import { ArrowLeft, ArrowRight, BookOpen, Sparkles, ChevronRight, Hash, Route } from "@lucide/astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Header from "../../../components/layout/Header.astro";
 import Footer from "../../../components/layout/Footer.astro";
@@ -19,6 +19,7 @@ import DocsSearchTrigger from "../../../components/docs/DocsSearchTrigger.astro"
 import DocsToc from "../../../components/docs/DocsToc.astro";
 import { getDictionary } from "../../../i18n";
 import { moduleCategories } from "../../../data/modules";
+import capabilitiesByModule from "../../../data/module-capabilities.json";
 import { resolveIcon } from "../../../lib/icons";
 import { getDocsCatalog, resolveGuides, moduleDocHref, guideHref } from "../../../lib/docs-content";
 
@@ -48,7 +49,10 @@ const guides = resolveGuides(catalog).filter((g) => g.resolvedSteps.some((s) => 
 const category = moduleCategories.find((c) => c.id === mod.category);
 const Icon = resolveIcon(mod.icon);
 
+const caps = (capabilitiesByModule as Record<string, { highlights: { icon: string; title: string; text: string }[]; compat?: string[] }>)[moduleKey];
+
 const toc = [
+  ...(caps ? [{ id: "capacidades", title: "Lo que puedes hacer", icon: "Sparkles" }] : []),
   ...(Overview ? [{ id: "resumen", title: "Descripción general", icon: "BookOpen" }] : []),
   ...views.map((v) => ({ id: v.slug, title: v.title, icon: v.icon })),
 ];
@@ -144,6 +148,37 @@ const dict = getDictionary(locale);
               );
             })}
           </nav>
+        )}
+
+        {caps && (
+          <section id="capacidades" class="doc-section mt-12 scroll-mt-24">
+            <h2 class="flex items-center gap-2 text-xl font-extrabold tracking-tight text-slate-900">
+              <Sparkles class="mod-text h-5 w-5" />
+              Lo que puedes hacer
+            </h2>
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+              {caps.highlights.map((cap) => {
+                const CapIcon = resolveIcon(cap.icon);
+                return (
+                  <div class="flex items-start gap-3 rounded-xl border border-slate-200 bg-white p-4">
+                    <span class="mod-soft flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"><CapIcon class="h-4 w-4" /></span>
+                    <div class="min-w-0">
+                      <h3 class="text-sm font-bold text-slate-900">{cap.title}</h3>
+                      <p class="mt-0.5 text-xs leading-relaxed text-slate-600">{cap.text}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {caps.compat && (
+              <div class="mt-5">
+                <p class="text-[11px] font-bold uppercase tracking-widest text-slate-400">Compatibilidades y formatos</p>
+                <ul class="mt-2 flex flex-wrap gap-2">
+                  {caps.compat.map((c) => <li class="mod-soft rounded-full px-3 py-1 text-xs font-semibold">{c}</li>)}
+                </ul>
+              </div>
+            )}
+          </section>
         )}
 
         {Overview && (

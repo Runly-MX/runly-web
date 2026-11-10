@@ -12,3 +12,12 @@ only here. After syncing, refresh the Hub with
 
 Module help (`src/content/help/`) is likewise generated from
 `runly/apps/api/src/manifests/official/help` by the same script.
+
+## Module capabilities (generated, do not edit)
+
+`src/data/module-capabilities.json` (the "Lo que puedes hacer" cards and compatibility
+chips on every module docs page) is copied from
+`runly/apps/api/src/manifests/official/help/capabilities.json` by
+`node scripts/sync-help-content.mjs`. Edit it in runly, next to the module help, in the
+same change that adds or changes a module feature, then sync. `modules.ts` (the grid)
+still lives here and must list every module that has help.

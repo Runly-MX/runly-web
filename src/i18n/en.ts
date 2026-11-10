@@ -134,7 +134,7 @@ export const en: SiteDictionary = {
     title: "A complete ecosystem to run your business.",
     description:
       "From your team collaboration to organizing your resources and operations, RUNLY brings different tools together in one place.",
-    viewAllCta: "View all 23 modules",
+    viewAllCta: "View all 27 modules",
     roadmapTitle: "And this is just the beginning. RUNLY keeps evolving.",
     roadmapDescription:
       "Our team at Racoon Devs ships new modules and improvements every month. All clients with active support get immediate access to updates.",
@@ -142,7 +142,7 @@ export const en: SiteDictionary = {
   },
   modulesPage: {
     metaTitle: "Module catalog — RUNLY ERP",
-    metaDescription: "Explore RUNLY ERP's 23 modules: identity, contacts, finance, inventory, point of sale, and more.",
+    metaDescription: "Explore RUNLY ERP's 27 modules: identity, contacts, finance, inventory, point of sale, and more.",
     eyebrow: "Full catalog",
     title: "Every RUNLY module, in one place.",
     description: "Filter by category and click (or hover) any card to see what each module solves.",

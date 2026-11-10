@@ -1,8 +1,131 @@
 ---
-import PublicInfoLayout from "../layouts/PublicInfoLayout.astro";
-import { developerPage } from "../data/public-policies";
+// Dedicated landing for Runly Developer (devs.runly.mx). Spanish-only, like the
+// Marketplace pages. The old legal-style copy (developerPage) is kept at the
+// bottom as "Alcance y aprobaciones" so the compliance wording is not lost.
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/layout/Header.astro";
+import Footer from "../components/layout/Footer.astro";
+import { getDictionary } from "../i18n";
+import { CONTACT_DEVELOPER_EMAIL } from "../consts";
+import { MARKETPLACE_NAV_HREF } from "../lib/marketplace-nav";
+import { Blocks, LayoutTemplate, Workflow, Globe, Package, Store, Plug, ShieldCheck, ArrowRight, CodeXml, Hammer, Send } from "@lucide/astro";
 
 export const prerender = true;
+
+const dict = getDictionary("es");
+
+const resources = [
+  { icon: Blocks, title: "Módulos personalizados", text: "Pantallas, entidades, permisos y lógica propios, construidos sobre el motor declarativo RME3 de Runly." },
+  { icon: LayoutTemplate, title: "Plantillas de Studio", text: "Diseños de etiquetas, credenciales y documentos listos para que otras empresas los usen." },
+  { icon: Globe, title: "Plantillas de Website", text: "Sitios completos con secciones, estilo y contenido que se instalan en un clic." },
+  { icon: Workflow, title: "Automatizaciones", text: "Flujos con disparadores, condiciones y acciones que cualquier empresa puede importar." },
+  { icon: Package, title: "Solutions", text: "Paquetes que combinan varios recursos para resolver un caso completo de negocio." },
+];
+
+const steps = [
+  { icon: CodeXml, title: "Crea", text: "Desarrolla en el portal o con tu asistente de IA conectado por MCP. Todo parte de la documentación y los contratos vigentes." },
+  { icon: Hammer, title: "Valida y compila", text: "Cada cambio se valida y se compila en builds con artefactos que puedes revisar antes de avanzar." },
+  { icon: Send, title: "Publica", text: "Prepara una versión y solicita revisión. Una persona autorizada decide qué llega al catálogo público." },
+];
+
+const links = [
+  { href: "https://devs.runly.mx", label: "Abrir el portal de Runly Developer", primary: true },
+  { href: MARKETPLACE_NAV_HREF, label: "Ver el catálogo público" },
+  { href: "/documentacion/desarrolladores", label: "Documentación para desarrolladores" },
+];
 ---
 
-<PublicInfoLayout page={developerPage} path="/runly-developer" />
+<BaseLayout title="Runly Developer | Crea y publica módulos, plantillas y automatizaciones" description="Runly Developer (devs.runly.mx) es la plataforma para crear módulos personalizados, plantillas y automatizaciones para Runly, y publicarlos en el catálogo público." locale="es" path="/runly-developer" hasEnglish={false}>
+  <Header locale="es" nav={dict.nav} />
+  <main id="contenido">
+    <section class="bg-gradient-to-b from-runly-navy to-[#0A1024] text-white py-20 sm:py-24">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/15 text-orange-300 text-xs font-semibold mb-5">
+          <CodeXml class="w-3.5 h-3.5" /> Runly Developer · devs.runly.mx
+        </div>
+        <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight">Construye sobre Runly y <span class="text-gradient-orange">compártelo con todos</span></h1>
+        <p class="mt-5 text-base sm:text-lg text-slate-300 max-w-3xl mx-auto">
+          Runly Developer es nuestra plataforma de desarrollo: crea módulos personalizados, plantillas y automatizaciones, pruébalos con un flujo de validación y compilación, y publícalos en un catálogo público que cualquier empresa de Runly puede explorar e instalar.
+        </p>
+        <div class="mt-8 flex flex-wrap justify-center gap-3">
+          {links.map((l) => (
+            <a href={l.href} class={l.primary ? "inline-flex items-center gap-2 rounded-full bg-orange-500 hover:bg-orange-400 text-white font-semibold px-6 py-3 transition-colors" : "inline-flex items-center gap-2 rounded-full border border-white/25 hover:bg-white/10 text-white font-semibold px-6 py-3 transition-colors"}>
+              {l.label}{l.primary && <ArrowRight class="w-4 h-4" />}
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="py-20 bg-white">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl mb-12">
+          <h2 class="text-3xl font-extrabold tracking-tight text-slate-900">No son solo módulos</h2>
+          <p class="mt-3 text-slate-600">Todo lo que puedes configurar en Runly se puede empaquetar, versionar y publicar.</p>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          {resources.map(({ icon: Icon, title, text }) => (
+            <div class="rounded-2xl border border-slate-200 p-6">
+              <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center mb-4"><Icon class="w-5 h-5" /></div>
+              <h3 class="font-bold text-slate-900">{title}</h3>
+              <p class="mt-2 text-sm text-slate-600 leading-relaxed">{text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="py-20 bg-slate-50">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-extrabold tracking-tight text-slate-900 max-w-2xl">Del borrador al catálogo en tres pasos</h2>
+        <div class="mt-10 grid md:grid-cols-3 gap-5">
+          {steps.map(({ icon: Icon, title, text }, i) => (
+            <div class="rounded-2xl bg-white border border-slate-200 p-6">
+              <div class="flex items-center gap-3 mb-3">
+                <span class="w-8 h-8 rounded-full bg-runly-blue text-white text-sm font-bold flex items-center justify-center">{i + 1}</span>
+                <Icon class="w-5 h-5 text-slate-500" />
+              </div>
+              <h3 class="font-bold text-slate-900">{title}</h3>
+              <p class="mt-2 text-sm text-slate-600 leading-relaxed">{text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="py-20 bg-white">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-2 gap-10">
+        <div class="rounded-2xl border border-slate-200 p-8">
+          <Store class="w-6 h-6 text-orange-600" />
+          <h2 class="mt-4 text-2xl font-extrabold text-slate-900">Catálogo público</h2>
+          <p class="mt-3 text-slate-600">Cada recurso publicado muestra su publicador y su nivel de confianza. Explóralos y llévalos a tu empresa desde dentro de Runly; este sitio solo los presenta, nunca instala nada.</p>
+          <div class="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold">
+            <a class="text-runly-blue underline underline-offset-4" href={MARKETPLACE_NAV_HREF}>Recursos del Marketplace</a>
+            <a class="text-runly-blue underline underline-offset-4" href="/modulos#marketplace">Catálogo comunitario de módulos</a>
+          </div>
+        </div>
+        <div class="rounded-2xl border border-slate-200 p-8">
+          <Plug class="w-6 h-6 text-orange-600" />
+          <h2 class="mt-4 text-2xl font-extrabold text-slate-900">Desarrolla con tu IA</h2>
+          <p class="mt-3 text-slate-600">Conecta ChatGPT, Claude u otro cliente compatible al servidor MCP de Runly Developer con OAuth. Tu asistente consulta la documentación, valida y compila con tu identidad y solo en los espacios que autorices.</p>
+          <div class="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm font-semibold">
+            <a class="text-runly-blue underline underline-offset-4 break-all" href="https://mcp.devs.runly.mx/">Endpoint MCP</a>
+            <a class="text-runly-blue underline underline-offset-4" href="/documentacion/desarrolladores">Guía para desarrolladores</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-16 bg-slate-50">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center gap-3"><ShieldCheck class="w-6 h-6 text-emerald-600" /><h2 class="text-2xl font-extrabold text-slate-900">Alcance y aprobaciones</h2></div>
+        <div class="mt-4 space-y-3 text-sm text-slate-600 leading-relaxed">
+          <p>Algunas operaciones sensibles requieren aprobación humana. Una validación o un build no sustituyen la revisión de contenido, permisos y dependencias por una persona autorizada.</p>
+          <p>Runly Developer no firma módulos, no aprueba reviews, no modera y no publica oficialmente por sí mismo. Preparar una solicitud de release o review no equivale a obtener una aprobación ni a publicar. El MCP de Runly Developer gestiona proyectos de desarrollo y es distinto del MCP de Runly ERP: conectar uno no concede acceso al otro.</p>
+          <p>Antes de conectar tu cuenta, consulta la <a class="text-runly-blue underline underline-offset-4" href="/privacy">política de privacidad</a> y los <a class="text-runly-blue underline underline-offset-4" href="/terms">términos de servicio</a>. ¿Dudas con OAuth, MCP o acceso? Escribe a <a class="text-runly-blue underline underline-offset-4" href={`mailto:${CONTACT_DEVELOPER_EMAIL}`}>{CONTACT_DEVELOPER_EMAIL}</a> o visita <a class="text-runly-blue underline underline-offset-4" href="/support">Soporte</a>.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer locale="es" footer={dict.footer} showStatus={false} />
+</BaseLayout>
