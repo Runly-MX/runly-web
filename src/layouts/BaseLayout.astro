@@ -26,11 +26,11 @@ const { title, description, locale, path, hasEnglish, noindex } = Astro.props;
   <head>
     <SiteHead title={title} description={description} locale={locale} path={path} hasEnglish={hasEnglish} noindex={noindex} />
   </head>
-  <body class="bg-[var(--rl-bg)] text-slate-800 font-sans antialiased selection:bg-orange-500 selection:text-white overflow-x-hidden">
+  <body class="bg-[var(--rl-bg)] text-slate-800 font-sans antialiased selection:bg-orange-500 selection:text-white overflow-x-clip">
     <slot />
     <noscript>
       <style>
-        .reveal-on-scroll {
+        .reveal-on-scroll, .bento-stagger > * {
           opacity: 1 !important;
           transform: none !important;
         }
@@ -62,13 +62,21 @@ const { title, description, locale, path, hasEnglish, noindex } = Astro.props;
       const KEY = "runly.theme";
       const mq = window.matchMedia("(prefers-color-scheme: dark)");
       const read = () => { try { const v = localStorage.getItem(KEY); return v === "light" || v === "dark" ? v : "system"; } catch { return "system"; } };
+      let preference = read();
       const apply = (pref: string) => {
+        preference = pref;
         const root = document.documentElement;
         root.classList.add("rl-theme-switching");
         root.dataset.theme = pref === "system" ? (mq.matches ? "dark" : "light") : pref;
         root.dataset.themePref = pref;
         requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("rl-theme-switching")));
         document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle] button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.value === pref)));
+        document.querySelectorAll<HTMLButtonElement>("[data-theme-cycle]").forEach((b) => {
+          const next = pref === "system" ? "light" : pref === "light" ? "dark" : "system";
+          const label = b.dataset[`label${next[0].toUpperCase()}${next.slice(1)}`] ?? next;
+          b.setAttribute("aria-label", label);
+          b.title = label;
+        });
       };
       apply(read());
       document.querySelectorAll<HTMLElement>("[data-theme-toggle]").forEach((group) => {
@@ -81,12 +89,12 @@ const { title, description, locale, path, hasEnglish, noindex } = Astro.props;
         });
       });
       document.querySelectorAll<HTMLElement>("[data-theme-cycle]").forEach((b) => b.addEventListener("click", () => {
-        const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-        try { localStorage.setItem(KEY, next); } catch {}
+        const next = preference === "system" ? "light" : preference === "light" ? "dark" : "system";
+        try { if (next === "system") localStorage.removeItem(KEY); else localStorage.setItem(KEY, next); } catch {}
         apply(next);
       }));
-      mq.addEventListener("change", () => { if (read() === "system") apply("system"); });
-      window.addEventListener("storage", (e) => { if (e.key === KEY) apply(read()); });
+      mq.addEventListener("change", () => { if (preference === "system") apply("system"); });
+      window.addEventListener("storage", (e) => { if (e.key === KEY || e.key === null) apply(read()); });
     </script>
     <script>
       // Subtle scroll parallax for decorative background blobs
@@ -98,11 +106,16 @@ const { title, description, locale, path, hasEnglish, noindex } = Astro.props;
       // only, respects prefers-reduced-motion, never touches anything
       // interactive or text-bearing.
       try {
-        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
         const parallaxEls = Array.from(document.querySelectorAll<HTMLElement>("[data-parallax]"));
-        if (!prefersReducedMotion && parallaxEls.length) {
+        if (parallaxEls.length) {
           let ticking = false;
           const update = () => {
+            if (motionPreference.matches) {
+              parallaxEls.forEach((el) => el.style.removeProperty("transform"));
+              ticking = false;
+              return;
+            }
             const viewportCenter = window.innerHeight / 2;
             parallaxEls.forEach((el) => {
               const speed = parseFloat(el.dataset.parallax || "0.15");
@@ -120,6 +133,7 @@ const { title, description, locale, path, hasEnglish, noindex } = Astro.props;
           };
           window.addEventListener("scroll", requestUpdate, { passive: true });
           window.addEventListener("resize", requestUpdate);
+          motionPreference.addEventListener("change", requestUpdate);
           update();
         }
       } catch {

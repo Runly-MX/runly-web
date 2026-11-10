@@ -40,6 +40,7 @@ if (root) {
   // One-shot reveals.
   const ios = Array.from(root.querySelectorAll<HTMLElement>(".io"));
   const showAll = () => ios.forEach((el) => el.classList.add("is-in"));
+  reduce.addEventListener("change", () => { if (reduce.matches) showAll(); });
   if (reduce.matches || !("IntersectionObserver" in window)) {
     showAll();
   } else {
@@ -56,7 +57,7 @@ if (root) {
   const update = () => {
     ticking = false;
     const vh = window.innerHeight;
-    scenes.forEach((s) => {
+    scenes.filter((s) => s.classList.contains("hv2-scene-motion")).forEach((s) => {
       const r = s.getBoundingClientRect();
       const range = r.height - vh;
       const p = range > 0 ? Math.min(1, Math.max(0, -r.top / range)) : 1;
@@ -66,14 +67,33 @@ if (root) {
   const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
   const sync = () => {
     window.removeEventListener("scroll", onScroll);
-    const active = !reduce.matches && desktop.matches;
+    const allowed = !reduce.matches && desktop.matches;
+    let active = false;
+    scenes.forEach((scene) => {
+      const pin = scene.querySelector<HTMLElement>(".hv2-pin");
+      const content = pin?.firstElementChild as HTMLElement | null;
+      const padding = pin ? parseFloat(getComputedStyle(pin).paddingTop) + parseFloat(getComputedStyle(pin).paddingBottom) : 0;
+      // Measure the two columns without temporarily enabling sticky layout.
+      // The layers stage uses the same 16 / 12.5 ratio as home-v2.css.
+      const height = content ? Math.max(...Array.from(content.children).map((column) => {
+        const rect = column.getBoundingClientRect();
+        return column.classList.contains("hv2-layers") ? rect.width * 12.5 / 16 : rect.height;
+      })) : Infinity;
+      // Tall text/zoom must remain in normal flow, never clipped in a pinned viewport.
+      const fits = allowed && height + padding <= window.innerHeight - 80;
+      scene.classList.toggle("hv2-scene-motion", fits);
+      if (!fits) scene.style.setProperty("--p", "1");
+      active ||= fits;
+    });
     root.classList.toggle("hv2-motion", active);
-    if (!active) { setAll(1); return; } // linear reading
+    if (!active) { setAll(1); return; }
     window.addEventListener("scroll", onScroll, { passive: true });
     update();
   };
   reduce.addEventListener("change", sync);
   desktop.addEventListener("change", sync);
-  window.addEventListener("resize", () => { if (desktop.matches && !reduce.matches) onScroll(); });
+  window.addEventListener("resize", sync);
+  window.addEventListener("pageshow", sync);
+  document.fonts?.ready.then(sync);
   sync();
 }

@@ -16,10 +16,10 @@
   --rl-surface-2: #f8fafc;
   --rl-text: #0b132b;
   --rl-text-muted: #475569;
-  --rl-text-faint: #64748b;
+  --rl-text-faint: #5c6b80;
   --rl-border: #e2e8f0;
   --rl-border-strong: #cbd5e1;
-  --rl-accent: #e4500a; /* orange tuned for text contrast on light (AA on white) */
+  --rl-accent: #c2410c;
   --rl-accent-fill: #ff5e14;
   --rl-accent-soft: #fff1e8;
   --rl-blue: #0e3a8c;
@@ -127,8 +127,8 @@ html[data-theme="dark"] {
 /* text-white is always meant to be white (buttons, dark scenes). Since
    --color-white now doubles as a surface in dark, pin the text/border uses. */
 html[data-theme="dark"] .text-white { color: #fff; }
-html[data-theme="dark"] .text-slate-800, html[data-theme="dark"] .text-gray-800, html[data-theme="dark"] .hover:text-slate-800:hover { color: #e3e9f6; }
-html[data-theme="dark"] .text-slate-900, html[data-theme="dark"] .text-gray-900, html[data-theme="dark"] .hover:text-slate-900:hover { color: #f1f5fc; }
+html[data-theme="dark"] .text-slate-800, html[data-theme="dark"] .text-gray-800, html[data-theme="dark"] .hover\:text-slate-800:hover { color: #e3e9f6; }
+html[data-theme="dark"] .text-slate-900, html[data-theme="dark"] .text-gray-900, html[data-theme="dark"] .hover\:text-slate-900:hover { color: #f1f5fc; }
 html[data-theme="dark"] .text-slate-950 { color: #fff; }
 /* Text that is already light because it sits on an intentionally dark section stays light. */
 html[data-theme="dark"] .text-slate-100 { color: #f1f5f9; }
@@ -191,4 +191,10 @@ html[data-theme="dark"] .bg-emerald-600 { background-color: #059669; }
 html[data-theme="dark"] .bg-orange-600 { background-color: #ea580c; }
 html[data-theme="dark"] .bg-blue-600 { background-color: #2563eb; }
 html[data-theme="dark"] .bg-red-600 { background-color: #dc2626; }
+
+/* Navy on the existing orange fill keeps small button labels legible. */
+.runly-gradient-btn, html[data-theme="dark"] .runly-gradient-btn { color: #070d1e; }
+html[data-theme="dark"] [data-theme-toggle] button[aria-pressed="true"] { color: #070d1e; }
+html[data-theme="dark"] header a[aria-current="page"] { color: #070d1e; }
+#contacto .text-orange-600, #implementacion .text-orange-600 { color: var(--rl-accent); }
 

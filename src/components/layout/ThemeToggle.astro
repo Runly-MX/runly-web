@@ -16,7 +16,7 @@ const opts = [
 ---
 
 {compact ? (
-  <button type="button" data-theme-cycle aria-label={t.group} title={t.group} class={`flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition-colors hover:border-runly-orange hover:text-runly-orange ${cls}`}>
+  <button type="button" data-theme-cycle data-label-system={t.system} data-label-light={t.light} data-label-dark={t.dark} aria-label={t.group} title={t.group} class={`flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition-colors hover:border-runly-orange hover:text-runly-orange ${cls}`}>
     <Sun class="rl-show-dark h-[1.1rem] w-[1.1rem]" aria-hidden="true" />
     <Moon class="rl-show-light h-[1.1rem] w-[1.1rem]" aria-hidden="true" />
   </button>

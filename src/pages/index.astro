@@ -6,6 +6,7 @@ import Footer from "../components/layout/Footer.astro";
 import HomeScenes from "../components/home/HomeScenes.astro";
 import ContactSection from "../components/sections/ContactSection.astro";
 import { getDictionary } from "../i18n";
+import { homeV2 } from "../i18n/home-v2";
 
 export const prerender = true;
 
@@ -13,7 +14,7 @@ const locale = "es" as const;
 const dict = getDictionary(locale);
 ---
 
-<BaseLayout title={dict.meta.title} description={dict.meta.description} locale={locale} path="/">
+<BaseLayout title={homeV2[locale].meta.title} description={homeV2[locale].meta.description} locale={locale} path="/">
   <Header locale={locale} nav={dict.nav} />
   <main>
     <HomeScenes locale={locale} dict={dict} />

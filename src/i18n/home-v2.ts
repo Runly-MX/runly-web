@@ -146,7 +146,7 @@ const en: HomeCopy = {
     ctaSecondary: "Explore the platform",
     shotAlt: "Runly home screen with the company's installed modules",
     miraiAlt: "A conversation with MirAI, Runly's built-in assistant",
-    caption: "Real Runly screen",
+    caption: "Real Runly screen (Spanish interface)",
   },
   companies: {
     id: "acerca-de",
@@ -206,8 +206,8 @@ const en: HomeCopy = {
     nodes: [
       { id: "mirai", name: "MirAI", kind: "Inside Runly", text: "The built-in assistant reads the information your user can see and proposes actions you confirm. Requires AI to be configured on your instance.", href: "/en/mirai", cta: "Meet MirAI" },
       { id: "mcp-erp", name: "Runly MCP", kind: "For external assistants", text: "A compatible client discovers authorized operations of your company; changes go through proposals with approval. It does not cover every module.", href: "/en/arquitectura", cta: "See architecture" },
-      { id: "mcp-hub", name: "Developer Hub MCP", kind: "For development", text: "Work on your module projects with your identity: documentation, validation and builds. It does not sign or publish for you.", href: "/runly-developer", cta: "Explore Runly Developer" },
-      { id: "chatgpt", name: "ChatGPT plugin", kind: "Being integrated", text: "Connects a compatible client through MCP with authorized access. Its listing and review in third-party stores have their own status.", href: "/runly-developer", cta: "See status and requirements" },
+      { id: "mcp-hub", name: "Developer Hub MCP", kind: "For development", text: "Work on your module projects with your identity: documentation, validation and builds. It does not sign or publish for you.", href: "/runly-developer", cta: "Explore Runly Developer (in Spanish)" },
+      { id: "chatgpt", name: "ChatGPT plugin", kind: "Being integrated", text: "Connects a compatible client through MCP with authorized access. Its listing and review in third-party stores have their own status.", href: "/runly-developer", cta: "See status and requirements (in Spanish)" },
     ],
     shotAlt: "A conversation with MirAI inside Runly's Chat module",
   },
@@ -222,7 +222,7 @@ const en: HomeCopy = {
       { t: "Custom modules", d: "Built for your case, using Runly's module architecture and its documented contracts.", tag: "Custom" },
     ],
     tools: ["Developer Hub", "SDK and contracts", "Module architecture", "Documentation"],
-    ctaA: "Explore Runly Developer",
+    ctaA: "Explore Runly Developer (in Spanish)",
     ctaAHref: "/runly-developer",
     ctaB: "See the architecture",
     ctaBHref: "/en/arquitectura",

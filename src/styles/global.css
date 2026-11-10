@@ -278,6 +278,7 @@
 .bento-stagger.is-visible > *:nth-child(8) { transition-delay: 350ms; }
 
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   .reveal-on-scroll {
     opacity: 1;
     transform: none;

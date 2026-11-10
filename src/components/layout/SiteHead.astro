@@ -1,6 +1,8 @@
 ---
 // src/components/layout/SiteHead.astro
 import { SITE_URL, SITE_NAME, COMPANY_NAME } from "../../consts";
+import { getImage } from "astro:assets";
+import appIcon from "../../../public/brand/runly-app-icon-light.png";
 
 interface Props {
   title: string;
@@ -31,6 +33,8 @@ const enUrl = new URL(enPath, SITE_URL).toString();
 
 const ogImagePath = locale === "es" ? "/brand/og-cover-es.png" : "/brand/og-cover-en.png";
 const ogImageUrl = new URL(ogImagePath, SITE_URL).toString();
+const favicon = await getImage({ src: appIcon, width: 32, height: 32, format: "png" });
+const touchIcon = await getImage({ src: appIcon, width: 180, height: 180, format: "png" });
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -57,14 +61,14 @@ const jsonLd = {
 <script is:inline>
   // Runs before first paint: apply the saved/system theme so there is no flash.
   (function () {
-    try {
-      var v = localStorage.getItem("runly.theme");
-      var d = v === "dark" || (v !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-      document.documentElement.dataset.theme = d ? "dark" : "light";
-    } catch (e) {}
+    var v;
+    try { v = localStorage.getItem("runly.theme"); } catch (e) {}
+    var d = v === "dark" || (v !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    document.documentElement.dataset.theme = d ? "dark" : "light";
   })();
 </script>
 <meta name="color-scheme" content="light dark" />
+<noscript><style>[data-theme-cycle], [data-theme-toggle], #mobileMenuBtn { display: none !important; }</style></noscript>
 <title>{title}</title>
 <meta name="description" content={description} />
 {noindex && <meta name="robots" content="noindex, nofollow" />}
@@ -96,7 +100,7 @@ const jsonLd = {
 <meta name="twitter:image" content={ogImageUrl} />
 <meta name="twitter:image:alt" content={title} />
 
-<link rel="icon" type="image/png" href="/brand/runly-app-icon-light.png" />
-<link rel="apple-touch-icon" href="/brand/runly-app-icon-light.png" />
+<link rel="icon" type="image/png" href={favicon.src} />
+<link rel="apple-touch-icon" href={touchIcon.src} />
 
 <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />

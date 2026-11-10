@@ -27,7 +27,7 @@ const s = c.create;
                   </div>
                 </figure>
               ) : (
-                <ShotSlot slotId={l.id2} label={l.name} pendingText="Captura en preparación" ratio="16 / 9" />
+                <ShotSlot slotId={l.id2} label={l.name} pendingText={c.modules.pendingTag} ratio="16 / 9" />
               )}
               <p>{l.text}</p>
             </div>

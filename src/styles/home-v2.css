@@ -16,6 +16,7 @@
   --rl-border: #22305a;
   --rl-accent: #ff7a3d;
   --rl-line: rgba(238, 242, 251, 0.24);
+  --rl-focus: #ffa06b;
   background: #070d1e;
   color: #eef2fb;
 }
@@ -43,7 +44,7 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease; white-space: nowrap;
 }
 .hv2-btn:hover { transform: translateY(-2px); }
-.hv2-btn-primary { color: #fff; background: linear-gradient(135deg, #e8490a 0%, #ff7a1a 100%); box-shadow: 0 12px 28px -12px rgba(255, 94, 20, 0.7); }
+.hv2-btn-primary { color: #070d1e; background: linear-gradient(135deg, #e8490a 0%, #ff7a1a 100%); box-shadow: 0 12px 28px -12px rgba(255, 94, 20, 0.7); }
 .hv2-btn-ghost { color: var(--rl-text); border: 1.5px solid var(--rl-border-strong); background: transparent; }
 .hv2-btn-ghost:hover { border-color: var(--rl-accent-fill); color: var(--rl-accent); }
 .hv2-night .hv2-btn-ghost { color: #eef2fb; border-color: #3a4a78; }
@@ -99,8 +100,8 @@
 
 /* ---------------- Scene B: companies (sticky) ---------------- */
 .hv2-sticky { position: relative; }
-.hv2-motion .hv2-sticky { height: 240vh; }
-.hv2-motion .hv2-sticky > .hv2-pin { position: sticky; top: 0; height: 100svh; display: flex; align-items: center; }
+.hv2-scene-motion .hv2-sticky { height: 240vh; }
+.hv2-scene-motion .hv2-sticky > .hv2-pin { position: sticky; top: 5rem; height: calc(100svh - 5rem); display: flex; align-items: center; }
 .hv2-pin { padding-block: 5rem; }
 .hv2-co-grid { display: grid; gap: 3rem; align-items: center; width: 100%; }
 @media (min-width: 1024px) { .hv2-co-grid { grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); gap: 4rem; } }
@@ -110,14 +111,14 @@
 .hv2-diagram .hv2-line { opacity: var(--k, 1); }
 .hv2-diagram .rv { --k: clamp(0, calc((var(--p) - var(--s, 0)) * var(--r, 6)), 1); }
 .hv2-line-live { stroke: #ff5e14; }
-.hv2-node { position: absolute; transform: translate(-50%, -50%); }
+.hv2-node { position: absolute; translate: -50% -50%; }
 .hv2-core { width: 22%; aspect-ratio: 1; border-radius: 9999px; display: grid; place-items: center; font-weight: 800; letter-spacing: -0.02em; color: #fff; font-size: clamp(0.9rem, 2vw, 1.5rem);
   background: radial-gradient(circle at 30% 25%, #ff9f1c, #ff5e14 55%, #c93a00); box-shadow: 0 0 0 0.6rem rgba(255, 94, 20, 0.14), 0 0 4rem 0.5rem rgba(255, 94, 20, 0.35); }
 .hv2-org { border: 1.5px solid var(--rl-border); background: var(--rl-surface); border-radius: 0.5rem; padding: 0.5rem 0.75rem; min-width: 6.5rem; text-align: center; box-shadow: var(--rl-shadow); }
 .hv2-org b { display: block; font-size: clamp(0.72rem, 1.4vw, 0.95rem); color: var(--rl-text); }
 .hv2-org i { display: block; font-style: normal; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--rl-text-faint); margin-top: 0.1rem; }
-.hv2-chip { position: absolute; transform: translate(-50%, -50%); font-size: clamp(0.58rem, 1.1vw, 0.75rem); font-weight: 600; padding: 0.22rem 0.55rem; border-radius: 9999px; border: 1px solid var(--rl-border-strong); color: var(--rl-text-muted); background: var(--rl-bg); white-space: nowrap; }
-.hv2-lock { position: absolute; transform: translate(-50%, -50%); width: 1.4rem; height: 1.4rem; border-radius: 9999px; display: grid; place-items: center; background: #ff5e14; color: #fff; }
+.hv2-chip { position: absolute; translate: -50% -50%; font-size: clamp(0.58rem, 1.1vw, 0.75rem); font-weight: 600; padding: 0.22rem 0.55rem; border-radius: 9999px; border: 1px solid var(--rl-border-strong); color: var(--rl-text-muted); background: var(--rl-bg); white-space: nowrap; }
+.hv2-lock { position: absolute; translate: -50% -50%; width: 1.4rem; height: 1.4rem; border-radius: 9999px; display: grid; place-items: center; background: #ff5e14; color: #fff; }
 .hv2-steps { display: grid; gap: 1.5rem; margin-top: 2rem; counter-reset: st; }
 .hv2-steps li { position: relative; padding-left: 3rem; counter-increment: st; }
 .hv2-steps li::before { content: "0" counter(st); position: absolute; left: 0; top: 0; font-weight: 800; font-size: 1.1rem; color: var(--rl-accent); font-variant-numeric: tabular-nums; }
@@ -148,7 +149,7 @@
   .hv2.js .hv2-tabs-on .hv2-tablist { flex-direction: row; overflow-x: auto; border-top: 0; gap: 0.5rem; padding-bottom: 0.5rem; scrollbar-width: thin; }
   .hv2.js .hv2-tabs-on .hv2-tab { font-size: 0.95rem; padding: 0.6rem 1rem; border: 1.5px solid var(--rl-border-strong); border-radius: 9999px; white-space: nowrap; flex: none; min-height: 2.75rem; }
   .hv2.js .hv2-tabs-on .hv2-tab small { display: none; }
-  .hv2.js .hv2-tabs-on .hv2-tab[aria-selected="true"] { padding-left: 1rem; box-shadow: none; background: #ff5e14; border-color: #ff5e14; color: #fff; }
+  .hv2.js .hv2-tabs-on .hv2-tab[aria-selected="true"] { padding-left: 1rem; box-shadow: none; background: #ff5e14; border-color: #ff5e14; color: #070d1e; }
 }
 
 /* Screenshot frame + intentional placeholder. */
@@ -172,8 +173,8 @@
 .hv2-layers { position: relative; display: grid; gap: 1.5rem; }
 /* Motion mode: the three layers share one stage and take turns (each one
    recedes as the next enters). Otherwise they read as a plain vertical list. */
-.hv2-motion .hv2-layers { display: block; aspect-ratio: 16 / 12.5; }
-.hv2-motion .hv2-layer {
+.hv2-scene-motion .hv2-layers { display: block; aspect-ratio: 16 / 12.5; }
+.hv2-scene-motion .hv2-layer {
   --kin: clamp(0, calc((var(--p) - var(--s, 0)) * 5), 1);
   --kout: clamp(0, calc((var(--p) - var(--e, 2)) * 9), 1);
   position: absolute; inset: 0;
@@ -181,8 +182,8 @@
   transform: translateY(calc((1 - var(--kin)) * 70px - var(--kout) * 26px)) scale(calc(1 - var(--kout) * 0.06));
   transform-origin: 50% 0;
 }
-.hv2-motion .hv2-layer[data-i="2"] { z-index: 3; } .hv2-motion .hv2-layer[data-i="1"] { z-index: 2; }
-.hv2-motion .hv2-layer .hv2-frame { background: var(--rl-surface); }
+.hv2-scene-motion .hv2-layer[data-i="2"] { z-index: 3; } .hv2-scene-motion .hv2-layer[data-i="1"] { z-index: 2; }
+.hv2-scene-motion .hv2-layer .hv2-frame { background: var(--rl-surface); }
 .hv2-layer .hv2-frame { box-shadow: var(--rl-shadow); }
 .hv2-layer-label { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.6rem; }
 .hv2-layer-label b { font-size: 1.1rem; letter-spacing: -0.02em; color: var(--rl-text); }

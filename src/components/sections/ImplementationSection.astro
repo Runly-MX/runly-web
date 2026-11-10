@@ -30,7 +30,7 @@ const stepIcons = [MessagesSquare, LayoutTemplate, Rocket, TrendingUp];
         const Icon = stepIcons[i] ?? Rocket;
         return (
           <div class="group bg-white p-6 rounded-2xl border border-slate-200 relative overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-orange-200">
-            <span class="text-4xl font-black text-orange-500/10 absolute top-4 right-4 transition-colors duration-300 group-hover:text-orange-500/25">{step.number}</span>
+            <span aria-hidden="true" class="text-4xl font-black text-orange-500/10 absolute top-4 right-4 transition-colors duration-300 group-hover:text-orange-500/25">{step.number}</span>
             <div class="relative z-10 w-11 h-11 rounded-xl bg-gradient-to-br from-slate-900 to-slate-700 text-white flex items-center justify-center mb-4 shadow-lg transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3">
               <Icon class="w-5 h-5" />
             </div>

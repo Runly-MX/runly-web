@@ -3,6 +3,8 @@
 import type { FooterDictionary } from "../../i18n/types";
 import { COMPANY_NAME, COMPANY_URL } from "../../consts";
 import { MARKETPLACE_NAV_HREF, marketplaceNavEnabled } from "../../lib/marketplace-nav";
+import { Image } from "astro:assets";
+import logoDark from "../../../public/brand/runly-logo-dark.png";
 
 interface Props {
   locale: "es" | "en";
@@ -19,7 +21,7 @@ const prefix = locale === "es" ? "" : "/en";
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-12 border-b border-slate-800">
       <div class="lg:col-span-2 space-y-4">
-        <img alt="RUNLY" class="h-9 w-auto object-contain" src="/brand/runly-logo-dark.png" width="140" height="36" />
+        <Image alt="RUNLY" class="h-9 w-auto object-contain" src={logoDark} width={280} format="png" loading="lazy" />
         <p class="text-sm text-slate-400 max-w-sm">{footer.tagline}</p>
         {showStatus && <div class="pt-2 text-xs text-slate-400">
           <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-2"></span>

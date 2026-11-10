@@ -42,7 +42,7 @@ export const en: SiteDictionary = {
     platformHeading: "Platform",
     ecosystemHeading: "Ecosystem",
     legalHeading: "Legal & Company",
-    uptime: "All systems operational (99.98% uptime)",
+    uptime: "Implementation and support tailored to your project",
     copyright: "RUNLY ERP - runly.mx. All rights reserved.",
     builtBy: "Built with passion by",
     links: {
@@ -398,7 +398,7 @@ export const en: SiteDictionary = {
       },
       {
         question: "Is my data protected and backed up?",
-        answer: "Yes. All communication travels encrypted with SSL/TLS. We run automatic daily backups and rely on cloud redundancy, aiming to guarantee availability and protection against unexpected data loss.",
+        answer: "Security configuration, backups and recovery procedures are defined and verified for your implementation. We review these requirements with your team before go-live.",
       },
       {
         question: "How is the cost of RUNLY calculated if there are no published fixed prices?",
@@ -406,7 +406,7 @@ export const en: SiteDictionary = {
       },
       {
         question: "How long does implementation and go-live take?",
-        answer: "For standard instances with Core modules, go-live usually takes about 2 to 3 business days. For projects with custom development and complex data migration, we set a phased timeline, typically 2 to 4 weeks depending on scope.",
+        answer: "The timeline is agreed after reviewing the modules, custom development, data migration and training your project requires. We define delivery stages with your team before implementation.",
       },
     ],
   },

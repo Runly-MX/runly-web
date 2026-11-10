@@ -40,7 +40,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
               <p class="text-xs text-slate-600">{contact.whatsappDescription}</p>
             </div>
           </div>
-          <a class="mt-4 inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition-colors" href={waHref} rel="noopener noreferrer" target="_blank">
+          <a class="mt-4 inline-flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-semibold text-xs transition-colors" href={waHref} rel="noopener noreferrer" target="_blank">
             <span>{contact.whatsappCta}</span>
             <span class="sr-only">{newTabHint}</span>
           </a>
@@ -105,15 +105,16 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
               <span>{contact.fields.consent}</span>
             </label>
             {turnstileSiteKey && <div class="cf-turnstile" data-sitekey={turnstileSiteKey} data-appearance="interaction-only"></div>}
-            <button class="w-full py-3.5 rounded-xl text-white font-semibold text-sm runly-gradient-btn shadow-md flex items-center justify-center gap-2" id="submitBtn" type="submit" data-submitting={contact.submitting}>
+            <button disabled class="w-full py-3.5 rounded-xl text-white font-semibold text-sm runly-gradient-btn shadow-md flex items-center justify-center gap-2" id="submitBtn" type="submit" data-submitting={contact.submitting}>
               <span id="submitLabel">{contact.submit}</span>
               <Send id="submitIcon" class="w-3.5 h-3.5" />
               <LoaderCircle id="submitSpinner" class="w-3.5 h-3.5 hidden animate-spin" />
             </button>
-            <div class="hidden p-4 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-medium text-center" id="formSuccess">
+            <div role="status" class="hidden p-4 rounded-xl bg-emerald-100 text-emerald-800 text-xs font-medium text-center" id="formSuccess">
               <CircleCheck class="w-4 h-4 inline mr-1.5 text-emerald-600" /> {contact.successMessage}
             </div>
-            <div class="hidden p-4 rounded-xl bg-red-100 text-red-800 text-xs font-medium text-center" id="formError">{contact.errorMessage}</div>
+            <div role="alert" class="hidden p-4 rounded-xl bg-red-100 text-red-800 text-xs font-medium text-center" id="formError">{contact.errorMessage}</div>
+            <noscript><p>{locale === "es" ? "Activa JavaScript para enviar el formulario o contáctanos por WhatsApp." : "Enable JavaScript to submit this form, or contact us on WhatsApp."}</p></noscript>
             <p class="text-[11px] text-slate-500 text-center pt-2">{contact.privacyNotice}</p>
           </form>
         </div>
@@ -134,6 +135,7 @@ const turnstileSiteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY ?? "";
   const errorBox = document.getElementById("formError");
 
   if (form && submitBtn && submitLabel && submitIcon && submitSpinner && success && errorBox) {
+    submitBtn.disabled = false;
     const originalLabel = submitLabel.textContent ?? "";
     const { formId, turnstileSiteKey } = form.dataset;
 

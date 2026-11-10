@@ -1,6 +1,9 @@
 ---
 // src/components/layout/Header.astro
 import ThemeToggle from "./ThemeToggle.astro";
+import { Image } from "astro:assets";
+import logoLight from "../../../public/brand/runly-logo-light.png";
+import logoDark from "../../../public/brand/runly-logo-dark.png";
 import {
   Menu,
   X,
@@ -38,7 +41,7 @@ const langSwitcher = [
 // desktop so the top-level nav doesn't grow past what fits the lg breakpoint
 // as more standalone pages get added.
 const productLinks = [
-  { href: `${prefix}/modulos`, label: "Módulos oficiales", description: nav.descriptions.modules, icon: Blocks },
+  { href: `${prefix}/modulos`, label: locale === "es" ? "Módulos oficiales" : "Official modules", description: nav.descriptions.modules, icon: Blocks },
   { href: `${prefix}/arquitectura`, label: nav.rm3, description: nav.descriptions.rm3, icon: Layers },
   { href: `${prefix}/mirai`, label: nav.mirai, description: nav.descriptions.mirai, icon: Sparkles, badge: "IA" },
 ];
@@ -96,8 +99,8 @@ const mobileRoot = [
 <header class="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/80 backdrop-blur-md transition-all duration-300">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
     <a aria-label="RUNLY" class="flex items-center gap-2" href={`${prefix}/`}>
-      <img alt="RUNLY - Business in motion" class="rl-show-light h-9 w-auto object-contain" src="/brand/runly-logo-light.png" width="140" height="36" />
-      <img alt="" aria-hidden="true" class="rl-show-dark h-9 w-auto object-contain" src="/brand/runly-logo-dark.png" width="140" height="36" />
+      <Image alt="RUNLY - Business in motion" class="rl-show-light h-9 w-auto object-contain" src={logoLight} width={280} format="png" loading="eager" />
+      <Image alt="" aria-hidden="true" class="rl-show-dark h-9 w-auto object-contain" src={logoDark} width={280} format="png" loading="eager" />
     </a>
     <nav class="relative hidden lg:flex items-center gap-4 xl:gap-7 text-sm font-semibold text-slate-600" id="desktopNav">
       <a class="nav-plain-link hover:text-runly-orange transition-colors whitespace-nowrap" href={`${prefix}/#hero`}>{nav.platform}</a>
@@ -143,7 +146,7 @@ const mobileRoot = [
     </nav>
     <div class="flex items-center gap-3 sm:gap-4">
       <ThemeToggle locale={locale} compact class="hidden sm:flex" />
-      <div class="hidden sm:flex items-center gap-0.5 text-xs font-bold rounded-full border border-slate-200 p-0.5" aria-label="Language">
+      <div class="hidden sm:flex items-center gap-0.5 text-xs font-bold rounded-full border border-slate-200 p-0.5" aria-label={locale === "es" ? "Idioma" : "Language"}>
         {langSwitcher.map((item) => (
           <a
             href={item.href}
@@ -158,7 +161,7 @@ const mobileRoot = [
         <span>{nav.requestDemo}</span>
         <ArrowRight class="w-3.5 h-3.5" />
       </a>
-      <button aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu" class="lg:hidden relative p-2 text-slate-700 hover:text-runly-orange rounded-lg" id="mobileMenuBtn">
+      <button aria-label={locale === "es" ? "Abrir o cerrar menú" : "Toggle menu"} aria-expanded="false" aria-controls="mobileMenu" class="lg:hidden relative p-2 text-slate-700 hover:text-runly-orange rounded-lg" id="mobileMenuBtn">
         <Menu class="menu-icon-open w-6 h-6" />
         <X class="menu-icon-close w-6 h-6 absolute inset-0 m-auto" />
       </button>
@@ -166,7 +169,7 @@ const mobileRoot = [
   </div>
   <!-- Mobile drawer: fills the screen below the header. Submenus slide in over
        the root list (drill-down) with a back button instead of nesting. -->
-  <div class="mobile-nav-panel lg:hidden absolute inset-x-0 top-full z-40 flex flex-col border-t border-slate-200 bg-white" id="mobileMenu">
+  <div class="mobile-nav-panel lg:hidden absolute inset-x-0 top-full z-40 flex flex-col border-t border-slate-200 bg-white" id="mobileMenu" inert>
     <div class="mobile-nav-levels relative flex-1 overflow-hidden" data-active="root">
       <div class="mobile-nav-level" data-level="root">
         <ul class="px-2 py-3 sm:px-4">
@@ -214,7 +217,7 @@ const mobileRoot = [
     </div>
     <div class="flex flex-wrap items-center gap-3 border-t border-slate-200 bg-white px-4 py-4 sm:px-6 md:hidden">
       <ThemeToggle locale={locale} class="inline-flex sm:hidden" />
-      <div class="flex items-center gap-1 text-xs font-bold rounded-full border border-slate-200 p-0.5 sm:hidden" aria-label="Language">
+      <div class="flex items-center gap-1 text-xs font-bold rounded-full border border-slate-200 p-0.5 sm:hidden" aria-label={locale === "es" ? "Idioma" : "Language"}>
         {langSwitcher.map((item) => (
           <a
             href={item.href}
@@ -231,6 +234,11 @@ const mobileRoot = [
     </div>
   </div>
 </header>
+<noscript>
+  <nav class="flex flex-wrap gap-4 p-4 border-b border-slate-200" aria-label={locale === "es" ? "Navegación sin JavaScript" : "Navigation without JavaScript"}>
+    {[...productLinks, ...marketplaceLinks, ...docsLinks, ...links].map((link) => <a href={link.href}>{link.label}</a>)}
+  </nav>
+</noscript>
 
 <script>
   // Desktop dropdowns: one shared viewport that moves/resizes to the active
@@ -401,12 +409,16 @@ const mobileRoot = [
       openers.forEach((b) => b.setAttribute("aria-expanded", String(b.dataset.openLevel === id)));
     };
 
+    let resetLevel: number | undefined;
     const setOpen = (open: boolean) => {
+      window.clearTimeout(resetLevel);
+      if (!open && mobileMenu.contains(document.activeElement)) mobileBtn.focus();
+      mobileMenu.inert = !open;
       mobileMenu.classList.toggle("is-open", open);
       mobileBtn.setAttribute("aria-expanded", String(open));
       // Lock page scroll behind the full-height drawer.
       document.documentElement.classList.toggle("overflow-hidden", open);
-      if (!open) window.setTimeout(() => showLevel("root"), 250);
+      if (!open) resetLevel = window.setTimeout(() => showLevel("root"), 250);
     };
     const closeMenu = () => setOpen(false);
 
@@ -437,6 +449,13 @@ const mobileRoot = [
       }
     });
     document.addEventListener("keydown", (e) => {
+      if (e.key === "Tab" && mobileMenu.classList.contains("is-open")) {
+        const controls = Array.from(mobileBtn.closest("header")!.querySelectorAll<HTMLElement>("a, button, [tabindex='0']"))
+          .filter((el) => !el.closest("[inert]") && el.getClientRects().length && getComputedStyle(el).visibility !== "hidden");
+        const first = controls[0], last = controls[controls.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
       if (e.key !== "Escape" || !mobileMenu.classList.contains("is-open")) return;
       // Escape steps back out of a submenu first, then closes the drawer.
       if (levelsEl.dataset.active !== "root") {

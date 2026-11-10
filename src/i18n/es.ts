@@ -42,7 +42,7 @@ export const es: SiteDictionary = {
     platformHeading: "Plataforma",
     ecosystemHeading: "Ecosistema",
     legalHeading: "Legal y Empresa",
-    uptime: "Todos los sistemas operativos en línea (99.98% uptime)",
+    uptime: "Implementación y soporte según tu proyecto",
     copyright: "RUNLY ERP - runly.mx. Todos los derechos reservados.",
     builtBy: "Desarrollado con pasión por",
     links: {
@@ -399,7 +399,7 @@ export const es: SiteDictionary = {
       },
       {
         question: "¿Mis datos están protegidos y respaldados?",
-        answer: "Sí. Toda la comunicación viaja cifrada con SSL/TLS. Realizamos copias de seguridad automáticas diarias y contamos con redundancia en la nube, buscando garantizar disponibilidad y protección contra pérdidas imprevistas.",
+        answer: "La configuración de seguridad, los respaldos y los procedimientos de recuperación se definen y verifican para tu implementación. Revisamos estos requisitos con tu equipo antes de la puesta en marcha.",
       },
       {
         question: "¿Cómo se calcula el costo de RUNLY si no hay precios fijos publicados?",
@@ -407,7 +407,7 @@ export const es: SiteDictionary = {
       },
       {
         question: "¿Cuánto tiempo toma la implementación y puesta en marcha?",
-        answer: "Para instancias estándar con módulos Core, la puesta en marcha suele tomar entre 2 y 3 días hábiles. Para proyectos con desarrollos custom y migración compleja de bases de datos, definimos un calendario por fases, habitualmente de 2 a 4 semanas según el alcance.",
+        answer: "El plazo se acuerda después de revisar los módulos, las adaptaciones, la migración de datos y la capacitación que requiere tu proyecto. Definimos las etapas de entrega con tu equipo antes de implementar.",
       },
     ],
   },
