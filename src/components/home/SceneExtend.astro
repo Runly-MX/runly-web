@@ -1,0 +1,34 @@
+---
+import { ArrowRight } from "@lucide/astro";
+import type { HomeCopy } from "../../i18n/home-v2";
+interface Props { c: HomeCopy }
+const { c } = Astro.props;
+const s = c.extend;
+---
+
+<section class="hv2-extend hv2-scroll-target" id={s.id} aria-labelledby="hv2-ex-title">
+  <div class="hv2-ext-l">
+    <div class="in io">
+      <p class="hv2-eyebrow">{s.eyebrow}</p>
+      <h2 id="hv2-ex-title">{s.title}</h2>
+      <p>{s.body}</p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href={s.ctaAHref} class="hv2-btn hv2-btn-dark">{s.ctaA} <ArrowRight class="h-4 w-4" aria-hidden="true" /></a>
+        <a href={s.ctaBHref} class="hv2-btn hv2-btn-line">{s.ctaB}</a>
+      </div>
+    </div>
+  </div>
+  <div class="hv2-ext-r">
+    <div class="in">
+      <ul class="hv2-tiers">
+        {s.tiers.map((t, i) => (
+          <li class="io" style={`--d:${i * 90}ms`}>
+            <span><span class="hv2-tag">{t.tag}</span></span>
+            <span><b>{t.t}</b><span class="d">{t.d}</span></span>
+          </li>
+        ))}
+      </ul>
+      <ul class="hv2-toolrow" aria-label="Developer">{s.tools.map((t) => <li>{t}</li>)}</ul>
+    </div>
+  </div>
+</section>

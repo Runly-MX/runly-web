@@ -1,0 +1,59 @@
+---
+import { Lock } from "@lucide/astro";
+import type { HomeCopy } from "../../i18n/home-v2";
+interface Props { c: HomeCopy }
+const { c } = Astro.props;
+const s = c.companies;
+// Node layout in diagram percentages (x,y). Companies sit around the core.
+const orgPos = [{ x: 14, y: 26 }, { x: 86, y: 26 }, { x: 50, y: 84 }];
+const chipOff = [
+  [{ x: 3, y: 11 }, { x: 24, y: 8 }, { x: 4, y: 41 }],
+  [{ x: 97, y: 11 }, { x: 76, y: 8 }, { x: 96, y: 41 }],
+  [{ x: 26, y: 95 }, { x: 74, y: 95 }, { x: 50, y: 98 }],
+];
+---
+
+<section class="hv2-night hv2-scroll-target" id={s.id} aria-labelledby="hv2-co-title" data-scene="sticky">
+  <div class="hv2-sticky" data-sticky>
+    <div class="hv2-pin">
+      <div class="hv2-wrap hv2-co-grid">
+        <div>
+          <p class="hv2-eyebrow">{s.eyebrow}</p>
+          <h2 id="hv2-co-title" class="hv2-h2 mt-5" style="color:#fff">{s.title}</h2>
+          <p class="hv2-lead mt-6">{s.body}</p>
+          <ol class="hv2-steps">
+            {s.steps.map((st, i) => (
+              <li class="rv" style={`--s:${0.12 + i * 0.22};--dy:16px`}><b>{st.t}</b><span>{st.d}</span></li>
+            ))}
+          </ol>
+          <p class="mt-6 text-sm" style="color:var(--rl-text-faint)">{s.note}</p>
+        </div>
+        <div>
+          <div class="hv2-diagram" role="img" aria-label={s.legend + ". " + s.orgs.map((o) => o.name + ": " + o.mods.join(", ")).join("; ")}>
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+              {orgPos.map((p, i) => (
+                <path class="hv2-line hv2-line-live rv" style={`--s:${0.05 + i * 0.2};--r:4`} d={`M50 50 L${p.x} ${p.y}`} />
+              ))}
+              {orgPos.map((p, i) => chipOff[i].map((q, j) => (
+                <path class="hv2-line rv" style={`--s:${0.3 + i * 0.18 + j * 0.04};--r:5`} d={`M${p.x} ${p.y} L${q.x} ${q.y}`} />
+              )))}
+            </svg>
+            <div class="hv2-node hv2-core" style="left:50%;top:50%">{s.core}</div>
+            {s.orgs.map((o, i) => (
+              <>
+                <div class="hv2-node hv2-org rv" style={`left:${orgPos[i].x}%;top:${orgPos[i].y}%;--s:${0.08 + i * 0.2};--dy:0px`}>
+                  <b>{o.name}</b>
+                </div>
+                {o.mods.map((m, j) => (
+                  <span class="hv2-chip rv" style={`left:${chipOff[i][j].x}%;top:${chipOff[i][j].y}%;--s:${0.34 + i * 0.18 + j * 0.04};--dy:0px`}>{m}</span>
+                ))}
+                <span class="hv2-lock rv" style={`left:${orgPos[i].x + (i === 1 ? -9 : i === 0 ? 9 : 0)}%;top:${orgPos[i].y + (i === 2 ? -9 : 7)}%;--s:${0.7 + i * 0.08};--dy:0px`}><Lock class="h-3 w-3" aria-hidden="true" /></span>
+              </>
+            ))}
+          </div>
+          <p class="hv2-legend">{s.legend}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

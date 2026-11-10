@@ -26,7 +26,7 @@ const { title, description, locale, path, hasEnglish, noindex } = Astro.props;
   <head>
     <SiteHead title={title} description={description} locale={locale} path={path} hasEnglish={hasEnglish} noindex={noindex} />
   </head>
-  <body class="bg-[#FCFDFF] text-slate-800 font-sans antialiased selection:bg-orange-500 selection:text-white overflow-x-hidden">
+  <body class="bg-[var(--rl-bg)] text-slate-800 font-sans antialiased selection:bg-orange-500 selection:text-white overflow-x-hidden">
     <slot />
     <noscript>
       <style>
@@ -55,6 +55,38 @@ const { title, description, locale, path, hasEnglish, noindex } = Astro.props;
       } catch {
         document.querySelectorAll(".reveal-on-scroll").forEach((el) => el.classList.add("is-visible"));
       }
+    </script>
+    <script>
+      // Theme control: "system" | "light" | "dark". The early inline script in
+      // SiteHead already applied data-theme; this wires every [data-theme-toggle].
+      const KEY = "runly.theme";
+      const mq = window.matchMedia("(prefers-color-scheme: dark)");
+      const read = () => { try { const v = localStorage.getItem(KEY); return v === "light" || v === "dark" ? v : "system"; } catch { return "system"; } };
+      const apply = (pref: string) => {
+        const root = document.documentElement;
+        root.classList.add("rl-theme-switching");
+        root.dataset.theme = pref === "system" ? (mq.matches ? "dark" : "light") : pref;
+        root.dataset.themePref = pref;
+        requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("rl-theme-switching")));
+        document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle] button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.value === pref)));
+      };
+      apply(read());
+      document.querySelectorAll<HTMLElement>("[data-theme-toggle]").forEach((group) => {
+        group.addEventListener("click", (e) => {
+          const btn = (e.target as HTMLElement).closest<HTMLButtonElement>("button[data-value]");
+          if (!btn) return;
+          const v = btn.dataset.value!;
+          try { if (v === "system") localStorage.removeItem(KEY); else localStorage.setItem(KEY, v); } catch {}
+          apply(v);
+        });
+      });
+      document.querySelectorAll<HTMLElement>("[data-theme-cycle]").forEach((b) => b.addEventListener("click", () => {
+        const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        try { localStorage.setItem(KEY, next); } catch {}
+        apply(next);
+      }));
+      mq.addEventListener("change", () => { if (read() === "system") apply("system"); });
+      window.addEventListener("storage", (e) => { if (e.key === KEY) apply(read()); });
     </script>
     <script>
       // Subtle scroll parallax for decorative background blobs

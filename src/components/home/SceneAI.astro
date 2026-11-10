@@ -1,0 +1,44 @@
+---
+import ShotSlot from "./ShotSlot.astro";
+import mirai from "../../assets/home-v2/mirai-chat.png";
+import { ArrowRight } from "@lucide/astro";
+import type { HomeCopy } from "../../i18n/home-v2";
+interface Props { c: HomeCopy }
+const { c } = Astro.props;
+const s = c.ai;
+// Satellites around the core in the 100x44 viewBox.
+const pos = [{ x: 14, y: 10 }, { x: 86, y: 10 }, { x: 14, y: 36 }, { x: 86, y: 36 }];
+---
+
+<section class="hv2-night hv2-ai hv2-scroll-target" id={s.id} aria-labelledby="hv2-ai-title">
+  <div class="hv2-wrap">
+    <p class="hv2-eyebrow io">{s.eyebrow}</p>
+    <h2 id="hv2-ai-title" class="hv2-h2 io mt-5 max-w-4xl" style="color:#fff">{s.title}</h2>
+    <p class="hv2-lead io mt-6">{s.body}</p>
+
+    <div class="hv2-net io" aria-hidden="true">
+      <svg viewBox="0 0 100 44" preserveAspectRatio="none">
+        {pos.map((p) => <path class="hv2-line" d={`M50 22 L${p.x} ${p.y}`} />)}
+      </svg>
+      <div class="hv2-core">Runly</div>
+      {s.nodes.map((n, i) => (
+        <div class="hv2-org" style={`left:${pos[i].x}%;top:${(pos[i].y / 44) * 100}%`}><b style="color:#fff">{n.name}</b><i>{n.kind}</i></div>
+      ))}
+    </div>
+
+    <div class="hv2-ai-cols">
+      {s.nodes.map((n, i) => (
+        <article class="io" style={`--d:${i * 80}ms`}>
+          <small>{n.kind}</small>
+          <h3>{n.name}</h3>
+          <p>{n.text}</p>
+          <a href={n.href}>{n.cta} <ArrowRight class="ml-1.5 h-4 w-4" aria-hidden="true" /></a>
+        </article>
+      ))}
+    </div>
+
+    <div class="hv2-ai-shot io">
+      <ShotSlot slotId="HV2-09" label="MirAI" alt={s.shotAlt} src={mirai} ratio="1916 / 941" sizes="(min-width: 1024px) 736px, 100vw" />
+    </div>
+  </div>
+</section>

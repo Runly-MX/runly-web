@@ -1,0 +1,39 @@
+---
+// Scrollytelling home (scenes A-H). Content: src/i18n/home-v2.ts.
+import SceneHero from "./SceneHero.astro";
+import SceneCompanies from "./SceneCompanies.astro";
+import SceneModules from "./SceneModules.astro";
+import SceneCreate from "./SceneCreate.astro";
+import SceneAI from "./SceneAI.astro";
+import SceneExtend from "./SceneExtend.astro";
+import SceneMarket from "./SceneMarket.astro";
+import SceneClose from "./SceneClose.astro";
+import ImplementationSection from "../sections/ImplementationSection.astro";
+import FaqSection from "../sections/FaqSection.astro";
+import { homeV2 } from "../../i18n/home-v2";
+import type { SiteDictionary } from "../../i18n/types";
+
+interface Props { locale: "es" | "en"; dict: SiteDictionary }
+const { locale, dict } = Astro.props;
+const c = homeV2[locale];
+const prefix = locale === "es" ? "" : "/en";
+---
+
+<div class="hv2" data-home-scenes>
+  <SceneHero c={c} prefix={prefix} />
+  <div class="hv2-nightfade" aria-hidden="true"></div>
+  <SceneCompanies c={c} />
+  <div class="hv2-nightfade-up" aria-hidden="true"></div>
+  <SceneModules c={c} />
+  <SceneCreate c={c} />
+  <SceneAI c={c} />
+  <SceneExtend c={c} />
+  <SceneMarket c={c} />
+  <ImplementationSection dict={dict} />
+  <FaqSection dict={dict} />
+  <SceneClose c={c} prefix={prefix} />
+</div>
+
+<script>
+  import "../../lib/scenes";
+</script>

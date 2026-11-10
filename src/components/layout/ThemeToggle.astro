@@ -1,0 +1,32 @@
+---
+// Three-way theme control (system / light / dark). Wired in BaseLayout; the
+// saved choice lives in localStorage under "runly.theme".
+import { Sun, Moon, Monitor } from "@lucide/astro";
+
+interface Props { locale: "es" | "en"; class?: string; compact?: boolean }
+const { locale, class: cls = "", compact = false } = Astro.props;
+const t = locale === "es"
+  ? { group: "Tema", system: "Tema del sistema", light: "Tema claro", dark: "Tema oscuro" }
+  : { group: "Theme", system: "System theme", light: "Light theme", dark: "Dark theme" };
+const opts = [
+  { v: "system", label: t.system, Icon: Monitor },
+  { v: "light", label: t.light, Icon: Sun },
+  { v: "dark", label: t.dark, Icon: Moon },
+];
+---
+
+{compact ? (
+  <button type="button" data-theme-cycle aria-label={t.group} title={t.group} class={`flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 text-slate-600 transition-colors hover:border-runly-orange hover:text-runly-orange ${cls}`}>
+    <Sun class="rl-show-dark h-[1.1rem] w-[1.1rem]" aria-hidden="true" />
+    <Moon class="rl-show-light h-[1.1rem] w-[1.1rem]" aria-hidden="true" />
+  </button>
+) : (
+<div data-theme-toggle role="group" aria-label={t.group} class={`items-center gap-0.5 rounded-full border border-slate-200 p-0.5 ${cls}`}>
+  {opts.map(({ v, label, Icon }) => (
+    <button type="button" data-value={v} aria-pressed="false" aria-label={label} title={label}
+      class="flex h-8 w-8 items-center justify-center rounded-full text-slate-500 transition-colors hover:text-slate-900 aria-pressed:bg-runly-orange aria-pressed:text-white">
+      <Icon class="h-4 w-4" aria-hidden="true" />
+    </button>
+  ))}
+</div>
+)}

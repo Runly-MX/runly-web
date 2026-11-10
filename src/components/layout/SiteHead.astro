@@ -54,6 +54,17 @@ const jsonLd = {
 
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script is:inline>
+  // Runs before first paint: apply the saved/system theme so there is no flash.
+  (function () {
+    try {
+      var v = localStorage.getItem("runly.theme");
+      var d = v === "dark" || (v !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      document.documentElement.dataset.theme = d ? "dark" : "light";
+    } catch (e) {}
+  })();
+</script>
+<meta name="color-scheme" content="light dark" />
 <title>{title}</title>
 <meta name="description" content={description} />
 {noindex && <meta name="robots" content="noindex, nofollow" />}

@@ -1,0 +1,39 @@
+---
+import ShotSlot from "./ShotSlot.astro";
+import type { HomeCopy } from "../../i18n/home-v2";
+interface Props { c: HomeCopy }
+const { c } = Astro.props;
+const s = c.create;
+---
+
+<section class="hv2-create hv2-scroll-target" id={s.id} aria-labelledby="hv2-cr-title" data-scene="sticky">
+  <div class="hv2-sticky">
+    <div class="hv2-pin">
+      <div class="hv2-wrap hv2-cr-grid">
+        <div>
+          <p class="hv2-eyebrow">{s.eyebrow}</p>
+          <h2 id="hv2-cr-title" class="hv2-h2 mt-5">{s.title}</h2>
+          <p class="hv2-lead mt-6">{s.body}</p>
+        </div>
+        <div class="hv2-layers">
+          {s.layers.map((l, i) => (
+            <div class="hv2-layer" data-i={i} style={`--s:${i === 0 ? 0 : 0.06 + i * 0.32};--e:${0.4 + i * 0.32}`}>
+              <div class="hv2-layer-label"><b>{l.name}</b><span class="hv2-tag">{l.tag}</span></div>
+              {l.id === "auto" ? (
+                <figure class="hv2-frame">
+                  <div class="hv2-frame-bar" aria-hidden="true"><i></i><i></i><i></i><span>{s.flowLegend}</span></div>
+                  <div class="hv2-flow" role="img" aria-label={`${s.flowLegend}: ${s.flow.map((f, k) => `${f} - ${s.flowSample[k]}`).join(" > ")}`}>
+                    {s.flow.map((f, k) => <div><i>{f}</i><span>{s.flowSample[k]}</span></div>)}
+                  </div>
+                </figure>
+              ) : (
+                <ShotSlot slotId={l.id2} label={l.name} pendingText="Captura en preparación" ratio="16 / 9" />
+              )}
+              <p>{l.text}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

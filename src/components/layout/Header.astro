@@ -1,5 +1,6 @@
 ---
 // src/components/layout/Header.astro
+import ThemeToggle from "./ThemeToggle.astro";
 import {
   Menu,
   X,
@@ -95,7 +96,8 @@ const mobileRoot = [
 <header class="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/80 backdrop-blur-md transition-all duration-300">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
     <a aria-label="RUNLY" class="flex items-center gap-2" href={`${prefix}/`}>
-      <img alt="RUNLY - Business in motion" class="h-9 w-auto object-contain" src="/brand/runly-logo-light.png" width="140" height="36" />
+      <img alt="RUNLY - Business in motion" class="rl-show-light h-9 w-auto object-contain" src="/brand/runly-logo-light.png" width="140" height="36" />
+      <img alt="" aria-hidden="true" class="rl-show-dark h-9 w-auto object-contain" src="/brand/runly-logo-dark.png" width="140" height="36" />
     </a>
     <nav class="relative hidden lg:flex items-center gap-4 xl:gap-7 text-sm font-semibold text-slate-600" id="desktopNav">
       <a class="nav-plain-link hover:text-runly-orange transition-colors whitespace-nowrap" href={`${prefix}/#hero`}>{nav.platform}</a>
@@ -140,11 +142,12 @@ const mobileRoot = [
       </div>
     </nav>
     <div class="flex items-center gap-3 sm:gap-4">
+      <ThemeToggle locale={locale} compact class="hidden sm:flex" />
       <div class="hidden sm:flex items-center gap-0.5 text-xs font-bold rounded-full border border-slate-200 p-0.5" aria-label="Language">
         {langSwitcher.map((item) => (
           <a
             href={item.href}
-            class={`px-2.5 py-1 rounded-full transition-colors ${locale === item.code ? "bg-slate-900 text-white" : "text-slate-500 hover:text-slate-900"}`}
+            class={`px-2.5 py-1 rounded-full transition-colors ${locale === item.code ? "bg-slate-900 text-white dark:bg-runly-orange" : "text-slate-500 hover:text-slate-900"}`}
             aria-current={locale === item.code ? "page" : undefined}
           >
             {item.label}
@@ -155,7 +158,7 @@ const mobileRoot = [
         <span>{nav.requestDemo}</span>
         <ArrowRight class="w-3.5 h-3.5" />
       </a>
-      <button aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu" class="lg:hidden relative p-2 text-slate-700 hover:text-runly-orange rounded-lg focus:outline-none" id="mobileMenuBtn">
+      <button aria-label="Toggle menu" aria-expanded="false" aria-controls="mobileMenu" class="lg:hidden relative p-2 text-slate-700 hover:text-runly-orange rounded-lg" id="mobileMenuBtn">
         <Menu class="menu-icon-open w-6 h-6" />
         <X class="menu-icon-close w-6 h-6 absolute inset-0 m-auto" />
       </button>
@@ -209,12 +212,13 @@ const mobileRoot = [
         </div>
       ))}
     </div>
-    <div class="flex items-center gap-3 border-t border-slate-200 bg-white px-4 py-4 sm:px-6 md:hidden">
+    <div class="flex flex-wrap items-center gap-3 border-t border-slate-200 bg-white px-4 py-4 sm:px-6 md:hidden">
+      <ThemeToggle locale={locale} class="inline-flex sm:hidden" />
       <div class="flex items-center gap-1 text-xs font-bold rounded-full border border-slate-200 p-0.5 sm:hidden" aria-label="Language">
         {langSwitcher.map((item) => (
           <a
             href={item.href}
-            class={`px-3 py-1.5 rounded-full transition-colors ${locale === item.code ? "bg-slate-900 text-white" : "text-slate-500 hover:text-slate-900"}`}
+            class={`px-3 py-1.5 rounded-full transition-colors ${locale === item.code ? "bg-slate-900 text-white dark:bg-runly-orange" : "text-slate-500 hover:text-slate-900"}`}
             aria-current={locale === item.code ? "page" : undefined}
           >
             {item.label}

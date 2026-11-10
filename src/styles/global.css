@@ -1,5 +1,7 @@
 /* src/styles/global.css */
 @import "tailwindcss";
+@import "./theme.css";
+@import "./home-v2.css";
 
 @theme {
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
@@ -85,6 +87,7 @@
 /* Mobile nav drawer: opaque, fills the viewport below the 5rem header, fades
    in and staggers the root links so it doesn't just snap open. */
 .mobile-nav-panel {
+  overflow: hidden;
   height: calc(100dvh - 5rem);
   opacity: 0;
   visibility: hidden;

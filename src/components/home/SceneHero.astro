@@ -1,0 +1,35 @@
+---
+import { Image } from "astro:assets";
+import { ArrowRight } from "@lucide/astro";
+import inicio from "../../assets/tour/inicio.png";
+import mirai from "../../assets/home-v2/mirai-chat.png";
+import type { HomeCopy } from "../../i18n/home-v2";
+interface Props { c: HomeCopy; prefix: string }
+const { c, prefix } = Astro.props;
+const h = c.hero;
+---
+
+<section class="hv2-hero hv2-scroll-target" id="hero" aria-labelledby="hv2-h1">
+  <div class="hv2-wrap w-full">
+    <div class="hv2-hero-grid">
+      <div>
+        <p class="hv2-eyebrow">{h.eyebrow}</p>
+        <h1 id="hv2-h1" class="mt-6">{h.lines.map((l) => <span>{l}</span>)}</h1>
+        <p class="hv2-lead mt-8">{h.sub}</p>
+        <div class="mt-10 flex flex-wrap gap-3">
+          <a href={`${prefix}/#contacto`} class="hv2-btn hv2-btn-primary">{h.ctaPrimary} <ArrowRight class="h-4 w-4" aria-hidden="true" /></a>
+          <a href="#acerca-de" class="hv2-btn hv2-btn-ghost">{h.ctaSecondary}</a>
+        </div>
+      </div>
+      <div class="hv2-stack">
+        <div class="hv2-shot-main">
+          <Image src={inicio} alt={h.shotAlt} widths={[640, 960, 1400, 1912]} sizes="(min-width: 1024px) 62vw, 100vw" loading="eager" fetchpriority="high" format="webp" quality={82} />
+        </div>
+        <div class="hv2-shot-second">
+          <Image src={mirai} alt={h.miraiAlt} widths={[480, 800]} sizes="(min-width: 1024px) 34vw, 52vw" loading="eager" format="webp" quality={80} />
+        </div>
+        <p class="hv2-caption">{h.caption}</p>
+      </div>
+    </div>
+  </div>
+</section>
