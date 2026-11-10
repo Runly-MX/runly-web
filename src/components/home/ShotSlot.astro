@@ -17,7 +17,13 @@ interface Props {
   sizes?: string;
   chrome?: boolean;
 }
-const { slotId, label, alt = "", src, ratio = "16 / 10", pendingText = "", eager = false, sizes = "(min-width: 1024px) 56vw, 100vw", chrome = true } = Astro.props;
+// Drop a file named after the slot ID (e.g. HV2-AI-01.webp) into
+// src/assets/home-v2/slots/ and it replaces the placeholder automatically.
+const dropped = import.meta.glob<ImageMetadata>("../../assets/home-v2/slots/*.{png,jpg,jpeg,webp}", { eager: true, import: "default" });
+const found = Object.entries(dropped).find(([k]) => k.split("/").pop()!.toLowerCase().startsWith(Astro.props.slotId.toLowerCase() + "."))?.[1];
+const { slotId, label, alt: altProp = "", src: srcProp, ratio = "16 / 10", pendingText = "", eager = false, sizes = "(min-width: 1024px) 56vw, 100vw", chrome = true } = Astro.props;
+const src = srcProp ?? found;
+const alt = altProp || (found ? label : "");
 ---
 
 <figure class="hv2-frame" data-slot={slotId} data-real={src ? "true" : "false"}>

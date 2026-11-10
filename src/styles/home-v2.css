@@ -106,18 +106,19 @@
 .hv2-co-grid { display: grid; gap: 3rem; align-items: center; width: 100%; }
 @media (min-width: 1024px) { .hv2-co-grid { grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); gap: 4rem; } }
 .hv2-diagram { position: relative; aspect-ratio: 1 / 0.86; width: 100%; max-width: 46rem; margin-inline: auto; }
-.hv2-diagram svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.hv2-diagram > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .hv2-line { stroke: var(--rl-line); fill: none; vector-effect: non-scaling-stroke; stroke-width: 1.5; }
 .hv2-diagram .hv2-line { opacity: var(--k, 1); }
 .hv2-diagram .rv { --k: clamp(0, calc((var(--p) - var(--s, 0)) * var(--r, 6)), 1); }
 .hv2-line-live { stroke: #ff5e14; }
 .hv2-node { position: absolute; translate: -50% -50%; }
-.hv2-core { width: 22%; aspect-ratio: 1; border-radius: 9999px; display: grid; place-items: center; font-weight: 800; letter-spacing: -0.02em; color: #fff; font-size: clamp(0.9rem, 2vw, 1.5rem);
-  background: radial-gradient(circle at 30% 25%, #ff9f1c, #ff5e14 55%, #c93a00); box-shadow: 0 0 0 0.6rem rgba(255, 94, 20, 0.14), 0 0 4rem 0.5rem rgba(255, 94, 20, 0.35); }
+.hv2-core { width: 20%; aspect-ratio: 1; display: grid; place-items: center; }
+.hv2-core::before { content: ""; position: absolute; inset: -30%; border-radius: 9999px; background: radial-gradient(circle, rgba(255, 94, 20, 0.28), transparent 65%); }
+.hv2-core img { position: relative; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 30px rgba(255, 94, 20, 0.35)); }
 .hv2-org { border: 1.5px solid var(--rl-border); background: var(--rl-surface); border-radius: 0.5rem; padding: 0.5rem 0.75rem; min-width: 6.5rem; text-align: center; box-shadow: var(--rl-shadow); }
 .hv2-org b { display: block; font-size: clamp(0.72rem, 1.4vw, 0.95rem); color: var(--rl-text); }
 .hv2-org i { display: block; font-style: normal; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--rl-text-faint); margin-top: 0.1rem; }
-.hv2-chip { position: absolute; translate: -50% -50%; font-size: clamp(0.58rem, 1.1vw, 0.75rem); font-weight: 600; padding: 0.22rem 0.55rem; border-radius: 9999px; border: 1px solid var(--rl-border-strong); color: var(--rl-text-muted); background: var(--rl-bg); white-space: nowrap; }
+.hv2-chip { display: inline-flex; align-items: center; gap: 0.4rem; padding-left: 0.25rem !important; position: absolute; translate: -50% -50%; font-size: clamp(0.58rem, 1.1vw, 0.75rem); font-weight: 600; padding: 0.22rem 0.55rem; border-radius: 9999px; border: 1px solid var(--rl-border-strong); color: var(--rl-text-muted); background: var(--rl-bg); white-space: nowrap; }
 .hv2-lock { position: absolute; translate: -50% -50%; width: 1.4rem; height: 1.4rem; border-radius: 9999px; display: grid; place-items: center; background: #ff5e14; color: #fff; }
 .hv2-steps { display: grid; gap: 1.5rem; margin-top: 2rem; counter-reset: st; }
 .hv2-steps li { position: relative; padding-left: 3rem; counter-increment: st; }
@@ -143,7 +144,7 @@
 .hv2.js .hv2-tabs-on .hv2-panel + .hv2-panel { margin-top: 0; }
 .hv2-panel p.txt { margin-top: 1.25rem; color: var(--rl-text-muted); font-size: 1.05rem; line-height: 1.65; max-width: 36rem; }
 .hv2-links { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
-.hv2-links li { font-size: 0.78rem; font-weight: 600; padding: 0.3rem 0.7rem; border-radius: 9999px; border: 1px solid var(--rl-border-strong); color: var(--rl-text-muted); }
+.hv2-links li { display: inline-flex; align-items: center; gap: 0.45rem; padding-left: 0.3rem !important; font-size: 0.78rem; font-weight: 600; padding: 0.3rem 0.7rem; border-radius: 9999px; border: 1px solid var(--rl-border-strong); color: var(--rl-text-muted); }
 /* Tab strip on small screens: collapse to horizontal chips so the stage is near. */
 @media (max-width: 1023px) {
   .hv2.js .hv2-tabs-on .hv2-tablist { flex-direction: row; overflow-x: auto; border-top: 0; gap: 0.5rem; padding-bottom: 0.5rem; scrollbar-width: thin; }
@@ -198,13 +199,12 @@
 .hv2-ai { padding-block: 6rem; position: relative; overflow: hidden; }
 .hv2-ai::before { content: ""; position: absolute; inset: 0; background: radial-gradient(50rem 30rem at 50% 38%, rgba(255, 94, 20, 0.2), transparent 65%), radial-gradient(40rem 30rem at 90% 80%, rgba(60, 110, 255, 0.16), transparent 70%); pointer-events: none; }
 .hv2-ai > * { position: relative; }
-.hv2-net { position: relative; aspect-ratio: 16 / 7; max-width: 64rem; margin: 3rem auto 0; display: none; }
+.hv2-net { position: relative; aspect-ratio: 16 / 9.4; max-width: 68rem; margin: 3rem auto 0; display: none; }
 @media (min-width: 900px) { .hv2-net { display: block; } }
-.hv2-net svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hv2-net > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .hv2-net .hv2-line { stroke: rgba(238, 242, 251, 0.34); stroke-dasharray: 6 6; stroke-dashoffset: 0; animation: hv2-flow 1.6s linear infinite; }
 @keyframes hv2-flow { to { stroke-dashoffset: -24; } }
-.hv2-net .hv2-core { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 14%; }
-.hv2-net .hv2-org { position: absolute; transform: translate(-50%, -50%); background: #0f1833; border-color: #2d3d68; }
+.hv2-net .hv2-core { width: 15%; }
 .hv2-ai-cols { display: grid; gap: 2rem 3rem; margin-top: 3.5rem; }
 @media (min-width: 640px) { .hv2-ai-cols { grid-template-columns: 1fr 1fr; } }
 @media (min-width: 1100px) { .hv2-ai-cols { grid-template-columns: repeat(4, 1fr); } }
@@ -271,3 +271,24 @@ html:not(.js) .hv2-net .hv2-line { animation: none; }
 /* Small screens: keep diagram nodes (centered on their anchor) inside the viewport. */
 .hv2-night, .hv2-hero, .hv2-close { overflow-x: clip; }
 @media (max-width: 639px) { .hv2-diagram { width: calc(100% - 5rem); } }
+
+/* Module icon tile (colors echo the product's Home tiles). */
+.hv2-ico { display: inline-grid; place-items: center; flex: none; background: var(--c); color: #fff; border-radius: 0.4rem; }
+.hv2-ico-sm { width: 1.35rem; height: 1.35rem; } .hv2-ico-md { width: 2.25rem; height: 2.25rem; border-radius: 0.55rem; }
+.hv2-ico-sm .hv2-ico-svg { width: 0.8rem; height: 0.8rem; } .hv2-ico-md .hv2-ico-svg { width: 1.2rem; height: 1.2rem; }
+
+/* Scene E tiles: image + caption around the core. */
+.hv2-tile { width: 25%; }
+.hv2-tile .hv2-frame { border-color: #2d3d68; background: #0f1833; }
+.hv2-tile .hv2-slot { padding: 0.75rem; background: repeating-linear-gradient(135deg, transparent 0 14px, rgba(255,255,255,0.04) 14px 15px), #0f1833; }
+.hv2-tile .hv2-slot b { font-size: 0.95rem; color: #fff; } .hv2-tile .hv2-slot span { color: #8d9bbd; font-size: 0.6rem; }
+.hv2-tile-cap { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.6rem; }
+.hv2-tile-cap b { display: block; color: #fff; font-size: clamp(0.8rem, 1.3vw, 1rem); line-height: 1.15; }
+.hv2-tile-cap i { display: block; font-style: normal; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: #8d9bbd; margin-top: 0.15rem; }
+.hv2-art-head { display: flex; align-items: center; gap: 0.7rem; }
+.hv2-art-head small { margin-top: 0; }
+.hv2-art-img { margin-bottom: 1rem; }
+.hv2-art-img .hv2-frame { border-color: #2d3d68; background: #0f1833; }
+.hv2-art-img .hv2-slot { background: repeating-linear-gradient(135deg, transparent 0 14px, rgba(255,255,255,0.04) 14px 15px), #0f1833; }
+.hv2-art-img .hv2-slot b { color: #fff; } .hv2-art-img .hv2-slot span { color: #8d9bbd; }
+@media (min-width: 900px) { .hv2-art-img { display: none; } }

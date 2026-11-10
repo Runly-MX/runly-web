@@ -1,13 +1,24 @@
 ---
 import ShotSlot from "./ShotSlot.astro";
+import ModuleIcon from "./ModuleIcon.astro";
 import mirai from "../../assets/home-v2/mirai-chat.png";
+import isotipo from "../../assets/home-v2/isotipo-dark.png";
+import { Image } from "astro:assets";
 import { ArrowRight } from "@lucide/astro";
 import type { HomeCopy } from "../../i18n/home-v2";
 interface Props { c: HomeCopy }
 const { c } = Astro.props;
 const s = c.ai;
-// Satellites around the core in the 100x44 viewBox.
-const pos = [{ x: 14, y: 10 }, { x: 86, y: 10 }, { x: 14, y: 36 }, { x: 86, y: 36 }];
+// Tiles around the core, in a 100x50 viewBox. Image slots HV2-AI-01..04 take
+// generated illustrations (see docs/home-v2/IMAGE-BRIEFS.md); drop the file in
+// src/assets/home-v2/slots/ named after the ID and the placeholder is replaced.
+const pos = [{ x: 15, y: 25 }, { x: 85, y: 25 }, { x: 15, y: 77 }, { x: 85, y: 77 }];
+const meta = [
+  { slot: "HV2-AI-01", icon: "Sparkles", color: "#8b5cf6" },
+  { slot: "HV2-AI-02", icon: "Plug", color: "#ff5e14" },
+  { slot: "HV2-AI-03", icon: "Code", color: "#0e7490" },
+  { slot: "HV2-AI-04", icon: "MessageSquareText", color: "#059669" },
+];
 ---
 
 <section class="hv2-night hv2-ai hv2-scroll-target" id={s.id} aria-labelledby="hv2-ai-title">
@@ -16,20 +27,24 @@ const pos = [{ x: 14, y: 10 }, { x: 86, y: 10 }, { x: 14, y: 36 }, { x: 86, y: 3
     <h2 id="hv2-ai-title" class="hv2-h2 io mt-5 max-w-4xl" style="color:#fff">{s.title}</h2>
     <p class="hv2-lead io mt-6">{s.body}</p>
 
-    <div class="hv2-net io" aria-hidden="true">
-      <svg viewBox="0 0 100 44" preserveAspectRatio="none">
-        {pos.map((p) => <path class="hv2-line" d={`M50 22 L${p.x} ${p.y}`} />)}
+    <div class="hv2-net io">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        {pos.map((p) => <path class="hv2-line" d={`M50 50 L${p.x} ${p.y}`} />)}
       </svg>
-      <div class="hv2-core">Runly</div>
+      <div class="hv2-node hv2-core" style="left:50%;top:50%"><Image src={isotipo} alt="Runly" widths={[160, 320]} sizes="12vw" format="webp" /></div>
       {s.nodes.map((n, i) => (
-        <div class="hv2-org" style={`left:${pos[i].x}%;top:${(pos[i].y / 44) * 100}%`}><b style="color:#fff">{n.name}</b><i>{n.kind}</i></div>
+        <div class="hv2-node hv2-tile" style={`left:${pos[i].x}%;top:${pos[i].y}%`}>
+          <ShotSlot slotId={meta[i].slot} label={n.name} pendingText="Ilustración en preparación" ratio="4 / 3" chrome={false} sizes="260px" />
+          <div class="hv2-tile-cap"><ModuleIcon icon={meta[i].icon} color={meta[i].color} size="md" /><span><b>{n.name}</b><i>{n.kind}</i></span></div>
+        </div>
       ))}
     </div>
 
     <div class="hv2-ai-cols">
       {s.nodes.map((n, i) => (
         <article class="io" style={`--d:${i * 80}ms`}>
-          <small>{n.kind}</small>
+          <div class="hv2-art-img"><ShotSlot slotId={meta[i].slot} label={n.name} pendingText="Ilustración en preparación" ratio="16 / 9" chrome={false} sizes="(min-width: 640px) 45vw, 100vw" /></div>
+          <div class="hv2-art-head"><ModuleIcon icon={meta[i].icon} color={meta[i].color} size="md" /><small>{n.kind}</small></div>
           <h3>{n.name}</h3>
           <p>{n.text}</p>
           <a href={n.href}>{n.cta} <ArrowRight class="ml-1.5 h-4 w-4" aria-hidden="true" /></a>

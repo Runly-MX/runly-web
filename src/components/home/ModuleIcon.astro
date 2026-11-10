@@ -1,0 +1,9 @@
+---
+import { resolveIcon } from "../../lib/icons";
+import { modIcon } from "../../lib/home-icons";
+interface Props { name?: string; icon?: string; color?: string; size?: "sm" | "md" }
+const { name, icon, color, size = "sm" } = Astro.props;
+const [i, c] = name ? modIcon(name) : [icon ?? "Boxes", color ?? "#0e3a8c"];
+const Icon = resolveIcon(icon ?? i);
+---
+<span class={`hv2-ico hv2-ico-${size}`} style={`--c:${color ?? c}`} aria-hidden="true"><Icon class="hv2-ico-svg" /></span>
