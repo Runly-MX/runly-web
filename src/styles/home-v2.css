@@ -1,6 +1,6 @@
 /* src/styles/home-v2.css  -  "Business in motion" scenes for the home.
    Progressive: everything is visible by default (--p:1). scenes.ts only takes
-   over --p when JS runs, motion is allowed and the viewport is desktop. */
+   over --p on desktop and adds bounded image depth on mobile when motion is allowed. */
 
 .hv2 { --p: 1; color: var(--rl-text); }
 .hv2 [data-scene] { --p: 1; }
@@ -156,7 +156,18 @@
 
 /* Screenshot frame + intentional placeholder. */
 .hv2-frame { position: relative; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--rl-border); background: var(--rl-surface); box-shadow: var(--rl-shadow); }
-.hv2-frame img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+.hv2-frame img { display: block; width: 100%; height: auto; object-fit: contain; object-position: center; }
+.hv2-image { position: relative; display: block; margin-inline: auto; }
+a.hv2-image { cursor: zoom-in; }
+.hv2-image-open {
+  position: absolute; right: 0.375rem; bottom: 0.375rem; z-index: 2; pointer-events: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  width: 1.75rem; height: 1.75rem; border-radius: 0.375rem;
+  background: #070d1e; color: #fff; border: 1px solid #3a4a78;
+  font-size: 0.75rem; font-weight: 700; box-shadow: 0 4px 12px #070d1e33;
+}
+.hv2-frame[data-visual="illustration"] { background: #070d1e; }
+.hv2-frame[data-visual="illustration"] .hv2-image { padding: 0.5rem; }
 html[data-theme="dark"] img.hv2-shot-light,
 html:not([data-theme="dark"]) img.hv2-shot-dark { display: none; }
 .hv2-frame-bar { display: flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--rl-border); background: var(--rl-surface-2); }
@@ -278,6 +289,30 @@ html:not(.js) .hv2-net .hv2-line { animation: none; }
 /* Small screens: keep diagram nodes (centered on their anchor) inside the viewport. */
 .hv2-night, .hv2-hero, .hv2-close { overflow-x: clip; }
 @media (max-width: 639px) { .hv2-diagram { width: calc(100% - 5rem); } }
+
+@media (max-width: 1023px) {
+  .hv2-mobile-motion [data-mobile-parallax] { translate: 0 var(--mobile-y, 0px); }
+  .hv2-mobile-motion [data-visual="illustration"] { rotate: var(--mobile-tilt, 0deg); }
+  .hv2-mobile-motion .hv2-layer { transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.22, 1, 0.36, 1); }
+  .hv2-mobile-motion .hv2-layer:not(.is-in) { opacity: 0; transform: translateY(22px); }
+  .hv2-layer-label { align-items: flex-start; flex-wrap: wrap; gap: 0.5rem; }
+  .hv2-pin { padding-block: 3.5rem; }
+  .hv2-ai, .hv2-modules, .hv2-market { padding-block: 4rem; }
+  .hv2-ai-cols { gap: 2.5rem; }
+  .hv2-art-img { margin-bottom: 1.25rem; }
+}
+@media (max-width: 639px) {
+  .hv2-btn { max-width: 100%; white-space: normal; text-align: center; }
+  .hv2-btn svg { flex-shrink: 0; }
+  .hv2-extend > * { min-width: 0; }
+  .hv2-tiers li { grid-template-columns: 6.5rem minmax(0, 1fr); }
+  .hv2-hero { padding-block: 2.5rem 4rem; }
+  .hv2-hero-grid { gap: 2rem; }
+  .hv2-stack .hv2-shot-second-compact { width: 44%; left: auto; right: 0.5rem; bottom: -1.5rem; }
+  .hv2-stack .hv2-caption { max-width: 50%; margin-top: 1rem; }
+  .hv2-stack { margin-bottom: 2rem; }
+  .hv2-ai-cols article { min-width: 0; }
+}
 
 /* Module icon tile (colors echo the product's Home tiles). */
 .hv2-ico { display: inline-grid; place-items: center; flex: none; background: var(--c); color: #fff; border-radius: 0.4rem; }

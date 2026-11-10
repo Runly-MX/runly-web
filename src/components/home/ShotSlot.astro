@@ -17,22 +17,23 @@ interface Props {
   eager?: boolean;
   sizes?: string;
   chrome?: boolean;
+  illustration?: boolean;
 }
 // Drop a file named after the slot ID (e.g. HV2-AI-01.webp) into
 // src/assets/home-v2/slots/ and it replaces the placeholder automatically.
-const { slotId, label, alt: altProp = "", src: srcProp, ratio = "16 / 10", pendingText = "", eager = false, sizes = "(min-width: 1024px) 56vw, 100vw", chrome = true } = Astro.props;
+const { slotId, label, alt: altProp = "", src: srcProp, ratio = "16 / 10", pendingText = "", eager = false, sizes = "(min-width: 1024px) 56vw, 100vw", chrome = true, illustration = false } = Astro.props;
 const found = getHomeShot(slotId);
 const src = srcProp ?? found;
 const light = src === found ? getHomeShot(slotId, "light") : undefined;
 const alt = altProp || (found ? label : "");
 ---
 
-<figure class="hv2-frame" data-slot={slotId} data-real={src ? "true" : "false"}>
+<figure class="hv2-frame" data-slot={slotId} data-real={src ? "true" : "false"} data-visual={illustration ? "illustration" : "screenshot"} data-mobile-parallax>
   {chrome && (
     <div class="hv2-frame-bar" aria-hidden="true"><i></i><i></i><i></i><span>{label}</span></div>
   )}
   {src ? (
-    <HomeShotImage src={src} light={light} alt={alt} widths={[640, 960, 1400]} sizes={sizes} eager={eager} ratio={ratio} />
+    <HomeShotImage src={src} light={light} alt={alt} widths={[320, 640, 960, 1400]} sizes={sizes} eager={eager} illustration={illustration} />
   ) : (
     <div class="hv2-slot" style={`--ratio:${ratio}`} role="img" aria-label={`${label}. ${pendingText}`}>
       <div><b>{label}</b><span>{pendingText} · {slotId}</span></div>
