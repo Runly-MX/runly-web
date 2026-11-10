@@ -85,7 +85,7 @@ export function parseResourceSummary(raw: unknown): ResourceSummary | null {
     latest = { version: l.version, releaseId: l.releaseId, publishedAt: l.publishedAt, sha256: l.sha256, size };
   }
   return {
-    resourceKey: r.resourceKey as string, type: r.type, slug: r.slug, title, summary, publisher, trust: r.trust, availability: r.availability,
+    resourceKey: r.resourceKey as string, type: r.type, slug: r.slug, title, summary, publisher, trust: r.trust === 'official' ? (publisher.verified ? 'community-verified' : 'community') : r.trust, officialAttestation: r.officialAttestation ?? null, availability: r.availability,
     listed: r.listed, indexable: r.indexable && r.listed && r.availability === "available", latest, license,
     compatibility: parseCompatibility(r.compatibility),
     categories: strings(r.categories, 5, 40).filter((c) => CATEGORY.test(c)),

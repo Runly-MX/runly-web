@@ -58,10 +58,13 @@ function useLiveState(r: ResourceDetail, hubUrl: string | null | undefined, enab
     if (!enabled) return;
     let alive = true;
     setState({ phase: "checking" });
-    createHubSource({ hubUrl }).detail(r.type, r.slug)
+    const load = () => createHubSource({ hubUrl }).detail(r.type, r.slug)
       .then((result) => { if (alive) setState(liveStateFrom(result, r)); })
       .catch(() => { if (alive) setState({ phase: "error" }); });
-    return () => { alive = false; };
+    load();
+    const timer = setInterval(load, 60000);
+    window.addEventListener('focus', load);
+    return () => { alive = false; clearInterval(timer); window.removeEventListener('focus', load); };
   }, [enabled, hubUrl, r.type, r.slug, attempt]);
   return [state, () => setAttempt((n) => n + 1)];
 }
@@ -132,7 +135,7 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-bold text-white" aria-hidden="true">{r.publisher.displayName.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("")}</span>
             <span className="min-w-0">
               <span className="block text-xs text-slate-500">{d.publishedBy}</span>
-              <span className="block truncate font-bold text-slate-900">{r.publisher.displayName}</span>
+              <span className="block truncate font-bold text-slate-900">{r.trust === 'official' ? 'Runly · Autoría institucional' : r.publisher.displayName}</span>
             </span>
             {r.publisher.verified && <span className="ml-auto shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">{T.verifiedPublisher}</span>}
           </a>
@@ -259,8 +262,8 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
           </section>
           <section className="rounded-3xl border border-slate-200 bg-white p-5">
             <h2 className="text-sm font-bold text-slate-900">{d.provenance}</h2>
-            <p className="mt-1 text-sm text-slate-600">{r.provenance.note ?? d.noProvenance}</p>
-            <p className="mt-2 text-xs text-slate-500">{d.provenanceNote}</p>
+            <p className="mt-1 text-sm text-slate-600">{r.trust === 'official' ? 'Procedencia institucional acreditada mediante atestación firmada y vinculada a esta release.' : r.provenance.note ?? d.noProvenance}</p>
+            <p className="mt-2 text-xs text-slate-500">{r.trust === 'official' ? 'La firma de procedencia se verificó junto al snapshot y la release disponibles. La decisión institucional se conserva en Developer Hub.' : d.provenanceNote}</p>
           </section>
         </aside>
       </div>

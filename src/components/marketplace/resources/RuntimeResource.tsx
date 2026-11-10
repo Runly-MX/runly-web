@@ -33,7 +33,7 @@ export default function RuntimeResource({ hubUrl }: { hubUrl?: string }) {
 
   if (state.phase === "loading") return <ResourceStateBlock kind="loading" />;
   const { result } = state;
-  if (result.status === "ok") return <ResourceDetailView resource={result.resource} hubUrl={hubUrl} />;
+  if (result.status === "ok") return <ResourceDetailView resource={result.resource} hubUrl={hubUrl} checkLive />;
   if (result.status === "gone") return <ResourceStateBlock kind={result.availability === "revoked" ? "revoked" : "withdrawn"} replacement={result.replacement} showBack />;
   if (result.status === "not_found") return <ResourceStateBlock kind="not_found" showBack />;
   return <ResourceStateBlock kind="unavailable" onRetry={() => setAttempt((n) => n + 1)} showBack />;

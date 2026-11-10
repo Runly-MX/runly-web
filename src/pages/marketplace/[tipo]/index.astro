@@ -4,6 +4,7 @@
 // One list page per resource type. getStaticPaths only emits types that have at
 // least one available resource, so an empty type has no page and is not linked.
 import CatalogShell from "../../../components/marketplace/resources/CatalogShell.astro";
+import RuntimeCatalog from "../../../components/marketplace/resources/RuntimeCatalog";
 import ResourceCatalog from "../../../components/marketplace/resources/ResourceCatalog.astro";
 import { typesWithResources } from "../../../lib/marketplace-resources/filters";
 import { MARKETPLACE_BASE, TYPE_SEGMENT, pageIsIndexable } from "../../../lib/marketplace-resources/routes";
@@ -16,7 +17,7 @@ export const prerender = true;
 export async function getStaticPaths() {
   const list = await loadCatalogForBuild();
   const items = list.status === "ok" ? list.items : [];
-  return typesWithResources(items).map((type) => ({ params: { tipo: TYPE_SEGMENT[type] }, props: { type, items: items.filter((r) => r.type === type), types: typesWithResources(items) } }));
+  return [...new Set(['studio_template' as ResourceType,...typesWithResources(items)])].map((type) => ({ params: { tipo: TYPE_SEGMENT[type] }, props: { type, items: items.filter((r) => r.type === type), types: typesWithResources(items) } }));
 }
 
 const { type, items, types } = Astro.props as { type: ResourceType; items: ResourceSummary[]; types: ResourceType[] };
@@ -41,6 +42,6 @@ const text = TYPE_TEXT[type];
     </div>
   </section>
   <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-    <ResourceCatalog items={items} source={source} showTypeFilter={false} />
+    {source === "hub" ? <RuntimeCatalog client:only="react" type={type} hubUrl={import.meta.env.PUBLIC_RUNLY_HUB_URL}/> : <ResourceCatalog items={items} source={source} showTypeFilter={false} />}
   </div>
 </CatalogShell>

@@ -1,3 +1,4 @@
+import { verifyOfficialResource } from './official';
 // src/lib/marketplace-resources/client.ts
 //
 // Data layer for the resource catalog, decoupled from the pages: pages talk to
@@ -27,6 +28,15 @@ export function createHubSource({ hubUrl, fetchImpl = fetch as unknown as FetchL
     } finally {
       clearTimeout(timer);
     }
+  }
+  async function attest<T extends ResourceSummary>(items: T[]): Promise<T[]> {
+    if (!items.some((r)=>r.officialAttestation)) return items;
+    let envelope: unknown;
+    try {
+      const response = await getJson('/catalog/resources/index.json');
+      if (response.ok) envelope = await response.json();
+    } catch { return items; }
+    return Promise.all(items.map(async (r)=>await verifyOfficialResource(r.officialAttestation,r,envelope) ? {...r,trust:'official'} : r));
   }
   const reason = (error: unknown) => ((error as Error)?.name === "AbortError" ? "timeout" : "network");
   const obj = (v: unknown) => (v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : null);
@@ -59,7 +69,7 @@ export function createHubSource({ hubUrl, fetchImpl = fetch as unknown as FetchL
         // Page budget exhausted with a cursor still pending: the catalog is incomplete.
         // Fail closed so a build never publishes a partial catalog as if it were whole.
         if (cursor) return { status: "unavailable", source: "hub", fetchedAt, reason: "incomplete_pagination", items: [] };
-        return { status: "ok", source: "hub", fetchedAt, feed, total, truncated, items };
+        return { status: "ok", source: "hub", fetchedAt, feed, total, truncated, items: await attest(items) };
       } catch (error) {
         return { status: "unavailable", source: "hub", fetchedAt, reason: reason(error), items: [] };
       }
@@ -81,7 +91,7 @@ export function createHubSource({ hubUrl, fetchImpl = fetch as unknown as FetchL
         const resource = parseResourceDetail(type === "solution" ? body.solution : body.resource);
         // The URL decides identity: a payload for a different resource is rejected.
         if (!resource || resource.type !== type || resource.slug !== slug) return { status: "unavailable", reason: "schema" };
-        return { status: "ok", source: "hub", feed: parseFeed(body.feed), resource };
+        return { status: "ok", source: "hub", feed: parseFeed(body.feed), resource: (await attest([resource]))[0] };
       } catch (error) {
         return { status: "unavailable", reason: reason(error) };
       }
@@ -97,7 +107,7 @@ export function createHubSource({ hubUrl, fetchImpl = fetch as unknown as FetchL
         const publisher = parsePublisherProfile(body?.publisher);
         if (!body || body.schemaVersion !== 1 || !publisher || publisher.handle !== handle || !Array.isArray(body.items)) return { status: "unavailable", reason: "schema" };
         const items = body.items.map(parseResourceSummary).filter((r): r is ResourceSummary => !!r && r.listed);
-        return { status: "ok", source: "hub", publisher, items };
+        return { status: "ok", source: "hub", publisher, items: await attest(items) };
       } catch (error) {
         return { status: "unavailable", reason: reason(error) };
       }

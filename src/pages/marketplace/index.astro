@@ -12,6 +12,7 @@
 // or counted; an unpublished or unreachable catalog renders an honest state.
 import { Blocks, Users } from "@lucide/astro";
 import CatalogShell from "../../components/marketplace/resources/CatalogShell.astro";
+import RuntimeCatalog from "../../components/marketplace/resources/RuntimeCatalog";
 import ResourceCatalog from "../../components/marketplace/resources/ResourceCatalog.astro";
 import ResourceCard from "../../components/marketplace/resources/ResourceCard.astro";
 import PublisherCard from "../../components/marketplace/resources/PublisherCard.astro";
@@ -95,7 +96,7 @@ const steps = [
         </li>
       </ul>
 
-      <h3 class="mt-10 text-sm font-bold uppercase tracking-wider text-slate-500">Recursos del Marketplace</h3>
+      {source === "fixtures" && <><h3 class="mt-10 text-sm font-bold uppercase tracking-wider text-slate-500">Recursos del Marketplace</h3>
       <p class="mt-1 max-w-2xl text-sm text-slate-600">Piezas listas para usar que se instalan desde Runly y se revisan antes de aplicarse.</p>
       <ul class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {RESOURCE_TYPES.map((type) => {
@@ -118,9 +119,11 @@ const steps = [
             </li>
           );
         })}
-      </ul>
+      </ul></>}
     </section>
 
+    {source === "hub" && <RuntimeCatalog client:only="react" hubUrl={import.meta.env.PUBLIC_RUNLY_HUB_URL}/> }
+    {source === "fixtures" && <>
     {list.status !== "ok" && <div class="mt-14"><ResourceStateBlock kind="unavailable" /></div>}
 
     {list.status === "ok" && items.length === 0 && (
@@ -162,6 +165,7 @@ const steps = [
       </section>
     )}
 
+    </>}
     <section class="mt-16" aria-labelledby="como-funciona">
       <h2 id="como-funciona" class="text-2xl font-extrabold tracking-tight text-slate-900">Cómo funciona</h2>
       <ol class="mt-5 grid gap-4 md:grid-cols-3">

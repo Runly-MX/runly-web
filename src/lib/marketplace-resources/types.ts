@@ -25,6 +25,7 @@ export interface ResourceSummary {
   summary: string;
   publisher: PublisherRef;
   trust: TrustLevel;
+  officialAttestation?: unknown;
   availability: Availability;
   listed: boolean;
   indexable: boolean;
