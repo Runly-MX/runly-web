@@ -69,10 +69,6 @@ const { title, description, locale, path, hasEnglish, noindex } = Astro.props;
         root.classList.add("rl-theme-switching");
         root.dataset.theme = pref === "system" ? (mq.matches ? "dark" : "light") : pref;
         root.dataset.themePref = pref;
-        document.querySelectorAll<HTMLAnchorElement>("[data-home-preview]").forEach((link) => {
-          const source = root.dataset.theme === "light" ? link.dataset.previewLight ?? link.dataset.previewDark : link.dataset.previewDark;
-          if (source) link.href = source;
-        });
         requestAnimationFrame(() => requestAnimationFrame(() => root.classList.remove("rl-theme-switching")));
         document.querySelectorAll<HTMLButtonElement>("[data-theme-toggle] button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.value === pref)));
         document.querySelectorAll<HTMLButtonElement>("[data-theme-cycle]").forEach((b) => {

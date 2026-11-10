@@ -27,7 +27,10 @@ const es = {
     title: "Muchas empresas. Una plataforma. Cada una en su lugar.",
     body: "Una organización puede operar varias empresas desde Runly. Cada empresa tiene sus propios miembros, módulos y permisos; quien trabaja en una ve solo lo que esa empresa le concede.",
     legend: "Ejemplo conceptual, no una pantalla del producto",
-    selectorAlt: "Selector de empresas de Runly con la empresa activa marcada",
+    workspace: "Tu espacio de trabajo",
+    activeCompany: "Empresa activa",
+    modulesLabel: "Módulos de esta empresa",
+    otherCompanies: "Otros contextos, en el mismo lugar",
     core: "Runly",
     orgs: [
       { name: "Distribuidora", mods: ["Compras", "Inventario", "Flota"] },
@@ -159,7 +162,10 @@ const en: HomeCopy = {
     title: "Many companies. One platform. Each in its place.",
     body: "An organization can run several companies from Runly. Each company has its own members, modules and permissions; someone working in one sees only what that company grants them.",
     legend: "Conceptual example, not a product screen",
-    selectorAlt: "Runly company switcher with the active company checked",
+    workspace: "Your workspace",
+    activeCompany: "Active company",
+    modulesLabel: "This company's modules",
+    otherCompanies: "Other contexts, in the same place",
     core: "Runly",
     orgs: [
       { name: "Distributor", mods: ["Purchasing", "Inventory", "Fleet"] },

@@ -57,17 +57,19 @@ try {
     }
     assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), `overflow: ${width}/${theme}/${locale}`);
     // The original small sources must not be enlarged by the responsive pipeline.
-    for (const preview of await page.locator('[data-home-preview]').all()) {
+    for (const preview of await page.locator('.hv2-image').all()) {
       const maximum = await preview.evaluate(element => parseFloat(element.style.maxWidth));
       for (const image of await preview.locator('img').all()) {
         const candidates = (await image.getAttribute('srcset') || '').split(',').map(item => Number(item.trim().split(' ').at(-1).replace('w', '')));
         assert(candidates.every(candidate => candidate <= maximum));
       }
     }
-    const preview = page.locator('[data-home-preview]').first();
-    const expectedSource = await preview.getAttribute(`data-preview-${theme}`);
-    assert.equal(await preview.getAttribute('href'), expectedSource);
-    assert.equal((await ctx.request.get(new URL(expectedSource, base).href)).status(), 200);
+    assert.equal(await page.locator('a.hv2-image, .hv2-image-open, [data-home-preview]').count(), 0);
+    const company = page.locator('.hv2-company-model');
+    await settle(page, company);
+    assert.equal(await company.locator('.hv2-company-list li').count(), 2);
+    assert.equal(await page.locator('[data-slot="HV2-02"]').count(), 0);
+    if (locale === 'es') await company.screenshot({ path: `${output}/final-${width}-${theme}-companies.png` });
     const tabs = page.locator('[data-tabs]').first();
     await tabs.locator('[role="tab"]').first().focus();
     await page.keyboard.press('ArrowRight');
@@ -90,11 +92,11 @@ try {
       await tabs.locator('[role="tab"]').first().focus();
       await page.keyboard.press('End');
       assert.equal(await tabs.locator('[data-panel]:visible').evaluate(panel => panel.getAnimations().length), 0);
-      // System theme changes update both the displayed image and full-size link.
+      // System theme changes still update the displayed screenshot.
       const next = theme === 'dark' ? 'light' : 'dark';
       await page.emulateMedia({ colorScheme: next });
       await page.waitForFunction(value => document.documentElement.dataset.theme === value, next);
-      assert.equal(await preview.getAttribute('href'), await preview.getAttribute(`data-preview-${next}`));
+      assert(await hero.locator(`img.hv2-shot-${next}`).first().isVisible());
       await page.reload();
       await page.waitForFunction(value => document.documentElement.dataset.theme === value, next);
     }
@@ -111,7 +113,7 @@ try {
       assert.equal(await image.evaluate(element => getComputedStyle(element.closest('article')).opacity), '1');
     }
     assert.equal(await page.locator('[data-tabs] [data-panel][hidden]').count(), 0);
-    assert(await page.locator('[data-home-preview]').first().getAttribute('href'));
+    assert(await page.locator('.hv2-company-model').isVisible());
     await ctx.close();
     results.push(`no-js/${locale}`);
   }

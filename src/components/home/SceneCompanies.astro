@@ -1,21 +1,11 @@
 ---
-import { Lock } from "@lucide/astro";
 import { Image } from "astro:assets";
 import ModuleIcon from "./ModuleIcon.astro";
-import ShotSlot from "./ShotSlot.astro";
-import { getHomeShot } from "./homeShots";
 import isotipo from "../../assets/home-v2/isotipo-dark.png";
 import type { HomeCopy } from "../../i18n/home-v2";
 interface Props { c: HomeCopy }
 const { c } = Astro.props;
 const s = c.companies;
-// Node layout in diagram percentages (x,y). Companies sit around the core.
-const orgPos = [{ x: 14, y: 26 }, { x: 86, y: 26 }, { x: 50, y: 84 }];
-const chipOff = [
-  [{ x: 3, y: 11 }, { x: 24, y: 8 }, { x: 4, y: 41 }],
-  [{ x: 97, y: 11 }, { x: 76, y: 8 }, { x: 96, y: 41 }],
-  [{ x: 26, y: 95 }, { x: 74, y: 95 }, { x: 50, y: 98 }],
-];
 ---
 
 <section class="hv2-night hv2-scroll-target" id={s.id} aria-labelledby="hv2-co-title" data-scene="sticky">
@@ -34,34 +24,29 @@ const chipOff = [
           <p class="mt-6 text-sm" style="color:var(--rl-text-faint)">{s.note}</p>
         </div>
         <div>
-          <div class="hv2-diagram" role="img" aria-label={s.legend + ". " + s.orgs.map((o) => o.name + ": " + o.mods.join(", ")).join("; ")}>
-            <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-              {orgPos.map((p, i) => (
-                <path class="hv2-line hv2-line-live rv" style={`--s:${0.05 + i * 0.2};--r:4`} d={`M50 50 L${p.x} ${p.y}`} />
+          <div class="hv2-company-model" data-mobile-parallax>
+            <div class="hv2-company-surface rv" style="--s:0.08;--dy:24px">
+              <div class="hv2-company-masthead"><Image src={isotipo} alt={s.core} widths={[64, 128]} sizes="32px" format="webp" /><span>{s.workspace}</span><i aria-hidden="true"></i></div>
+              <p class="hv2-company-kicker">{s.activeCompany}</p>
+              <div class="hv2-company-identity"><span aria-hidden="true">{s.orgs[0].name[0]}</span><h3>{s.orgs[0].name}</h3></div>
+              <p class="hv2-company-detail">{s.modulesLabel}</p>
+              <ul class="hv2-company-modules" role="list">
+                {s.orgs[0].mods.map((m) => <li><ModuleIcon name={m} size="md" /><span>{m}</span></li>)}
+              </ul>
+              <div class="hv2-company-foot"><span aria-hidden="true">01</span><p>{s.steps[1].d}</p></div>
+            </div>
+            <p class="hv2-company-others">{s.otherCompanies}</p>
+            <ul class="hv2-company-list" role="list">
+              {s.orgs.slice(1).map((o, i) => (
+                <li class="rv" style={`--s:${0.35 + i * 0.2};--dy:20px`}>
+                  <span class="hv2-company-avatar" aria-hidden="true">{o.name[0]}</span>
+                  <div><b>{o.name}</b><span>{o.mods.join(" · ")}</span></div>
+                  <span class="hv2-company-number" aria-hidden="true">0{i + 2}</span>
+                </li>
               ))}
-              {orgPos.map((p, i) => chipOff[i].map((q, j) => (
-                <path class="hv2-line rv" style={`--s:${0.3 + i * 0.18 + j * 0.04};--r:5`} d={`M${p.x} ${p.y} L${q.x} ${q.y}`} />
-              )))}
-            </svg>
-            <div class="hv2-node hv2-core" style="left:50%;top:50%"><Image src={isotipo} alt={s.core} widths={[160, 320]} sizes="12vw" format="webp" /></div>
-            {s.orgs.map((o, i) => (
-              <>
-                <div class="hv2-node hv2-org rv" style={`left:${orgPos[i].x}%;top:${orgPos[i].y}%;--s:${0.08 + i * 0.2};--dy:0px`}>
-                  <b>{o.name}</b>
-                </div>
-                {o.mods.map((m, j) => (
-                  <span class="hv2-chip rv" style={`left:${chipOff[i][j].x}%;top:${chipOff[i][j].y}%;--s:${0.34 + i * 0.18 + j * 0.04};--dy:0px`}><ModuleIcon name={m} />{m}</span>
-                ))}
-                <span class="hv2-lock rv" style={`left:${orgPos[i].x + (i === 1 ? -9 : i === 0 ? 9 : 0)}%;top:${orgPos[i].y + (i === 2 ? -9 : 7)}%;--s:${0.7 + i * 0.08};--dy:0px`}><Lock class="h-3 w-3" aria-hidden="true" /></span>
-              </>
-            ))}
+            </ul>
           </div>
           <p class="hv2-legend">{s.legend}</p>
-          {getHomeShot("HV2-02") && (
-            <div class="mx-auto mt-4 max-w-56">
-              <ShotSlot slotId="HV2-02" label={s.selectorAlt} ratio="224 / 153" sizes="224px" chrome={false} />
-            </div>
-          )}
         </div>
       </div>
     </div>

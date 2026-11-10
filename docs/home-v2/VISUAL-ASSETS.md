@@ -107,3 +107,7 @@ Guardar y abrir cada archivo antes de aceptarlo; descartar carga incompleta, blo
 - Conservar una toma completa y una derivada para composición. En móvil usar acercamiento significativo o captura móvil real; no reducir un escritorio de 1900 px a una miniatura ilegible.
 - Alt propuesto por contenido: «Proyecto de demostración con tareas agrupadas por estado», no «dashboard revolucionario». Traducir por locale y no incrustar titulares comerciales dentro del bitmap.
 - Una captura oscura no implica que toda la web tenga dark mode. La web y el producto son superficies diferentes.
+
+### Sustitución de la captura de empresa de baja resolución
+
+`HV2-02` se conserva como fuente histórica pero ya no se renderiza en la landing. Su resolución de 224 × 153 px no alcanza para una presentación nítida. La escena multiempresa usa una composición conceptual con texto HTML, módulos y superficies con profundidad, localizada en ES/EN. Se retiraron también los enlaces e iconos de ampliación de todas las capturas: la corrección de calidad conserva las proporciones y limita las variantes al tamaño nativo. MirAI sigue limitado por su fuente de 390 px.

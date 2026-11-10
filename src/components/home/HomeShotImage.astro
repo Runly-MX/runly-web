@@ -1,7 +1,6 @@
 ---
 import { Image } from "astro:assets";
 import type { ImageMetadata } from "astro";
-import { Maximize2 } from "@lucide/astro";
 
 interface Props {
   src: ImageMetadata;
@@ -14,9 +13,6 @@ interface Props {
 }
 
 const { src, light, alt, widths, sizes, eager = false, illustration = false } = Astro.props;
-const english = Astro.url.pathname.startsWith("/en/");
-const openLabel = english ? "View full-size screenshot (opens in a new tab)" : "Ver captura completa (se abre en otra pestaña)";
-const Wrapper = illustration ? "div" : "a";
 const sourceWidths = (image: ImageMetadata) => [...new Set(widths.map((width) => Math.min(width, image.width)))].sort((a, b) => a - b);
 const imageProps = {
   alt,
@@ -28,12 +24,7 @@ const imageProps = {
 };
 ---
 
-<Wrapper class="hv2-image" style={`max-width:${Math.min(src.width, light?.width ?? src.width)}px`} data-home-preview={!illustration ? "" : undefined} data-preview-dark={!illustration ? src.src : undefined} data-preview-light={!illustration ? light?.src : undefined} href={!illustration ? light?.src ?? src.src : undefined} target={!illustration ? "_blank" : undefined} rel={!illustration ? "noopener noreferrer" : undefined} aria-label={!illustration ? `${openLabel}: ${alt}` : undefined} title={!illustration ? openLabel : undefined}>
+<div class="hv2-image" style={`max-width:${Math.min(src.width, light?.width ?? src.width)}px`}>
   <Image {...imageProps} widths={sourceWidths(src)} src={src} class={light ? "hv2-shot-dark" : undefined} />
   {light && <Image {...imageProps} widths={sourceWidths(light)} src={light} class="hv2-shot-light" />}
-  {!illustration && (
-    <span class="hv2-image-open" aria-hidden="true">
-      <Maximize2 class="h-4 w-4" aria-hidden="true" />
-    </span>
-  )}
-</Wrapper>
+</div>

@@ -106,21 +106,50 @@
 .hv2-pin { padding-block: 5rem; }
 .hv2-co-grid { display: grid; gap: 3rem; align-items: center; width: 100%; }
 @media (min-width: 1024px) { .hv2-co-grid { grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); gap: 4rem; } }
-.hv2-diagram { position: relative; aspect-ratio: 1 / 0.86; width: 100%; max-width: 46rem; margin-inline: auto; }
-.hv2-diagram > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .hv2-line { stroke: var(--rl-line); fill: none; vector-effect: non-scaling-stroke; stroke-width: 1.5; }
-.hv2-diagram .hv2-line { opacity: var(--k, 1); }
-.hv2-diagram .rv { --k: clamp(0, calc((var(--p) - var(--s, 0)) * var(--r, 6)), 1); }
 .hv2-line-live { stroke: #ff5e14; }
 .hv2-node { position: absolute; translate: -50% -50%; }
 .hv2-core { width: 20%; aspect-ratio: 1; display: grid; place-items: center; }
 .hv2-core::before { content: ""; position: absolute; inset: -30%; border-radius: 9999px; background: radial-gradient(circle, rgba(255, 94, 20, 0.28), transparent 65%); }
 .hv2-core img { position: relative; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 30px rgba(255, 94, 20, 0.35)); }
-.hv2-org { border: 1.5px solid var(--rl-border); background: var(--rl-surface); border-radius: 0.5rem; padding: 0.5rem 0.75rem; min-width: 6.5rem; text-align: center; box-shadow: var(--rl-shadow); }
-.hv2-org b { display: block; font-size: clamp(0.72rem, 1.4vw, 0.95rem); color: var(--rl-text); }
-.hv2-org i { display: block; font-style: normal; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--rl-text-faint); margin-top: 0.1rem; }
-.hv2-chip { display: inline-flex; align-items: center; gap: 0.4rem; padding-left: 0.25rem !important; position: absolute; translate: -50% -50%; font-size: clamp(0.58rem, 1.1vw, 0.75rem); font-weight: 600; padding: 0.22rem 0.55rem; border-radius: 9999px; border: 1px solid var(--rl-border-strong); color: var(--rl-text-muted); background: var(--rl-bg); white-space: nowrap; }
-.hv2-lock { position: absolute; translate: -50% -50%; width: 1.4rem; height: 1.4rem; border-radius: 9999px; display: grid; place-items: center; background: #ff5e14; color: #fff; }
+/* Material workspace study: live type and layered surfaces, never a product screenshot. */
+.hv2-company-model {
+  --company-edge: #344465; --company-ink: #eef2fb; --company-muted: #b6c1da;
+  --company-accent: #ff9a62; --company-glow: #ff5e1426;
+  max-width: 34rem; margin-inline: auto; padding: 1.5rem 0.5rem;
+  background: radial-gradient(ellipse at 80% 25%, var(--company-glow), transparent 65%);
+}
+.hv2-company-surface {
+  position: relative; padding: clamp(1.25rem, 3vw, 2rem); overflow: hidden;
+  border: 1px solid var(--company-edge); border-radius: 1.25rem;
+  background: linear-gradient(135deg, #24304a 0%, #121c33 50%, #0c1529 100%);
+  box-shadow: inset 0 1px 0 #ffffff24, 0 28px 55px -20px #000a, 0 6px 0 -2px #18223a, 0 7px 0 -2px var(--company-edge);
+}
+.hv2-company-surface::before { content: ""; position: absolute; inset: 0 0 auto; height: 2px; background: linear-gradient(90deg, transparent, var(--company-accent), transparent); }
+.hv2-company-masthead { display: flex; align-items: center; gap: 0.7rem; padding-bottom: 1.25rem; border-bottom: 1px solid var(--company-edge); color: var(--company-muted); font-size: 0.85rem; }
+.hv2-company-masthead img { width: 2rem; height: 2rem; object-fit: contain; }
+.hv2-company-masthead i { margin-left: auto; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--company-accent); box-shadow: 0 0 14px var(--company-accent); }
+.hv2-company-kicker { margin-top: 1.5rem; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--company-accent); }
+.hv2-company-identity { display: flex; align-items: center; gap: 0.9rem; margin-top: 0.65rem; min-width: 0; }
+.hv2-company-identity > span { display: grid; place-items: center; flex: none; width: 2.75rem; height: 2.75rem; border-radius: 0.7rem; background: linear-gradient(145deg, #ffab68, #f35a16); color: #070d1e; font-size: 1.25rem; font-weight: 800; box-shadow: inset 0 1px 0 #fff7, 0 5px 12px #0005; }
+.hv2-company-identity h3 { font-size: clamp(1.25rem, 2.7vw, 2rem); line-height: 1.15; font-weight: 800; letter-spacing: -0.035em; color: var(--company-ink); overflow-wrap: anywhere; }
+.hv2-company-detail { margin-top: 1.75rem; font-size: 0.8rem; color: var(--company-muted); }
+.hv2-company-modules { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; margin-top: 0.65rem; }
+.hv2-company-modules li { display: flex; flex-direction: column; align-items: flex-start; gap: 0.65rem; padding: 0.8rem 0.55rem; border-radius: 0.65rem; border: 1px solid var(--company-edge); background: linear-gradient(145deg, #ffffff08, #00000010); color: var(--company-ink); font-size: 0.75rem; font-weight: 600; }
+.hv2-company-foot { display: flex; align-items: flex-start; gap: 0.9rem; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--company-edge); color: var(--company-muted); }
+.hv2-company-foot > span { color: var(--company-accent); font-size: 0.75rem; font-weight: 700; }
+.hv2-company-foot p { max-width: 24rem; font-size: 0.8rem; line-height: 1.55; }
+.hv2-company-others { padding: 1.75rem 0.5rem 0.75rem; color: var(--company-muted); font-size: 0.8rem; }
+.hv2-company-list { display: grid; gap: 0.65rem; padding-inline: 0.5rem; }
+.hv2-company-list li { display: flex; align-items: center; gap: 0.75rem; padding: 1rem; border-radius: 0.9rem; border: 1px solid var(--company-edge); background: linear-gradient(110deg, #1c2840, #0f1830); box-shadow: inset 0 1px 0 #ffffff0d, 0 12px 22px -12px #000b; }
+.hv2-company-avatar { display: grid; place-items: center; flex: none; width: 2.5rem; height: 2.5rem; border-radius: 0.65rem; background: #ffffff0a; border: 1px solid var(--company-edge); color: var(--company-muted); font-weight: 700; }
+.hv2-company-list b { display: block; color: var(--company-ink); font-size: 0.95rem; }
+.hv2-company-list div > span { display: block; color: var(--company-muted); font-size: 0.7rem; line-height: 1.5; margin-top: 0.2rem; }
+.hv2-company-number { margin-left: auto; color: var(--company-muted); font-size: 0.7rem; font-variant-numeric: tabular-nums; }
+@media (max-width: 359px) {
+  .hv2-company-modules { grid-template-columns: 1fr; }
+  .hv2-company-modules li { flex-direction: row; align-items: center; padding: 0.65rem; font-size: 0.875rem; }
+}
 .hv2-steps { display: grid; gap: 1.5rem; margin-top: 2rem; counter-reset: st; }
 .hv2-steps li { position: relative; padding-left: 3rem; counter-increment: st; }
 .hv2-steps li::before { content: "0" counter(st); position: absolute; left: 0; top: 0; font-weight: 800; font-size: 1.1rem; color: var(--rl-accent); font-variant-numeric: tabular-nums; }
@@ -158,14 +187,6 @@
 .hv2-frame { position: relative; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--rl-border); background: var(--rl-surface); box-shadow: var(--rl-shadow); }
 .hv2-frame img { display: block; width: 100%; height: auto; object-fit: contain; object-position: center; }
 .hv2-image { position: relative; display: block; margin-inline: auto; }
-a.hv2-image { cursor: zoom-in; }
-.hv2-image-open {
-  position: absolute; right: 0.375rem; bottom: 0.375rem; z-index: 2; pointer-events: none;
-  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
-  width: 1.75rem; height: 1.75rem; border-radius: 0.375rem;
-  background: #070d1e; color: #fff; border: 1px solid #3a4a78;
-  font-size: 0.75rem; font-weight: 700; box-shadow: 0 4px 12px #070d1e33;
-}
 .hv2-frame[data-visual="illustration"] { background: #070d1e; }
 .hv2-frame[data-visual="illustration"] .hv2-image { padding: 0.5rem; }
 html[data-theme="dark"] img.hv2-shot-light,
@@ -288,7 +309,6 @@ html:not(.js) .hv2-net .hv2-line { animation: none; }
 
 /* Small screens: keep diagram nodes (centered on their anchor) inside the viewport. */
 .hv2-night, .hv2-hero, .hv2-close { overflow-x: clip; }
-@media (max-width: 639px) { .hv2-diagram { width: calc(100% - 5rem); } }
 
 @media (max-width: 1023px) {
   .hv2-mobile-motion [data-mobile-parallax] { translate: 0 var(--mobile-y, 0px); }
