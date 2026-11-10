@@ -25,7 +25,19 @@ Cada captura tiene una variante clara tomada en la misma vista del ERP. El archi
 | `HV2-08` | Categorías del Marketplace público. El catálogo de recursos seguía en preparación al capturar. |
 | `HV2-MIRAI` | Bienvenida de una conversación nueva en MirAI, sin historial. Se usa en el hero y en la escena de IA. `HV2-09` corresponde a Calendario. |
 
-Las cinco vistas tienen variantes clara y oscura. `HV2-05` (Automatizaciones) conserva el diagrama hasta tener un flujo apto para mostrar. `HV2-06` (Website) queda pendiente de un sitio de demostración con borrador y vista previa.
+Las cinco vistas tienen variantes clara y oscura.
+
+### Website y Automatizaciones
+
+Las siguientes capturas proceden de una instancia autorizada y se instalaron en ambos temas con la barra de cuenta excluida. No se registran destinos de infraestructura en este documento público.
+
+| ID | Pantalla y tratamiento |
+| --- | --- |
+| `HV2-05` | Lienzo real de Automatizaciones con el ejemplo incorporado «Revisión semanal», en pausa. Se abrió en el editor sin guardarlo ni ejecutarlo. |
+| `HV2-06` | Editor por bloques de una página de inicio. Se contrastó el contenido visible con la versión pública. |
+| `HV2-06-preview` | Vista previa integrada en el editor de esa misma página. El contenido conserva la paleta del sitio. La vista previa aislada del sitio completo está deshabilitada en la instancia. |
+
+Verificación de integración: 17 casos aprobados en Chrome local (320, 390, 768 y 1440 px; ES/EN; claro/oscuro; más una comprobación sin JavaScript). Se comprobó el cambio de imágenes y enlaces al original con la preferencia del sistema, la navegación con teclado entre editor y vista previa y la ausencia de recortes o desbordamiento horizontal. Evidencias locales en `.artifacts/mobile-visual/new-HV2-*` y `new-assets-results.json`. Build: 78 páginas; Astro check: 0 errores, 0 warnings y 9 hints preexistentes. Estas capturas no cambian las etiquetas de disponibilidad comercial.
 
 ## Inventario y plan originales
 

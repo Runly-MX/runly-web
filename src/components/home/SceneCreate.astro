@@ -5,10 +5,20 @@ import type { HomeCopy } from "../../i18n/home-v2";
 interface Props { c: HomeCopy }
 const { c } = Astro.props;
 const s = c.create;
-const studioViews = [
-  { id: "HV2-04-editor", label: s.studioEditor },
-  { id: "HV2-04", label: s.studioGallery },
-];
+const viewsByLayer: Record<string, { id: string; label: string }[]> = {
+  studio: [
+    { id: "HV2-04-editor", label: s.editorLabel },
+    { id: "HV2-04", label: s.studioGallery },
+  ],
+  web: [
+    { id: "HV2-06", label: s.editorLabel },
+    { id: "HV2-06-preview", label: s.websitePreview },
+  ],
+};
+const layers = s.layers.map((layer) => ({
+  ...layer,
+  views: viewsByLayer[layer.id]?.filter((view) => getHomeShot(view.id)) ?? [],
+}));
 ---
 
 <section class="hv2-create hv2-scroll-target" id={s.id} aria-labelledby="hv2-cr-title" data-scene="sticky">
@@ -21,19 +31,19 @@ const studioViews = [
           <p class="hv2-lead mt-6">{s.body}</p>
         </div>
         <div class="hv2-layers">
-          {s.layers.map((l, i) => (
+          {layers.map((l, i) => (
             <div class="hv2-layer" data-i={i} style={`--s:${i === 0 ? 0 : 0.06 + i * 0.32};--e:${0.4 + i * 0.32}`}>
               <div class="hv2-layer-label"><b>{l.name}</b><span class="hv2-tag">{l.tag}</span></div>
-              {l.id === "studio" && getHomeShot("HV2-04-editor") ? (
+              {l.views.length > 1 ? (
                 <div data-tabs>
-                  <div class="hv2-studio-tabs" role="tablist" aria-label={l.name}>
-                    {studioViews.map((view, j) => (
+                  <div class="hv2-view-tabs" role="tablist" aria-label={l.name}>
+                    {l.views.map((view, j) => (
                       <button type="button" role="tab" id={`tab-${view.id}`} aria-controls={`panel-${view.id}`} aria-selected={j === 0 ? "true" : "false"} tabindex={j === 0 ? 0 : -1}>{view.label}</button>
                     ))}
                   </div>
-                  {studioViews.map((view) => (
+                  {l.views.map((view) => (
                     <div class="hv2-panel" id={`panel-${view.id}`} role="tabpanel" aria-labelledby={`tab-${view.id}`} data-panel>
-                      <ShotSlot slotId={view.id} label={view.label} ratio="16 / 9" />
+                      <ShotSlot slotId={view.id} label={view.label} alt={`${l.name}: ${view.label}`} ratio="16 / 9" />
                     </div>
                   ))}
                 </div>
@@ -45,7 +55,7 @@ const studioViews = [
                   </div>
                 </figure>
               ) : (
-                <ShotSlot slotId={l.id2} label={l.name} pendingText={c.modules.pendingTag} ratio="16 / 9" />
+                <ShotSlot slotId={l.views[0]?.id ?? l.id2} label={l.name} pendingText={c.modules.pendingTag} ratio="16 / 9" />
               )}
               <p>{l.text}</p>
             </div>

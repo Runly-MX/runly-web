@@ -202,9 +202,9 @@ html:not([data-theme="dark"]) img.hv2-shot-dark { display: none; }
 .hv2-layer .hv2-frame { box-shadow: var(--rl-shadow); }
 .hv2-layer-label { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.6rem; }
 .hv2-layer-label b { font-size: 1.1rem; letter-spacing: -0.02em; color: var(--rl-text); }
-.hv2-studio-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.55rem; }
-.hv2-studio-tabs button { padding: 0.3rem 0.85rem; border: 1px solid var(--rl-border-strong); border-radius: 999px; background: var(--rl-surface); color: var(--rl-text); font-size: 0.85rem; }
-.hv2-studio-tabs button[aria-selected="true"] { background: #ff5e14; border-color: #ff5e14; color: #070d1e; }
+.hv2-view-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.55rem; }
+.hv2-view-tabs button { padding: 0.3rem 0.85rem; border: 1px solid var(--rl-border-strong); border-radius: 999px; background: var(--rl-surface); color: var(--rl-text); font-size: 0.85rem; }
+.hv2-view-tabs button[aria-selected="true"] { background: #ff5e14; border-color: #ff5e14; color: #070d1e; }
 .hv2-layer p { font-size: 0.9rem; color: var(--rl-text-muted); line-height: 1.55; margin-top: 0.6rem; max-width: 34rem; }
 .hv2-flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.5rem; padding: 1.25rem; background: var(--rl-surface-2); }
 .hv2-flow div { flex: 1 1 8rem; border: 1.5px solid var(--rl-border-strong); border-radius: 0.5rem; padding: 0.7rem 0.85rem; background: var(--rl-surface); }
