@@ -2,6 +2,8 @@
 
 Cuatro imágenes generadas (no capturas de producto). Sirven para que la escena no sea solo vectores.
 
+Las cuatro ilustraciones se generaron con OpenAI ImageGen el 2026-11-09 y se instalaron como WebP de 1600 × 1200. Se usan en ambos temas sobre el fondo oscuro de la escena.
+
 ## Cómo se instalan
 
 Guardar cada archivo en `src/assets/home-v2/slots/` con el ID como nombre: `HV2-AI-01.webp`, `HV2-AI-02.webp`, etc. (también `.png`/`.jpg`). `ShotSlot` los detecta y reemplaza el placeholder sin tocar código. Ese mismo mecanismo sirve para cualquier slot de `VISUAL-ASSETS.md` (por ejemplo `HV2-04.webp`).

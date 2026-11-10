@@ -80,6 +80,7 @@
 .hv2-shot-main { border-radius: 0.9rem; overflow: hidden; box-shadow: var(--rl-shadow); border: 1px solid var(--rl-border); background: #fff; }
 .hv2-shot-main img, .hv2-shot-second img { display: block; width: 100%; height: auto; }
 .hv2-shot-second { position: absolute; width: 56%; left: -2%; bottom: -14%; border-radius: 0.75rem; overflow: hidden; box-shadow: var(--rl-shadow); border: 1px solid var(--rl-border); background: #fff; }
+.hv2-stack .hv2-shot-second-compact { width: 38%; }
 @media (max-width: 1023px) { .hv2-shot-second { left: 4%; bottom: -8%; width: 52%; } .hv2-stack { margin-bottom: 3rem; } }
 .hv2-caption { margin-top: 0.75rem; font-size: 0.75rem; color: var(--rl-text-faint); letter-spacing: 0.04em; }
 @media (min-width: 1024px) { .hv2-stack { margin-right: -9vw; } .hv2-shot-main { transform-origin: 20% 50%; } }
@@ -156,6 +157,8 @@
 /* Screenshot frame + intentional placeholder. */
 .hv2-frame { position: relative; border-radius: 0.75rem; overflow: hidden; border: 1px solid var(--rl-border); background: var(--rl-surface); box-shadow: var(--rl-shadow); }
 .hv2-frame img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
+html[data-theme="dark"] img.hv2-shot-light,
+html:not([data-theme="dark"]) img.hv2-shot-dark { display: none; }
 .hv2-frame-bar { display: flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.8rem; border-bottom: 1px solid var(--rl-border); background: var(--rl-surface-2); }
 .hv2-frame-bar i { width: 0.55rem; height: 0.55rem; border-radius: 9999px; background: var(--rl-border-strong); }
 .hv2-frame-bar span { margin-left: 0.5rem; font-size: 0.7rem; color: var(--rl-text-faint); letter-spacing: 0.04em; }
@@ -188,6 +191,9 @@
 .hv2-layer .hv2-frame { box-shadow: var(--rl-shadow); }
 .hv2-layer-label { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.6rem; }
 .hv2-layer-label b { font-size: 1.1rem; letter-spacing: -0.02em; color: var(--rl-text); }
+.hv2-studio-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.55rem; }
+.hv2-studio-tabs button { padding: 0.3rem 0.85rem; border: 1px solid var(--rl-border-strong); border-radius: 999px; background: var(--rl-surface); color: var(--rl-text); font-size: 0.85rem; }
+.hv2-studio-tabs button[aria-selected="true"] { background: #ff5e14; border-color: #ff5e14; color: #070d1e; }
 .hv2-layer p { font-size: 0.9rem; color: var(--rl-text-muted); line-height: 1.55; margin-top: 0.6rem; max-width: 34rem; }
 .hv2-flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.5rem; padding: 1.25rem; background: var(--rl-surface-2); }
 .hv2-flow div { flex: 1 1 8rem; border: 1.5px solid var(--rl-border-strong); border-radius: 0.5rem; padding: 0.7rem 0.85rem; background: var(--rl-surface); }
@@ -216,6 +222,7 @@
 .hv2-ai-cols a { display: inline-flex; align-items: center; min-height: 2.75rem; margin-top: 0.5rem; font-weight: 700; font-size: 0.9rem; color: #ff9a62; }
 .hv2-ai-cols a:hover { color: #ffc2a0; }
 .hv2-ai-shot { max-width: 46rem; margin: 3.5rem auto 0; }
+.hv2-ai-shot-compact { max-width: 30rem; }
 
 /* ---------------- Scene F: extend (split) ---------------- */
 .hv2-extend { display: grid; }

@@ -1,9 +1,14 @@
 ---
 import ShotSlot from "./ShotSlot.astro";
+import { getHomeShot } from "./homeShots";
 import type { HomeCopy } from "../../i18n/home-v2";
 interface Props { c: HomeCopy }
 const { c } = Astro.props;
 const s = c.create;
+const studioViews = [
+  { id: "HV2-04-editor", label: s.studioEditor },
+  { id: "HV2-04", label: s.studioGallery },
+];
 ---
 
 <section class="hv2-create hv2-scroll-target" id={s.id} aria-labelledby="hv2-cr-title" data-scene="sticky">
@@ -19,7 +24,20 @@ const s = c.create;
           {s.layers.map((l, i) => (
             <div class="hv2-layer" data-i={i} style={`--s:${i === 0 ? 0 : 0.06 + i * 0.32};--e:${0.4 + i * 0.32}`}>
               <div class="hv2-layer-label"><b>{l.name}</b><span class="hv2-tag">{l.tag}</span></div>
-              {l.id === "auto" ? (
+              {l.id === "studio" && getHomeShot("HV2-04-editor") ? (
+                <div data-tabs>
+                  <div class="hv2-studio-tabs" role="tablist" aria-label={l.name}>
+                    {studioViews.map((view, j) => (
+                      <button type="button" role="tab" id={`tab-${view.id}`} aria-controls={`panel-${view.id}`} aria-selected={j === 0 ? "true" : "false"} tabindex={j === 0 ? 0 : -1}>{view.label}</button>
+                    ))}
+                  </div>
+                  {studioViews.map((view) => (
+                    <div class="hv2-panel" id={`panel-${view.id}`} role="tabpanel" aria-labelledby={`tab-${view.id}`} data-panel>
+                      <ShotSlot slotId={view.id} label={view.label} ratio="16 / 9" />
+                    </div>
+                  ))}
+                </div>
+              ) : l.id === "auto" && !getHomeShot(l.id2) ? (
                 <figure class="hv2-frame">
                   <div class="hv2-frame-bar" aria-hidden="true"><i></i><i></i><i></i><span>{s.flowLegend}</span></div>
                   <div class="hv2-flow" role="img" aria-label={`${s.flowLegend}: ${s.flow.map((f, k) => `${f} - ${s.flowSample[k]}`).join(" > ")}`}>

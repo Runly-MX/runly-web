@@ -1,12 +1,15 @@
 ---
-import { Image } from "astro:assets";
 import { ArrowRight } from "@lucide/astro";
 import inicio from "../../assets/tour/inicio.png";
 import mirai from "../../assets/home-v2/mirai-chat.png";
+import { getHomeShot } from "./homeShots";
+import HomeShotImage from "./HomeShotImage.astro";
 import type { HomeCopy } from "../../i18n/home-v2";
 interface Props { c: HomeCopy; prefix: string }
 const { c, prefix } = Astro.props;
 const h = c.hero;
+const homeShot = getHomeShot("HV2-01") ?? inicio;
+const miraiShot = getHomeShot("HV2-MIRAI");
 ---
 
 <section class="hv2-hero hv2-scroll-target" id="hero" aria-labelledby="hv2-h1">
@@ -23,10 +26,10 @@ const h = c.hero;
       </div>
       <div class="hv2-stack">
         <div class="hv2-shot-main">
-          <Image src={inicio} alt={h.shotAlt} widths={[640, 960, 1400, 1912]} sizes="(min-width: 1024px) 62vw, 100vw" loading="eager" fetchpriority="high" format="webp" quality={82} />
+          <HomeShotImage src={homeShot} light={getHomeShot("HV2-01", "light")} alt={h.shotAlt} widths={[640, 960, 1400, 1912]} sizes="(min-width: 1024px) 62vw, 100vw" eager />
         </div>
-        <div class="hv2-shot-second">
-          <Image src={mirai} alt={h.miraiAlt} widths={[480, 800]} sizes="(min-width: 1024px) 34vw, 52vw" loading="eager" format="webp" quality={80} />
+        <div class:list={["hv2-shot-second", { "hv2-shot-second-compact": miraiShot }]}>
+          <HomeShotImage src={miraiShot ?? mirai} light={miraiShot ? getHomeShot("HV2-MIRAI", "light") : undefined} alt={h.miraiAlt} widths={[320, 480, 800]} sizes="(min-width: 1024px) 25vw, 40vw" eager />
         </div>
         <p class="hv2-caption">{h.caption}</p>
       </div>

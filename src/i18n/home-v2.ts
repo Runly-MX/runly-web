@@ -18,7 +18,7 @@ const es = {
     ctaPrimary: "Solicitar una demostración",
     ctaSecondary: "Explorar la plataforma",
     shotAlt: "Pantalla de inicio de Runly con los módulos instalados de la empresa",
-    miraiAlt: "Conversación con MirAI, el asistente integrado de Runly",
+    miraiAlt: "Pantalla de bienvenida de MirAI, el asistente de Runly",
     caption: "Pantalla real de Runly",
   },
   companies: {
@@ -27,6 +27,7 @@ const es = {
     title: "Muchas empresas. Una plataforma. Cada una en su lugar.",
     body: "Una organización puede operar varias empresas desde Runly. Cada empresa tiene sus propios miembros, módulos y permisos; quien trabaja en una ve solo lo que esa empresa le concede.",
     legend: "Ejemplo conceptual, no una pantalla del producto",
+    selectorAlt: "Selector de empresas de Runly con la empresa activa marcada",
     core: "Runly",
     orgs: [
       { name: "Distribuidora", mods: ["Compras", "Inventario", "Flota"] },
@@ -68,6 +69,8 @@ const es = {
       { id: "web", name: "Website", id2: "HV2-06", text: "Páginas por bloques, borradores y revisión antes de publicar.", tag: "En preparación para clientes" },
     ],
     flowLegend: "Diagrama ilustrativo del editor de automatizaciones",
+    studioEditor: "Editor",
+    studioGallery: "Galería",
     flow: ["Disparador", "Condición", "Acción"],
     flowSample: ["Se crea una tarea", "Es prioridad alta", "Avisar en el chat"],
   },
@@ -82,7 +85,7 @@ const es = {
       { id: "mcp-hub", name: "MCP de Developer Hub", kind: "Para desarrollo", text: "Trabaja sobre tus proyectos de módulos con tu identidad: documentación, validación y compilación. No firma ni publica por ti.", href: "/runly-developer", cta: "Conocer Runly Developer" },
       { id: "chatgpt", name: "Plugin para ChatGPT", kind: "En integración", text: "Conecta un cliente compatible mediante MCP con acceso autorizado. Su publicación y revisión en tiendas de terceros tienen estado propio.", href: "/runly-developer", cta: "Ver estado y requisitos" },
     ],
-    shotAlt: "Conversación con MirAI dentro del módulo Chat de Runly",
+    shotAlt: "Nueva conversación con MirAI y sugerencias de inicio",
   },
   extend: {
     id: "extender",
@@ -99,7 +102,7 @@ const es = {
     ctaAHref: "/runly-developer",
     ctaB: "Ver la arquitectura",
     ctaBHref: "/arquitectura",
-    shotAlt: "Portal de Runly Developer",
+    shotAlt: "Playground de Developer Hub con una tabla de datos ficticios",
   },
   market: {
     id: "marketplace",
@@ -109,6 +112,7 @@ const es = {
     status: "Estado",
     cta: "Explorar el Marketplace",
     ctaNote: "El Marketplace está disponible en español.",
+    shotAlt: "Categorías del Marketplace público de Runly",
     kinds: [
       { id: "studio", name: "Plantillas Studio", text: "Documentos, etiquetas y diseños de partida.", status: "En preparación" },
       { id: "auto", name: "Automatizaciones", text: "Flujos que llegarían en pausa, para revisarlos antes de activarlos.", status: "En preparación" },
@@ -145,7 +149,7 @@ const en: HomeCopy = {
     ctaPrimary: "Request a demo",
     ctaSecondary: "Explore the platform",
     shotAlt: "Runly home screen with the company's installed modules",
-    miraiAlt: "A conversation with MirAI, Runly's built-in assistant",
+    miraiAlt: "Welcome screen for MirAI, Runly's built-in assistant",
     caption: "Real Runly screen (Spanish interface)",
   },
   companies: {
@@ -154,6 +158,7 @@ const en: HomeCopy = {
     title: "Many companies. One platform. Each in its place.",
     body: "An organization can run several companies from Runly. Each company has its own members, modules and permissions; someone working in one sees only what that company grants them.",
     legend: "Conceptual example, not a product screen",
+    selectorAlt: "Runly company switcher with the active company checked",
     core: "Runly",
     orgs: [
       { name: "Distributor", mods: ["Purchasing", "Inventory", "Fleet"] },
@@ -195,6 +200,8 @@ const en: HomeCopy = {
       { id: "web", name: "Website", id2: "HV2-06", text: "Block-based pages, drafts and review before publishing.", tag: "In preparation for customers" },
     ],
     flowLegend: "Illustrative diagram of the automation editor",
+    studioEditor: "Editor",
+    studioGallery: "Gallery",
     flow: ["Trigger", "Condition", "Action"],
     flowSample: ["A task is created", "It is high priority", "Notify in chat"],
   },
@@ -209,7 +216,7 @@ const en: HomeCopy = {
       { id: "mcp-hub", name: "Developer Hub MCP", kind: "For development", text: "Work on your module projects with your identity: documentation, validation and builds. It does not sign or publish for you.", href: "/runly-developer", cta: "Explore Runly Developer (in Spanish)" },
       { id: "chatgpt", name: "ChatGPT plugin", kind: "Being integrated", text: "Connects a compatible client through MCP with authorized access. Its listing and review in third-party stores have their own status.", href: "/runly-developer", cta: "See status and requirements (in Spanish)" },
     ],
-    shotAlt: "A conversation with MirAI inside Runly's Chat module",
+    shotAlt: "New MirAI conversation with starter suggestions",
   },
   extend: {
     id: "extender",
@@ -226,7 +233,7 @@ const en: HomeCopy = {
     ctaAHref: "/runly-developer",
     ctaB: "See the architecture",
     ctaBHref: "/en/arquitectura",
-    shotAlt: "Runly Developer portal",
+    shotAlt: "Developer Hub Playground showing a table with sample data",
   },
   market: {
     id: "marketplace",
@@ -236,6 +243,7 @@ const en: HomeCopy = {
     status: "Status",
     cta: "Explore the Marketplace",
     ctaNote: "The Marketplace is available in Spanish.",
+    shotAlt: "Categories in the public Runly Marketplace",
     kinds: [
       { id: "studio", name: "Studio templates", text: "Starting documents, labels and designs.", status: "In preparation" },
       { id: "auto", name: "Automations", text: "Flows that would arrive paused, so you can review them before activating.", status: "In preparation" },

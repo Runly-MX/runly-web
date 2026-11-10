@@ -1,5 +1,34 @@
 # Recursos visuales — inventario y manifiesto de captura
 
+## Capturas instaladas en Home V2 · 2026-11-09
+
+Se capturó la interfaz en español de `app.runly.mx`, Runly ERP Jaguar v0.1 según el pie de la aplicación, en tema oscuro. El área visible del navegador fue de 1920 × 945 o 1920 × 889, según el módulo. Los WebP recortados están en `src/assets/home-v2/slots/`. Se excluyeron la cuenta, las notificaciones y la actividad reciente. Las referencias internas indicadas en la tabla quedaron cubiertas con máscaras opacas. El material muestra la interfaz de Runly y la plantilla incluida en Studio, que el producto identifica como apta para uso comercial.
+
+Cada captura tiene una variante clara tomada en la misma vista del ERP. El archivo `<ID>.webp` corresponde al tema oscuro y `<ID>-light.webp` al claro. La landing selecciona la variante según el tema efectivo de la página. Si un slot tiene un solo archivo, ese archivo se usa en ambos temas.
+
+| ID | Pantalla y estado | Descripción ES / EN |
+| --- | --- | --- |
+| `HV2-01` | Catálogo de Inicio, usado en el hero y en Administración. | Catálogo de aplicaciones de Runly / Runly application catalog |
+| `HV2-03` | Panel de Inventario con indicadores en cero. | Panel de activos y asignaciones / Asset and assignment dashboard |
+| `HV2-04` | Galería de plantillas oficiales de Studio. | Galería de plantillas de Studio / Studio template gallery |
+| `HV2-09` | Vista mensual de Calendario para Colaboración, sin eventos visibles y con el nombre del calendario interno cubierto. | Vista mensual de Calendario / Monthly Calendar view |
+| `HV2-10` | Panel de Compras con indicadores en cero, usado en Operaciones. | Panel de órdenes y facturas de Compras / Purchasing orders and invoices dashboard |
+| `HV2-11` | Kanban de Proyectos con el título del proyecto y dos referencias de tareas cubiertos o fuera del recorte. | Tablero de Proyectos con tareas agrupadas por estado / Project board with tasks grouped by status |
+
+### Capturas adicionales
+
+| ID | Pantalla y tratamiento |
+| --- | --- |
+| `HV2-02` | Selector real de empresas de Runly ERP. Se cubrió la empresa secundaria. Acompaña al diagrama. |
+| `HV2-04-editor` | Editor de Studio con un diseño existente, capas y propiedades de una forma seleccionada. La galería `HV2-04` tiene su propia pestaña. |
+| `HV2-07` | Playground de Developer Hub en vista generada TABLE con datos ficticios. Se excluyó la cuenta y se cubrió la ruta del módulo. |
+| `HV2-08` | Categorías del Marketplace público. El catálogo de recursos seguía en preparación al capturar. |
+| `HV2-MIRAI` | Bienvenida de una conversación nueva en MirAI, sin historial. Se usa en el hero y en la escena de IA. `HV2-09` corresponde a Calendario. |
+
+Las cinco vistas tienen variantes clara y oscura. `HV2-05` (Automatizaciones) conserva el diagrama hasta tener un flujo apto para mostrar. `HV2-06` (Website) queda pendiente de un sitio de demostración con borrador y vista previa.
+
+## Inventario y plan originales
+
 Fecha: 2026-11-09. No se generaron mockups ni se modificaron imágenes. Las dos referencias del usuario sirven para dirección artística, no para reutilización de sus interfaces o activos.
 
 ## Estado de acceso y evidencia

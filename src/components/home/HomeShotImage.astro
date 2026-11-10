@@ -1,0 +1,29 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+
+interface Props {
+  src: ImageMetadata;
+  light?: ImageMetadata;
+  alt: string;
+  widths: number[];
+  sizes: string;
+  eager?: boolean;
+  ratio?: string;
+}
+
+const { src, light, alt, widths, sizes, eager = false, ratio } = Astro.props;
+const imageProps = {
+  alt,
+  widths,
+  sizes,
+  format: "webp" as const,
+  quality: 82,
+  loading: eager ? "eager" as const : "lazy" as const,
+  fetchpriority: eager ? "high" as const : "auto" as const,
+  style: ratio ? `aspect-ratio:${ratio}` : undefined,
+};
+---
+
+<Image {...imageProps} src={src} class={light ? "hv2-shot-dark" : undefined} />
+{light && <Image {...imageProps} src={light} class="hv2-shot-light" />}

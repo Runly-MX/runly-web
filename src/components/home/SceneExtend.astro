@@ -1,5 +1,7 @@
 ---
 import { ArrowRight } from "@lucide/astro";
+import ShotSlot from "./ShotSlot.astro";
+import { getHomeShot } from "./homeShots";
 import type { HomeCopy } from "../../i18n/home-v2";
 interface Props { c: HomeCopy }
 const { c } = Astro.props;
@@ -29,6 +31,7 @@ const s = c.extend;
         ))}
       </ul>
       <ul class="hv2-toolrow" aria-label="Developer">{s.tools.map((t) => <li>{t}</li>)}</ul>
+      {getHomeShot("HV2-07") && <div class="mt-6"><ShotSlot slotId="HV2-07" label="Developer Hub · Playground" alt={s.shotAlt} ratio="16 / 9" /></div>}
     </div>
   </div>
 </section>

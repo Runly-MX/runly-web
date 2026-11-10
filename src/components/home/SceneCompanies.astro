@@ -2,6 +2,8 @@
 import { Lock } from "@lucide/astro";
 import { Image } from "astro:assets";
 import ModuleIcon from "./ModuleIcon.astro";
+import ShotSlot from "./ShotSlot.astro";
+import { getHomeShot } from "./homeShots";
 import isotipo from "../../assets/home-v2/isotipo-dark.png";
 import type { HomeCopy } from "../../i18n/home-v2";
 interface Props { c: HomeCopy }
@@ -55,6 +57,11 @@ const chipOff = [
             ))}
           </div>
           <p class="hv2-legend">{s.legend}</p>
+          {getHomeShot("HV2-02") && (
+            <div class="mx-auto mt-4 max-w-56">
+              <ShotSlot slotId="HV2-02" label={s.selectorAlt} ratio="224 / 153" sizes="224px" chrome={false} />
+            </div>
+          )}
         </div>
       </div>
     </div>

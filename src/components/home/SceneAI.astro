@@ -2,6 +2,7 @@
 import ShotSlot from "./ShotSlot.astro";
 import ModuleIcon from "./ModuleIcon.astro";
 import mirai from "../../assets/home-v2/mirai-chat.png";
+import { getHomeShot } from "./homeShots";
 import isotipo from "../../assets/home-v2/isotipo-dark.png";
 import { Image } from "astro:assets";
 import { ArrowRight } from "@lucide/astro";
@@ -9,6 +10,7 @@ import type { HomeCopy } from "../../i18n/home-v2";
 interface Props { c: HomeCopy }
 const { c } = Astro.props;
 const s = c.ai;
+const miraiShot = getHomeShot("HV2-MIRAI");
 // Tiles around the core, in a 100x50 viewBox. Image slots HV2-AI-01..04 take
 // generated illustrations (see docs/home-v2/IMAGE-BRIEFS.md); drop the file in
 // src/assets/home-v2/slots/ named after the ID and the placeholder is replaced.
@@ -52,8 +54,8 @@ const meta = [
       ))}
     </div>
 
-    <div class="hv2-ai-shot io">
-      <ShotSlot slotId="HV2-09" label="MirAI" alt={s.shotAlt} src={mirai} ratio="1916 / 941" sizes="(min-width: 1024px) 736px, 100vw" />
+    <div class:list={["hv2-ai-shot io", { "hv2-ai-shot-compact": miraiShot }]}>
+      <ShotSlot slotId="HV2-MIRAI" label="MirAI" alt={s.shotAlt} src={miraiShot ?? mirai} ratio={miraiShot ? "390 / 306" : "1916 / 941"} sizes="(min-width: 1024px) 480px, 100vw" />
     </div>
   </div>
 </section>
