@@ -1,8 +1,11 @@
 // src/components/marketplace/resources/ResourceDetailView.tsx
 //
-// Detail sheet for any resource type. Pure presentation of a parsed
+// Detail page for any resource type. Pure presentation of a parsed
 // ResourceDetail: all text is rendered as React text nodes (never HTML), the
 // actions download original packages or explain the confirmed import inside Runly.
+// Layout: large preview gallery + sticky side panel (identity, facts, actions);
+// description, technical details and versions below. Raw identifiers (resource
+// key, release id, hash) live only in the technical section.
 import { useEffect, useState } from "react";
 import { createHubSource } from "../../../lib/marketplace-resources/client";
 import { resourceIdentity } from "../../../lib/marketplace-resources/identity";
@@ -13,7 +16,8 @@ import { categoryLabel } from "../../../lib/marketplace-resources/filters";
 import { MARKETPLACE_BASE, publisherPath, resourcePath, typePath } from "../../../lib/marketplace-resources/routes";
 import { T, TYPE_TEXT } from "../../../lib/marketplace-resources/text";
 import type { ResourceDetail } from "../../../lib/marketplace-resources/types";
-import { AvailabilityChip, Panel, TrustBadge, TYPE_COVER, TypeChip } from "./parts";
+import { Icon, TYPE_ICON } from "./icons";
+import { AvailabilityChip, Avatar, FOCUS, Panel, TrustBadge, TYPE_COVER, TypeChip } from "./parts";
 import ResourceStateBlock from "./ResourceStateBlock";
 
 const d = T.detail;
@@ -32,10 +36,10 @@ function CopyField({ label, value }: { label: string; value: string }) {
   };
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{label}</p>
+      <p className="text-xs font-semibold text-slate-500">{label}</p>
       <div className="mt-1 flex items-stretch gap-2">
         <code className="min-w-0 flex-1 select-all break-all rounded-lg bg-slate-100 px-2.5 py-2 text-xs text-slate-700">{value}</code>
-        <button type="button" onClick={copy} className="shrink-0 rounded-lg border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50" aria-live="polite">{copied ? d.copied : d.copy}</button>
+        <button type="button" onClick={copy} className={`min-h-10 shrink-0 rounded-lg border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 ${FOCUS}`} aria-live="polite">{copied ? d.copied : d.copy}</button>
       </div>
     </div>
   );
@@ -76,7 +80,7 @@ function LiveNotice({ kind, onRetry }: { kind: "checking" | "missing" | "error";
     <div className={`rounded-3xl border p-4 ${copy[2]}`} role={kind === "error" ? "alert" : "status"} aria-live="polite" data-live-notice={kind}>
       <p className="font-bold">{copy[0]}</p>
       <p className="mt-1 text-sm">{copy[1]}</p>
-      {kind === "error" && <button type="button" onClick={onRetry} className="mt-3 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">{T.states.retry}</button>}
+      {kind === "error" && <button type="button" onClick={onRetry} className={`mt-3 min-h-11 rounded-full bg-[#c2410c] px-4 text-sm font-semibold text-white hover:bg-[#9a3412] ${FOCUS}`}>{T.states.retry}</button>}
     </div>
   );
 }
@@ -88,13 +92,13 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
   const identity = resourceIdentity(r);
   const req = r.requirements;
   const requirementRows = ([[d.modules, req.modules], [d.fonts, req.fonts], [d.permissions, req.permissions], [d.services, req.services]] as const).filter(([, v]) => v.length > 0);
-  const hasRequirements = requirementRows.length > 0 || !!req.builder;
   const paragraphs = r.description.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
   const sol = r.solution;
+  const official = !!identity.organization;
 
   return (
     <article data-resource={r.resourceKey} data-availability={r.availability} data-live={live.phase}>
-      <nav aria-label="Ruta" className="mb-6 flex flex-wrap items-center gap-1.5 text-sm text-slate-500">
+      <nav aria-label="Ruta" className="mb-5 flex flex-wrap items-center gap-1.5 text-sm text-slate-500">
         <a href={`${MARKETPLACE_BASE}/`} className="font-semibold text-orange-600 hover:underline">{T.breadcrumbHome}</a>
         <span aria-hidden="true">/</span>
         <a href={typePath(r.type)} className="hover:text-slate-800">{TYPE_TEXT[r.type].plural}</a>
@@ -110,43 +114,60 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
         </div>
       )}
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start" data-detail-hero>
-        <div>
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_23rem] lg:gap-x-10 lg:gap-y-8 xl:grid-cols-[minmax(0,1fr)_26rem]">
+        <div className="min-w-0 lg:col-start-1 lg:row-start-1" data-detail-hero>
           {r.previews.length > 0
             ? <PreviewGallery previews={r.previews} hubUrl={hubUrl} />
             : (
-              <div className={`flex aspect-[16/10] flex-col items-center justify-center gap-2 rounded-3xl border border-slate-200 bg-gradient-to-br ${TYPE_COVER[r.type]}`} data-cover-fallback role="img" aria-label={TYPE_TEXT[r.type].singular}>
-                <span className="text-2xl font-extrabold tracking-tight sm:text-3xl">{TYPE_TEXT[r.type].singular}</span>
+              <div className={`flex aspect-[16/10] flex-col items-center justify-center gap-3 rounded-3xl border border-slate-200 bg-gradient-to-br ${TYPE_COVER[r.type]}`} data-cover-fallback role="img" aria-label={TYPE_TEXT[r.type].singular}>
+                <Icon name={TYPE_ICON[r.type]} className="h-12 w-12 opacity-80" />
                 <span className="text-xs font-medium opacity-80">{d.noPreview}</span>
               </div>
             )}
         </div>
 
-        <div className="space-y-5">
+        <aside className="mt-6 min-w-0 space-y-5 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:mt-0 lg:self-start lg:sticky lg:top-24" aria-label="Resumen del recurso">
           <header>
             <div className="flex flex-wrap items-center gap-2">
               <TypeChip type={r.type} />
-              <TrustBadge trust={r.trust} />
               <AvailabilityChip availability={r.availability} trust={r.trust} />
             </div>
-            <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{r.title}</h1>
-            <p className="mt-3 text-base text-slate-600">{r.summary}</p>
+            <h1 className="mt-3 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">{r.title}</h1>
+            <p className="mt-2 text-base text-slate-600">{r.summary}</p>
           </header>
 
-          <a href={publisherPath(r.publisher.handle)} className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 transition-colors hover:border-orange-300 hover:bg-orange-50/40" data-publisher>
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-bold text-white" aria-hidden="true">{r.publisher.displayName.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("")}</span>
-            <span className="min-w-0">
-              <span className="block text-xs text-slate-500">{d.publishedBy}</span>
-              <span className="block truncate font-bold text-slate-900">{r.publisher.displayName}</span>
-            </span>
-            {r.publisher.verified && <span className="ml-auto shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">{T.verifiedPublisher}</span>}
-          </a>
+          <div className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white" data-identity>
+            <div className="flex items-start gap-3 p-4" data-provenance>
+              <span className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${official ? "bg-orange-50 text-orange-600" : "bg-slate-100 text-slate-600"}`}><Icon name={official ? "shield" : "users"} className="h-5 w-5" /></span>
+              <div className="min-w-0">
+                <TrustBadge trust={r.trust} />
+                <p className="mt-1.5 text-sm text-slate-600" {...(official ? { "data-institutional-identity": true } : {})}>
+                  {official ? "Procedencia institucional acreditada por Runly mediante atestación firmada. Es independiente de quién creó el recurso." : T.trustHint[r.trust]}
+                </p>
+              </div>
+            </div>
+            <a href={publisherPath(r.publisher.handle)} className={`flex items-center gap-3 p-4 transition-colors hover:bg-slate-50 ${FOCUS}`} data-publisher>
+              <Avatar name={r.publisher.displayName} />
+              <span className="min-w-0 flex-1">
+                <span className="block text-xs text-slate-500">{d.publishedBy}</span>
+                <span className="block truncate font-bold text-slate-900">{r.publisher.displayName}</span>
+              </span>
+              {r.publisher.verified && <span className="shrink-0 text-[11px] font-semibold text-emerald-700">{T.verifiedPublisher}</span>}
+              <Icon name="right" className="h-4 w-4 text-slate-400" />
+            </a>
+            {identity.creator && (
+              <div className="flex items-center gap-3 p-4" data-creator>
+                <Avatar name={identity.creator.displayName} />
+                <span className="min-w-0"><span className="block text-xs text-slate-500">Creado por</span><span className="block truncate font-bold text-slate-900">{identity.creator.displayName}</span></span>
+              </div>
+            )}
+          </div>
 
           <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-slate-200 bg-slate-200 text-sm" data-facts>
             {([
               [d.version, r.latest ? T.version(r.latest.version) : "—"],
-              [d.compatibility, r.compatibility ? d.requiresRunly(r.compatibility.runly.min, r.compatibility.runly.max) : "—"],
               [T.licenseLabel, r.license],
+              [d.compatibility, r.compatibility ? d.requiresRunly(r.compatibility.runly.min, r.compatibility.runly.max) : "—"],
               [T.languageLabel, T.locale[r.locale]],
             ] as const).map(([label, value]) => (
               <div key={label} className="bg-white p-3">
@@ -156,16 +177,17 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
             ))}
           </dl>
 
-          {identity.organization && <p data-institutional-identity className="text-sm text-slate-600">Procedencia: Oficial Runly · Organización responsable: Runly</p>}
           {r.install && view.showInstall && <ResourceActions resource={r} hubUrl={hubUrl} />}
+        </aside>
 
-        </div>
-      </div>
-
-      <div className="mt-12 grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="space-y-6">
+        <div className="mt-8 min-w-0 space-y-4 lg:col-start-1 lg:row-start-2 lg:mt-0">
           <Panel title={d.description}>
             {paragraphs.length ? paragraphs.map((p, i) => <p key={i} className="whitespace-pre-line leading-relaxed">{p}</p>) : <p>{r.summary}</p>}
+            {r.categories.length > 0 && (
+              <p className="flex flex-wrap gap-1.5 pt-1">
+                {r.categories.map((c) => <span key={c} className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">{categoryLabel(c)}</span>)}
+              </p>
+            )}
           </Panel>
 
           {r.riskSummary && (
@@ -197,7 +219,7 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
                     </div>
                     <div className="flex items-center gap-2">
                       <AvailabilityChip availability={c.availability} />
-                      <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${c.required ? "bg-slate-900 text-white ring-slate-900" : "bg-white text-slate-600 ring-slate-300"}`}>{c.required ? d.componentRequired : d.componentOptional}</span>
+                      <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${c.required ? "bg-[#c2410c] text-white ring-[#c2410c]" : "bg-white text-slate-600 ring-slate-300"}`}>{c.required ? d.componentRequired : d.componentOptional}</span>
                     </div>
                   </li>
                 ))}
@@ -214,17 +236,33 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
             </Panel>
           )}
 
-          <Panel title={d.requirements}>
-            {hasRequirements ? (
-              <dl>
-                {requirementRows.map(([label, values]) => <Meta key={label} label={label}>{values.join(", ")}</Meta>)}
-                {req.builder && <Meta label={d.builder}>{req.builder}</Meta>}
-              </dl>
-            ) : <p>{d.none}</p>}
+          <Panel title="Detalles técnicos" id="tecnico" collapsible>
+            <dl>
+              <Meta label="Formato">{d.format(r.format.name, r.format.version)}</Meta>
+              {r.latest && <Meta label={d.published}>{date(r.latest.publishedAt)}</Meta>}
+              {requirementRows.map(([label, values]) => <Meta key={label} label={label}>{values.join(", ")}</Meta>)}
+              {req.builder && <Meta label={d.builder}>{req.builder}</Meta>}
+              {requirementRows.length === 0 && !req.builder && <Meta label={d.requirements}>{d.none}</Meta>}
+            </dl>
+            <div>
+              <p className="font-semibold text-slate-900">{d.provenance}</p>
+              <p className="mt-1">{official ? "Procedencia institucional acreditada mediante atestación firmada y vinculada a esta release." : r.provenance.note ?? d.noProvenance}</p>
+              <p className="mt-1 text-xs text-slate-500">{official ? "La firma de procedencia se verificó junto al snapshot y la release disponibles. La decisión institucional se conserva en Developer Hub." : d.provenanceNote}</p>
+            </div>
+            <details className="group border-t border-slate-100 pt-3" data-identifiers>
+              <summary className={`flex min-h-10 cursor-pointer list-none items-center justify-between rounded-lg text-sm font-semibold text-slate-700 [&::-webkit-details-marker]:hidden ${FOCUS}`}>
+                Identificadores
+                <Icon name="down" className="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180 motion-reduce:transition-none" />
+              </summary>
+              <div className="mt-3 space-y-3">
+                <CopyField label={d.resourceKey} value={r.resourceKey} />
+                {r.install && view.showInstall && <CopyField label={d.releaseId} value={r.install.releaseId} />}
+              </div>
+            </details>
           </Panel>
 
           {r.versions.length > 0 && (
-            <Panel title={d.versions}>
+            <Panel title={d.versions} id="versiones" collapsible>
               {!view.versionStatuses && <p data-versions-history>{L.versionsHistory}</p>}
               <ul className="space-y-3">
                 {r.versions.map((v) => (
@@ -241,26 +279,6 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
             </Panel>
           )}
         </div>
-
-        <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
-          <section className="rounded-3xl border border-slate-200 bg-white p-5">
-            <dl>
-              <Meta label="Formato">{d.format(r.format.name, r.format.version)}</Meta>
-              {r.latest && <Meta label={d.published}>{date(r.latest.publishedAt)}</Meta>}
-            </dl>
-            {r.categories.length > 0 && (
-              <p className="mt-3 flex flex-wrap gap-1.5">
-                {r.categories.map((c) => <span key={c} className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">{categoryLabel(c)}</span>)}
-              </p>
-            )}
-            <div className="mt-4"><CopyField label={d.resourceKey} value={r.resourceKey} /></div>
-          </section>
-          <section className="rounded-3xl border border-slate-200 bg-white p-5">
-            <h2 className="text-sm font-bold text-slate-900">{d.provenance}</h2>
-            <p className="mt-1 text-sm text-slate-600">{r.trust === 'official' ? 'Procedencia institucional acreditada mediante atestación firmada y vinculada a esta release.' : r.provenance.note ?? d.noProvenance}</p>
-            <p className="mt-2 text-xs text-slate-500">{r.trust === 'official' ? 'La firma de procedencia se verificó junto al snapshot y la release disponibles. La decisión institucional se conserva en Developer Hub.' : d.provenanceNote}</p>
-          </section>
-        </aside>
       </div>
 
       {backHref && <p className="mt-10"><a href={backHref} className="text-sm font-semibold text-orange-600 hover:underline">&larr; {T.states.backToCatalog}</a></p>}

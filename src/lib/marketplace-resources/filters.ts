@@ -37,3 +37,13 @@ export const groupPublishers = (items: ResourceSummary[]) => {
 
 /** Publishers that really get a profile page: only those with a statically generated resource (same rule as the profile route). */
 export const publishersWithPages = (items: ResourceSummary[], source: DataSource) => groupPublishers(items.filter((r) => hasStaticPage(source, r)));
+
+export type SortKey = "recent" | "official" | "name";
+export const SORT_LABEL: Record<SortKey, string> = { recent: "Más recientes", official: "Oficiales primero", name: "Nombre (A-Z)" };
+const TRUST_RANK: Record<string, number> = { official: 0, "community-verified": 1, community: 2, revoked: 3 };
+
+export function sortResources(items: ResourceSummary[], sort: SortKey) {
+  const recent = (a: ResourceSummary, b: ResourceSummary) => b.updatedAt.localeCompare(a.updatedAt);
+  const by = { recent, official: (a: ResourceSummary, b: ResourceSummary) => TRUST_RANK[a.trust] - TRUST_RANK[b.trust] || recent(a, b), name: (a: ResourceSummary, b: ResourceSummary) => a.title.localeCompare(b.title, "es") }[sort];
+  return [...items].sort(by);
+}

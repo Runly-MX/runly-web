@@ -1,14 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
-import { experimental_AstroContainer as AstroContainer } from "astro/container";
 import { parseResourceDetail } from "../parse";
 import { liveStateFrom, liveView } from "../live";
 import { pageIsIndexable } from "../routes";
 import type { Preview, ResourceDetail } from "../types";
 import ResourceDetailView from "../../../components/marketplace/resources/ResourceDetailView";
 import PreviewGallery from "../../../components/marketplace/resources/PreviewGallery";
-import ResourceCard from "../../../components/marketplace/resources/ResourceCard.astro";
+import ResourceTile from "../../../components/marketplace/resources/ResourceTile";
 
 // Contract-shaped Hub payloads (PUBLIC_PROJECTIONS_CONTRACT_V1 section 4.2), parsed by the real parser.
 const SHA = (c: string) => c.repeat(64);
@@ -138,18 +137,17 @@ describe("preview gallery", () => {
   });
 });
 
-describe("catalog card", () => {
-  it("shows the first authentic preview, otherwise a type-icon cover (never an invented image); links and labels unchanged", async () => {
-    const container = await AstroContainer.create();
-    const withPreview = await container.renderToString(ResourceCard, { props: { resource: hubDetail({ previews: [shot("a", "Portada del menú"), shot("b", "Otra")] }), source: "hub" } });
+describe("catalog tile", () => {
+  it("shows the first authentic preview in its real format, otherwise a type-icon cover (never an invented image); link and provenance unchanged", () => {
+    const withPreview = renderToStaticMarkup(createElement(ResourceTile, { resource: hubDetail({ previews: [shot("a", "Portada del menú"), shot("b", "Otra")] }), hubUrl: "https://devs.runly.mx" }));
     expect(withPreview).toContain("data-mk-preview");
     expect(withPreview).toContain('alt="Portada del menú"');
     expect(withPreview).toContain(`/api/v1/marketplace/previews/${SHA("a")}`);
     expect(withPreview).not.toContain(`/api/v1/marketplace/previews/${SHA("b")}`);
-    expect(withPreview).not.toContain("data-mk-icon");
+    expect(withPreview).toContain("aspect-ratio:1.5");
     expect(withPreview).toContain('href="/marketplace/plantillas-studio/menu-restaurante/"');
-    expect(withPreview).toContain('data-search=');
-    const without = await container.renderToString(ResourceCard, { props: { resource: hubDetail({ previews: [] }), source: "hub" } });
+    expect(withPreview).toContain('data-trust="community-verified"');
+    const without = renderToStaticMarkup(createElement(ResourceTile, { resource: hubDetail({ previews: [] }) }));
     expect(without).toContain("data-mk-preview-fallback");
     expect(without).not.toContain("<img");
   });

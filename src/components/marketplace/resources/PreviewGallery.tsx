@@ -1,39 +1,40 @@
 // src/components/marketplace/resources/PreviewGallery.tsx
 //
 // Up to six previews of a resource, exactly as the parser admitted them (only
-// raster images on the Hub preview route). Main image + selectable thumbnails
-// (arrow keys, Home/End) + an enlarged view on the native <dialog> (Escape and
-// the backdrop close it; arrows browse). No iframes, no Studio rendering, no
-// dependencies. A preview that fails to load says so instead of breaking.
+// raster images on the Hub preview route). A large stage that respects each
+// image's real format, selectable page thumbnails (arrow keys, Home/End) and the
+// full viewer (PreviewViewer). No iframes, no Studio rendering. A preview that
+// fails to load says so instead of breaking.
 import { useEffect, useRef, useState } from "react";
 import { previewUrl } from "../../../lib/marketplace-resources/client";
 import { T } from "../../../lib/marketplace-resources/text";
 import type { Preview } from "../../../lib/marketplace-resources/types";
+import { Icon } from "./icons";
+import { FOCUS } from "./parts";
+import PreviewViewer from "./PreviewViewer";
 
 const G = T.gallery;
 
-function Shot({ preview, hubUrl, failed, onFail, className, sizes, eager = false, compact = false }: { preview: Preview; hubUrl?: string | null; failed: boolean; onFail: () => void; className: string; sizes?: string; eager?: boolean; compact?: boolean }) {
-  if (failed) {
-    return (
-      <div className={`${className} flex flex-col items-center justify-center gap-1 bg-slate-100 p-3 text-center text-xs text-slate-500`} role="img" aria-label={G.failed(preview.alt)} data-preview-failed>
-        <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="1.6"><rect x="3" y="4" width="18" height="16" rx="2" /><path d="m3 16 5-5 4 4 3-3 6 6" /><path d="M4 4l16 16" /></svg>
-        {!compact && <span>{G.failedShort}</span>}
-      </div>
-    );
-  }
-  return <img src={previewUrl(hubUrl, preview)} alt={preview.alt} width={preview.width} height={preview.height} sizes={sizes} loading={eager ? "eager" : "lazy"} decoding="async" onError={onFail} className={className} />;
+function Failed({ preview, className, compact = false }: { preview: Preview; className: string; compact?: boolean }) {
+  return (
+    <div className={`${className} flex flex-col items-center justify-center gap-1 bg-slate-100 p-3 text-center text-xs text-slate-500`} role="img" aria-label={G.failed(preview.alt)} data-preview-failed>
+      <Icon name="imageOff" className="h-6 w-6" />
+      {!compact && <span>{G.failedShort}</span>}
+    </div>
+  );
 }
 
 export default function PreviewGallery({ previews, hubUrl }: { previews: Preview[]; hubUrl?: string | null }) {
   const items = previews.slice(0, 6);
   const [index, setIndex] = useState(0);
+  const [viewer, setViewer] = useState(false);
   const [failed, setFailed] = useState<Record<string, boolean>>({});
-  const dialog = useRef<HTMLDialogElement>(null);
   const thumbs = useRef<(HTMLButtonElement | null)[]>([]);
   useEffect(() => { if (index >= items.length) setIndex(0); }, [items.length, index]);
   if (items.length === 0) return null;
   const current = items[Math.min(index, items.length - 1)];
-  const fail = (sha: string) => () => setFailed((f) => ({ ...f, [sha]: true }));
+  const fail = (sha: string) => setFailed((f) => ({ ...f, [sha]: true }));
+  const many = items.length > 1;
   const go = (next: number, focus = false) => {
     const n = (next + items.length) % items.length;
     setIndex(n);
@@ -43,23 +44,29 @@ export default function PreviewGallery({ previews, hubUrl }: { previews: Preview
     const keys: Record<string, number> = { ArrowRight: index + 1, ArrowDown: index + 1, ArrowLeft: index - 1, ArrowUp: index - 1, Home: 0, End: items.length - 1 };
     if (event.key in keys) { event.preventDefault(); go(keys[event.key], true); }
   };
-  const open = () => { if (!failed[current.sha256]) dialog.current?.showModal(); };
+  const bad = !!failed[current.sha256];
 
   return (
     <section aria-label={G.label} data-gallery data-count={items.length}>
-      <div className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50">
-        <button type="button" onClick={open} className="group relative block w-full cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 focus-visible:ring-offset-2" aria-label={G.enlarge(current.alt)} disabled={!!failed[current.sha256]}>
-          <Shot key={current.sha256} preview={current} hubUrl={hubUrl} failed={!!failed[current.sha256]} onFail={fail(current.sha256)} className="mx-auto aspect-[4/3] w-full object-contain" sizes="(min-width: 1024px) 66vw, 100vw" eager />
-          {!failed[current.sha256] && (
-            <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-slate-900/75 px-3 py-1.5 text-xs font-semibold text-white opacity-90 transition-opacity motion-reduce:transition-none group-hover:opacity-100">{G.enlargeHint}</span>
-          )}
+      <div className="relative overflow-hidden rounded-3xl border border-slate-200 bg-slate-100">
+        <button type="button" onClick={() => setViewer(true)} disabled={bad} aria-label={G.enlarge(current.alt)} className={`group flex min-h-[16rem] w-full cursor-zoom-in items-center justify-center p-4 sm:p-8 ${FOCUS} focus-visible:ring-inset`}>
+          {bad
+            ? <Failed preview={current} className="aspect-[4/3] w-full rounded-2xl" />
+            : <img key={current.sha256} src={previewUrl(hubUrl, current)} alt={current.alt} width={current.width} height={current.height} sizes="(min-width: 1024px) 60vw, 100vw" loading="eager" decoding="async" onError={() => fail(current.sha256)} className="h-auto max-h-[72dvh] w-auto max-w-full rounded-lg object-contain shadow-[0_20px_50px_-20px_rgba(11,19,43,0.45)] transition-transform duration-300 motion-reduce:transition-none sm:group-hover:scale-[1.01]" />}
+          {!bad && <span className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-1.5 rounded-full bg-[#0b132bd9] px-3 py-1.5 text-xs font-semibold text-white"><Icon name="expand" className="h-3.5 w-3.5" />{G.enlargeHint}</span>}
         </button>
-        <p className="border-t border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-600" data-gallery-caption>
-          {current.alt}{items.length > 1 && <span className="text-slate-400"> · {G.position(index + 1, items.length)}</span>}
-        </p>
+        {many && (
+          <>
+            <button type="button" onClick={() => go(index - 1)} aria-label={G.previous} className={`absolute left-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-800 shadow hover:bg-white sm:flex ${FOCUS}`}><Icon name="left" className="h-5 w-5" /></button>
+            <button type="button" onClick={() => go(index + 1)} aria-label={G.next} className={`absolute right-2 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-800 shadow hover:bg-white sm:flex ${FOCUS}`}><Icon name="right" className="h-5 w-5" /></button>
+          </>
+        )}
       </div>
+      <p className="mt-2 px-1 text-sm text-slate-600" data-gallery-caption>
+        {current.alt}{many && <span className="text-slate-500"> · {G.position(index + 1, items.length)}</span>}
+      </p>
 
-      {items.length > 1 && (
+      {many && (
         <div role="group" aria-label={G.thumbnails} className="mt-3 flex gap-2 overflow-x-auto pb-1" onKeyDown={onThumbKey}>
           {items.map((p, i) => (
             <button
@@ -70,42 +77,17 @@ export default function PreviewGallery({ previews, hubUrl }: { previews: Preview
               tabIndex={i === index ? 0 : -1}
               aria-pressed={i === index}
               aria-label={G.show(i + 1, p.alt)}
-              className={`h-16 w-20 shrink-0 overflow-hidden rounded-xl border-2 bg-slate-50 transition-colors motion-reduce:transition-none focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 sm:h-[72px] sm:w-24 ${i === index ? "border-orange-500" : "border-transparent hover:border-slate-300"}`}
+              className={`h-16 w-20 shrink-0 overflow-hidden rounded-xl border-2 bg-slate-100 transition-colors motion-reduce:transition-none sm:h-[4.5rem] sm:w-24 ${FOCUS} ${i === index ? "border-orange-500" : "border-transparent opacity-80 hover:border-slate-300 hover:opacity-100"}`}
             >
-              <Shot preview={p} hubUrl={hubUrl} failed={!!failed[p.sha256]} onFail={fail(p.sha256)} className="h-full w-full object-cover" compact />
+              {failed[p.sha256]
+                ? <Failed preview={p} className="h-full w-full" compact />
+                : <img src={previewUrl(hubUrl, p)} alt="" loading="lazy" decoding="async" onError={() => fail(p.sha256)} className="h-full w-full object-contain" />}
             </button>
           ))}
         </div>
       )}
 
-      <dialog
-        ref={dialog}
-        aria-label={G.enlarged}
-        onClick={(e) => { if (e.target === dialog.current) dialog.current?.close(); }}
-        onKeyDown={(e) => { if (items.length > 1 && e.key === "ArrowRight") go(index + 1); if (items.length > 1 && e.key === "ArrowLeft") go(index - 1); }}
-        className="m-auto max-h-[92dvh] w-[min(96vw,1200px)] rounded-2xl bg-white p-0 shadow-2xl backdrop:bg-slate-950/80"
-      >
-        <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-4 py-2.5">
-          <p className="min-w-0 truncate text-sm font-semibold text-slate-800">{current.alt}</p>
-          <button type="button" onClick={() => dialog.current?.close()} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500" aria-label={G.close}>
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 6l12 12M18 6 6 18" /></svg>
-          </button>
-        </div>
-        <div className="relative bg-slate-50">
-          <Shot key={current.sha256} preview={current} hubUrl={hubUrl} failed={!!failed[current.sha256]} onFail={fail(current.sha256)} className="mx-auto max-h-[78dvh] w-full object-contain" />
-          {items.length > 1 && (
-            <>
-              <button type="button" onClick={() => go(index - 1)} className="absolute left-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-800 shadow hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500" aria-label={G.previous}>
-                <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="m15 6-6 6 6 6" /></svg>
-              </button>
-              <button type="button" onClick={() => go(index + 1)} className="absolute right-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-800 shadow hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-500" aria-label={G.next}>
-                <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2"><path d="m9 6 6 6-6 6" /></svg>
-              </button>
-            </>
-          )}
-        </div>
-        {items.length > 1 && <p className="px-4 py-2 text-center text-xs text-slate-500" aria-live="polite">{G.position(index + 1, items.length)}</p>}
-      </dialog>
+      <PreviewViewer items={items} index={index} onIndex={setIndex} open={viewer} onClose={() => setViewer(false)} hubUrl={hubUrl} failed={failed} onFail={fail} />
     </section>
   );
 }

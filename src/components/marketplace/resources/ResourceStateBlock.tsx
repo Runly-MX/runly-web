@@ -48,7 +48,7 @@ export default function ResourceStateBlock({ kind, replacement, onRetry, compact
       {replacement && <p className="mt-2 text-sm font-semibold">{T.states.replacement(replacement.resourceKey, replacement.version)}</p>}
       {(onRetry || showBack) && (
         <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-          {onRetry && <button type="button" onClick={onRetry} className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">{T.states.retry}</button>}
+          {onRetry && <button type="button" onClick={onRetry} className="rounded-full bg-[#c2410c] px-4 py-2 text-sm font-semibold text-white hover:bg-[#9a3412]">{T.states.retry}</button>}
           {showBack && <a href={`${MARKETPLACE_BASE}/`} className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">{T.states.backToCatalog}</a>}
         </div>
       )}
