@@ -2,10 +2,11 @@
 //
 // Detail sheet for any resource type. Pure presentation of a parsed
 // ResourceDetail: all text is rendered as React text nodes (never HTML), the
-// only action is "copy release id" (no downloads, no installs: those happen
-// inside Runly). Used by the static pages and by the runtime loader.
+// actions download original packages or explain the confirmed import inside Runly.
 import { useEffect, useState } from "react";
 import { createHubSource } from "../../../lib/marketplace-resources/client";
+import { resourceIdentity } from "../../../lib/marketplace-resources/identity";
+import ResourceActions from "./ResourceActions";
 import PreviewGallery from "./PreviewGallery";
 import { liveStateFrom, liveView, type LiveState } from "../../../lib/marketplace-resources/live";
 import { categoryLabel } from "../../../lib/marketplace-resources/filters";
@@ -84,6 +85,7 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
   const [live, retry] = useLiveState(built, hubUrl, checkLive);
   const view = liveView(built, live);
   const r = view.resource;
+  const identity = resourceIdentity(r);
   const req = r.requirements;
   const requirementRows = ([[d.modules, req.modules], [d.fonts, req.fonts], [d.permissions, req.permissions], [d.services, req.services]] as const).filter(([, v]) => v.length > 0);
   const hasRequirements = requirementRows.length > 0 || !!req.builder;
@@ -135,7 +137,7 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-bold text-white" aria-hidden="true">{r.publisher.displayName.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("")}</span>
             <span className="min-w-0">
               <span className="block text-xs text-slate-500">{d.publishedBy}</span>
-              <span className="block truncate font-bold text-slate-900">{r.trust === 'official' ? 'Runly · Autoría institucional' : r.publisher.displayName}</span>
+              <span className="block truncate font-bold text-slate-900">{r.publisher.displayName}</span>
             </span>
             {r.publisher.verified && <span className="ml-auto shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700">{T.verifiedPublisher}</span>}
           </a>
@@ -154,16 +156,9 @@ export default function ResourceDetailView({ resource: built, hubUrl, backHref, 
             ))}
           </dl>
 
-          {r.install && view.showInstall && (
-            <section className="rounded-3xl border border-orange-200 bg-orange-50/60 p-5" aria-labelledby="usar-en-runly">
-              <h2 id="usar-en-runly" className="text-lg font-bold text-slate-900">{d.howTo}</h2>
-              <p className="mt-1 text-sm text-slate-600">{d.howToIntro}</p>
-              <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-slate-700">
-                {d.steps(r.install.resourcePath).map((s) => <li key={s}>{s}</li>)}
-              </ol>
-              <div className="mt-4"><CopyField label={d.releaseId} value={r.install.releaseId} /></div>
-            </section>
-          )}
+          {identity.organization && <p data-institutional-identity className="text-sm text-slate-600">Procedencia: Oficial Runly · Organización responsable: Runly</p>}
+          {r.install && view.showInstall && <ResourceActions resource={r} hubUrl={hubUrl} />}
+
         </div>
       </div>
 

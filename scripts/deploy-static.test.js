@@ -10,7 +10,7 @@ const EMPTY_V1 = JSON.stringify({ schemaVersion: 1, generatedAt: '2026-10-04T00:
 function fakeFs({ entries = [MARKER, 'index.html'], releases = [], built = true, live = EMPTY_V1, targetFiles = PAGES } = {}) {
   const dirs = new Map([[TARGET, [...entries]], [`${TARGET}.releases`, [...releases]]]);
   const files = new Map(targetFiles.map((p) => [`${TARGET}/${p}`, p === 'catalog/v1/index.json' ? live : 'x']));
-  if (built) for (const p of PAGES) files.set(resolve('dist', p), p === 'catalog/v1/index.json' ? EMPTY_V1 : 'x');
+  if (built) for (const p of PAGES) files.set(resolve('dist/client', p), p === 'catalog/v1/index.json' ? EMPTY_V1 : 'x');
   return {
     dirs, files,
     existsSync: (path) => dirs.has(path) || files.has(path),
@@ -32,7 +32,7 @@ test('target guardrails: explicit, absolute, normalized, not broad, not overlapp
 
 test('rsync never deletes outside the target, protects the marker and the catalog mirror; releases live outside', () => {
   const plan = deployPlan({ target: TARGET, owner: 'www-data:www-data', stamp: 's1' });
-  expect(plan.apply).toEqual(['rsync', ['-a', '--delete-after', '--filter', `P ${MARKER}`, '--filter', 'P /catalog/**', '--chown=www-data:www-data', 'dist/', `${TARGET}/`]]);
+  expect(plan.apply).toEqual(['rsync', ['-a', '--delete-after', '--filter', `P ${MARKER}`, '--filter', 'P /catalog/**', '--chown=www-data:www-data', 'dist/client/', `${TARGET}/`]]);
   expect(plan.dryRun[1]).toContain('--dry-run');
   expect(plan.release).toBe(`${TARGET}.releases/s1`);
   expect(plan.release.startsWith(`${TARGET}/`)).toBe(false);
@@ -65,9 +65,9 @@ test('a failed build or a failed health check never leaves a broken site', async
 
 test('catalog v1 compatibility mirror is never silently replaced', async () => {
   const live = JSON.stringify({ schemaVersion: 1, generatedAt: '2026-10-08T00:00:00.000Z', modules: [{ key: 'custom.x' }] });
-  expect(checkCatalogV1('dist', TARGET, fakeFs())).toEqual({ live: true, modules: 0 });
-  expect(() => checkCatalogV1('dist', TARGET, fakeFs({ live }))).toThrow('CATALOG_V1_WOULD_BE_REPLACED');
-  expect(checkCatalogV1('dist', TARGET, fakeFs({ live }), { replace: true }).modules).toBe(1);
+  expect(checkCatalogV1('dist/client', TARGET, fakeFs())).toEqual({ live: true, modules: 0 });
+  expect(() => checkCatalogV1('dist/client', TARGET, fakeFs({ live }))).toThrow('CATALOG_V1_WOULD_BE_REPLACED');
+  expect(checkCatalogV1('dist/client', TARGET, fakeFs({ live }), { replace: true }).modules).toBe(1);
   await expect(deploy({ target: TARGET, run: runner().run, fsOps: fakeFs({ live }), stamp: 's4' })).rejects.toThrow('CATALOG_V1_WOULD_BE_REPLACED');
 });
 

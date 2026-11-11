@@ -1,46 +1,34 @@
 ---
 // src/pages/marketplace/[tipo]/[slug].astro
 //
-// Static detail page per resource (listed + indexable + available in production;
-// every fixture in local preview). Everything else resolves at runtime on
-// /marketplace/detalle/ (noindex).
+// On-demand details keep stable URLs and current HTTP availability after publication.
+import ResourceStateBlock from "../../../components/marketplace/resources/ResourceStateBlock";
+import { typeFromSegment } from "../../../lib/marketplace-resources/routes";
 import CatalogShell from "../../../components/marketplace/resources/CatalogShell.astro";
 import ResourceDetailView from "../../../components/marketplace/resources/ResourceDetailView";
-import { typesWithResources } from "../../../lib/marketplace-resources/filters";
-import { TYPE_SEGMENT, hasStaticPage, pageIsIndexable, resourcePath } from "../../../lib/marketplace-resources/routes";
-import { indexingAuthorized, getBuildSource, loadCatalogForBuild, sourceKind } from "../../../lib/marketplace-resources/source";
-import type { ResourceDetail } from "../../../lib/marketplace-resources/types";
+import { pageIsIndexable } from "../../../lib/marketplace-resources/routes";
+import { indexingAuthorized, getBuildSource, sourceKind } from "../../../lib/marketplace-resources/source";
 
-export const prerender = true;
-
-export async function getStaticPaths() {
-  const list = await loadCatalogForBuild();
-  if (list.status !== "ok") return [];
-  const source = sourceKind();
-  const catalog = await getBuildSource();
-  const types = typesWithResources(list.items);
-  const paths = [];
-  for (const summary of list.items.filter((r) => hasStaticPage(source, r))) {
-    const detail = await catalog.detail(summary.type, summary.slug);
-    if (detail.status === "ok") paths.push({ params: { tipo: TYPE_SEGMENT[summary.type], slug: summary.slug }, props: { resource: detail.resource, types } });
-  }
-  return paths;
-}
-
-const { resource, types } = Astro.props as { resource: ResourceDetail; types: import("../../../lib/marketplace-resources/types").ResourceType[] };
+export const prerender = false;
+const type = typeFromSegment(Astro.params.tipo);
+const result = type ? await (await getBuildSource()).detail(type, Astro.params.slug ?? '') : { status: 'not_found' as const };
+const resource = result.status === 'ok' ? result.resource : null;
 const source = sourceKind();
+Astro.response.status = result.status === 'not_found' ? 404 : result.status === 'gone' ? 410 : result.status === 'unavailable' ? 503 : 200;
+Astro.response.headers.set('Cache-Control', 'no-store');
+const kind = result.status === 'gone' ? result.availability === 'revoked' ? 'revoked' : 'withdrawn' : result.status === 'not_found' ? 'not_found' : 'unavailable';
+
 ---
 
 <CatalogShell
-  title={`${resource.title} | Marketplace RUNLY`}
-  description={resource.summary}
-  path={resourcePath(resource.type, resource.slug).replace(/\/$/, "")}
+  title={`${resource?.title ?? "Recurso"} | Marketplace RUNLY`}
+  description={resource?.summary ?? "Recurso del Marketplace de Runly."}
+  path={Astro.url.pathname.replace(/\/$/, "")}
   source={source}
-  noindex={!pageIsIndexable(source, indexingAuthorized(), resource)}
-  types={types}
-  active={resource.type}
+  noindex={!resource || !pageIsIndexable(source, indexingAuthorized(), resource)}
+  active={type}
 >
   <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
-    <ResourceDetailView resource={resource} hubUrl={import.meta.env.PUBLIC_RUNLY_HUB_URL} checkLive={source === "hub"} client:load />
+    {resource ? <ResourceDetailView resource={resource} hubUrl={import.meta.env.PUBLIC_RUNLY_HUB_URL} checkLive={source === "hub"} client:load /> : <ResourceStateBlock kind={kind} replacement={result.status === "gone" ? result.replacement : null} showBack />}
   </div>
 </CatalogShell>

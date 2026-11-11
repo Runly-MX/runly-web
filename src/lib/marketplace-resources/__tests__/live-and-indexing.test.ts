@@ -48,7 +48,9 @@ describe("static page: the Hub's CURRENT answer is the source of truth", () => {
     expect(view.resource.requirements.fonts).toEqual(["Inter", "Lato"]);
     expect(view.resource.versions.map((v) => [v.version, v.status])).toEqual([["1.1.0", "published"], ["1.0.0", "withdrawn"]]);
     const html = renderToStaticMarkup(createElement(ResourceDetailView, { resource: view.resource }));
-    expect(html).toContain("22222222-2222-4222-8222-222222222222");
+    expect(html).toContain("Descargar .runlystudio");
+    expect(html).toContain("v1.1.0");
+    expect(html).not.toContain("22222222-2222-4222-8222-222222222222");
     expect(html).not.toContain("11111111-1111-4111-8111-111111111111");
     expect(html).not.toContain("Portada antigua");
   });
@@ -91,13 +93,13 @@ describe("static page: the Hub's CURRENT answer is the source of truth", () => {
   it("the built HTML of a static Hub page shows neither guide nor previews before the browser verifies", () => {
     const r = hubDetail();
     const pending = renderToStaticMarkup(createElement(ResourceDetailView, { resource: r, checkLive: true }));
-    expect(pending).not.toContain("usar-en-runly");
+    expect(pending).not.toContain("data-resource-actions");
     expect(pending).not.toContain(r.install!.releaseId);
     expect(pending).not.toContain("data-gallery");
     expect(pending).toContain('data-live-notice="checking"');
     expect(pending).toContain(r.title);
     const fresh = renderToStaticMarkup(createElement(ResourceDetailView, { resource: r }));
-    expect(fresh).toContain("usar-en-runly");
+    expect(fresh).toContain("data-resource-actions");
     expect(fresh).toContain("data-gallery");
   });
 });

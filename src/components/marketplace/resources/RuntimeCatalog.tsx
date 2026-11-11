@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createHubSource, previewUrl } from '../../../lib/marketplace-resources/client';
 import { filterResources } from '../../../lib/marketplace-resources/filters';
-import { runtimeResourcePath, typePath } from '../../../lib/marketplace-resources/routes';
+import { resourcePath, typePath } from '../../../lib/marketplace-resources/routes';
 import { TYPE_TEXT } from '../../../lib/marketplace-resources/text';
 import { RESOURCE_TYPES, type ListResult, type ResourceType } from '../../../lib/marketplace-resources/types';
 import { TrustBadge } from './parts';
@@ -32,10 +32,10 @@ export default function RuntimeCatalog({hubUrl,type}: {hubUrl?: string;type?: Re
     </form>
     <p role="status" className="mb-4 text-sm text-slate-600">{visible.length} recursos disponibles</p>
     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{visible.map((r)=><article key={r.resourceKey} className="overflow-hidden rounded-3xl border border-slate-200 bg-white">
-      <a href={runtimeResourcePath(r.type,r.slug)} className="block p-5">
+      <a href={resourcePath(r.type,r.slug)} className="block p-5">
         {r.previews[0] && <img src={previewUrl(hubUrl,r.previews[0])} alt={r.previews[0].alt} className="mb-4 aspect-[4/3] w-full rounded-xl object-contain" loading="lazy"/>}
         <TrustBadge trust={r.trust}/><h3 className="mt-3 text-lg font-bold">{r.title}</h3><p className="mt-2 text-sm text-slate-600">{r.summary}</p>
-        <p className="mt-3 text-sm">{r.trust === 'official' ? 'Runly · Autoría institucional' : r.publisher.displayName} · v{r.latest?.version}</p>
+        <p className="mt-3 text-sm">{r.publisher.displayName} · v{r.latest?.version}</p>
         <p className="mt-2 text-xs text-slate-500">{r.categories.join(' · ')}</p>
       </a>
     </article>)}</div>

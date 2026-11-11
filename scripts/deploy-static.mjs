@@ -25,7 +25,7 @@ const REQUIRED_BUILD = ['index.html', 'modulos/index.html', 'en/modulos/index.ht
 const fail = (code) => { throw Object.assign(new Error(code), { code }); };
 
 // Pure validation of the requested paths (POSIX production paths).
-export function validateTarget(target, source = 'dist') {
+export function validateTarget(target, source = 'dist/client') {
   if (typeof target !== 'string' || !target.trim()) fail('TARGET_REQUIRED');
   if (!target.startsWith('/') || target.includes('\0') || /\s/.test(target)) fail('TARGET_MUST_BE_ABSOLUTE');
   const normalized = posix.normalize(target).replace(/\/+$/, '') || '/';
@@ -36,7 +36,7 @@ export function validateTarget(target, source = 'dist') {
   return normalized;
 }
 
-export function deployPlan({ target, source = 'dist', owner = null, stamp = new Date().toISOString().replace(/[:.]/g, '-'), keep = 5 }) {
+export function deployPlan({ target, source = 'dist/client', owner = null, stamp = new Date().toISOString().replace(/[:.]/g, '-'), keep = 5 }) {
   const dir = validateTarget(target, source);
   if (owner !== null && !/^[a-z_][a-z0-9_-]{0,31}:[a-z_][a-z0-9_-]{0,31}$/.test(owner)) fail('OWNER_INVALID');
   const releases = `${dir}.releases`;
@@ -76,7 +76,7 @@ export function checkTargetState(target, fs = { existsSync, lstatSync, readdirSy
 }
 
 // Orchestration with injectable effects; returns the step log (no secrets).
-export async function deploy({ target, source = 'dist', owner = null, dryRun = false, healthUrl = null, run, fsOps, fetchImpl = fetch, keep = 5, stamp, replaceCatalogV1 = false }) {
+export async function deploy({ target, source = 'dist/client', owner = null, dryRun = false, healthUrl = null, run, fsOps, fetchImpl = fetch, keep = 5, stamp, replaceCatalogV1 = false }) {
   const plan = deployPlan({ target, source, owner, stamp, keep });
   const log = [];
   const exec = (step, [command, args]) => { log.push(step); const result = run(command, args); if (result.status !== 0) fail(`${step.toUpperCase()}_FAILED`); return result; };
