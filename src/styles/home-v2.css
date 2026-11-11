@@ -61,7 +61,7 @@
 .hv2.js .io.is-in { opacity: 1; transform: none; }
 
 /* ---------------- Scene A: hero ---------------- */
-.hv2-hero { position: relative; overflow: hidden; min-height: calc(100svh - 5rem); display: flex; align-items: center; padding-block: 3rem 5rem; isolation: isolate; }
+.hv2-hero { position: relative; overflow: clip; /* not hidden: hidden makes the hero the scroller of its own view() timeline */ min-height: calc(100svh - 5rem); display: flex; align-items: center; padding-block: 3rem 5rem; isolation: isolate; }
 .hv2-hero::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
   background:
