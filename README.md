@@ -102,60 +102,20 @@ See `docs/superpowers/specs/2026-09-27-public-help-docs-runly-web-design.md` in 
 
 ## Deploy
 
-Initial setup clones the repo to `/opt/runly-web` on the VPS. After that, shipping a change is:
+The site is mostly static, with on-demand Marketplace profiles, resource details and sitemap.
+`dist/client` alone is not a complete deployment. Astro's Node standalone runtime lives outside
+Nginx's public root and is managed by systemd; only the dynamic Marketplace routes are proxied.
 
-```bash
-cd /opt/runly-web
+Follow [Marketplace hosting: setup, exact VPS commands and paired rollback](docs/MARKETPLACE_HOSTING.md).
+The deployment prepares one immutable runtime release and reuses the existing guarded static
+backup/apply/health workflow. A failed activation restores static files, Node and the Nginx snippet
+together. After activation, the legacy static-only deploy/rollback refuses to detach that pair.
 
-git pull --ff-only
-
-pnpm install --frozen-lockfile
-
-# Once, on the existing tree deployed with cp -a (marks it as the managed target; deletes nothing):
-node scripts/deploy-static.mjs --target /var/www/runly.mx --adopt --confirm "ADOPT RUNLY.MX TARGET"
-
-# Preview first (builds, checks the build, shows the rsync plan and deletions):
-node scripts/deploy-static.mjs --target /var/www/runly.mx --owner www-data:www-data --dry-run
-
-# Deploy (backup → apply → health; restores the previous release if health fails):
-node scripts/deploy-static.mjs --target /var/www/runly.mx --owner www-data:www-data --health-url https://runly.mx
-
-# Manual rollback to the newest saved release:
-node scripts/deploy-static.mjs --target /var/www/runly.mx --rollback
-```
-
-`dist/` is a self-contained static tree (both locales, sitemap, robots.txt, assets). Nothing needs to run afterwards — no process to keep alive, no port to expose. `scripts/deploy-static.mjs` wraps `rsync -a --delete-after` with guardrails: explicit absolute target (never `/`, shallow or system paths, never a symlink), the target must be empty on the first deploy or carry the `.runly-web-target` marker, the build must succeed and contain the expected pages, the previous tree is saved under `/var/www/runly.mx.releases/<stamp>` (outside the target, last 5 kept), a dry run is always shown, and a health check runs after the swap. The catalog v1 compatibility mirror (`catalog/`, default URL of older Runly versions) is never deleted by the sync, and a production `catalog/v1/index.json` that lists modules is never replaced by a different one unless `--replace-catalog-v1` is passed explicitly. It replaces the tree without a window with no files served **and removes pages that no longer exist**: a plain `cp -a` overlay would keep serving (and letting search engines index) the static page of a Marketplace module that was revoked or withdrawn after an earlier build. The `chown` after keeps ownership matching Nginx's `www-data` user. Rebuild and redeploy after Marketplace publications or revocations (target: within 24 h) so static module pages match the catalog; the browser refresh already flags changes in the meantime.
-
-### Nginx
-
-Minimal server block; adjust paths/TLS to match the rest of the VPS's Nginx config:
-
-```nginx
-server {
-    listen 80;
-    server_name runly.mx www.runly.mx;
-    root /var/www/runly.mx;
-    index index.html;
-
-    # Astro prerenders llms.txt and the Markdown endpoints as static files.
-    # Preserve Spanish text as UTF-8 when Nginx serves those files directly.
-    charset utf-8;
-    charset_types text/plain text/markdown;
-
-    location / {
-        try_files $uri $uri/ $uri.html =404;
-    }
-
-    error_page 404 /404.html;
-}
-```
-
-The `charset` directives are required for `/llms.txt`, `/llms-full.txt`, and
-the raw `.md` documentation. Without them, Nginx serves valid UTF-8 bytes as
-`text/plain` without a declared charset and browsers can display text such as
-`español` as `espaÃ±ol`.
-
-No `proxy_pass`, no upstream — this block only serves files from disk.
+Keep the existing vhost, TLS, API locations and UTF-8 charset directives. Include
+`/etc/nginx/snippets/runly-marketplace.conf` inside the HTTPS server before generic regex
+locations. The ordinary static handler remains `try_files $uri $uri/ $uri.html =404`, never
+an indiscriminate SPA fallback. No build or VPS changes are required for a new resource or
+publisher once the runtime is active; static module pages retain their separate publication policy.
 
 ## Runly ERP integration (Growth)
 

@@ -17,6 +17,7 @@ import { posix, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 export const MARKER = '.runly-web-target';
+export const RUNTIME_MARKER = '.runly-web-runtime';
 // Catalog v1 compatibility mirror (Runly 'Disponibles' default URL). Never deleted
 // by the sync; a non-empty production index is never silently replaced.
 export const CATALOG_V1_INDEX = 'catalog/v1/index.json';
@@ -36,11 +37,12 @@ export function validateTarget(target, source = 'dist/client') {
   return normalized;
 }
 
-export function deployPlan({ target, source = 'dist/client', owner = null, stamp = new Date().toISOString().replace(/[:.]/g, '-'), keep = 5 }) {
+export function deployPlan({ target, source = 'dist/client', owner = null, stamp = new Date().toISOString().replace(/[:.]/g, '-'), keep = 5, preserveAssets = false }) {
   const dir = validateTarget(target, source);
   if (owner !== null && !/^[a-z_][a-z0-9_-]{0,31}:[a-z_][a-z0-9_-]{0,31}$/.test(owner)) fail('OWNER_INVALID');
   const releases = `${dir}.releases`;
-  const sync = (from, to, extra = []) => ['rsync', ['-a', '--delete-after', '--filter', `P ${MARKER}`, '--filter', 'P /catalog/**', ...(owner ? [`--chown=${owner}`] : []), ...extra, `${from.replace(/\/+$/, '')}/`, `${to}/`]];
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]{0,100}$/.test(stamp) || stamp.includes('..')) fail('STAMP_INVALID');
+  const sync = (from, to, extra = []) => ['rsync', ['-a', '--delete-after', '--filter', `P ${MARKER}`, '--filter', `P ${RUNTIME_MARKER}`, '--filter', 'P /catalog/**', ...(preserveAssets ? ['--filter', 'P /_astro/**'] : []), ...(owner ? [`--chown=${owner}`] : []), ...extra, `${from.replace(/\/+$/, '')}/`, `${to}/`]];
   return {
     target: dir, releases, release: `${releases}/${stamp}`, keep,
     build: ['pnpm', ['build']],
@@ -76,28 +78,41 @@ export function checkTargetState(target, fs = { existsSync, lstatSync, readdirSy
 }
 
 // Orchestration with injectable effects; returns the step log (no secrets).
-export async function deploy({ target, source = 'dist/client', owner = null, dryRun = false, healthUrl = null, run, fsOps, fetchImpl = fetch, keep = 5, stamp, replaceCatalogV1 = false }) {
-  const plan = deployPlan({ target, source, owner, stamp, keep });
+export async function deploy({ target, source = 'dist/client', owner = null, dryRun = false, healthUrl = null, run, fsOps, fetchImpl = fetch, keep = 5, stamp, replaceCatalogV1 = false, skipBuild = false, runtime = null }) {
+  const plan = deployPlan({ target, source, owner, stamp, keep, preserveAssets: Boolean(runtime) });
+  if (!runtime && fsOps.existsSync(`${plan.target}/${RUNTIME_MARKER}`)) fail('USE_MARKETPLACE_DEPLOY');
   const log = [];
   const exec = (step, [command, args]) => { log.push(step); const result = run(command, args); if (result.status !== 0) fail(`${step.toUpperCase()}_FAILED`); return result; };
-  exec('build', plan.build);
+  if (!skipBuild) exec('build', plan.build);
   checkBuild(source, fsOps.existsSync); log.push('build_checked');
   const state = checkTargetState(plan.target, fsOps);
   const catalogV1 = checkCatalogV1(source, plan.target, fsOps, { replace: replaceCatalogV1 }); log.push('catalog_v1_checked');
   const preview = exec('dry_run', plan.dryRun);
   const deletions = String(preview.stdout ?? '').split('\n').filter((line) => line.startsWith('*deleting')).length;
-  if (dryRun) return { log, dryRun: true, deletions, firstDeploy: state.firstDeploy, catalogV1 };
+  if (dryRun) return { log, dryRun: true, deletions, changes: String(preview.stdout ?? ''), firstDeploy: state.firstDeploy, catalogV1 };
+  if (runtime && state.firstDeploy) fail('RUNTIME_REQUIRES_STATIC_BASELINE');
   if (!state.firstDeploy) { fsOps.mkdirSync(plan.releases, { recursive: true }); exec('backup', plan.backup); }
-  exec('apply', plan.apply);
-  if (state.firstDeploy) fsOps.writeFileSync(`${plan.target}/${MARKER}`, 'runly-web static deploy target\n');
-  log.push('marker');
-  const healthy = await health({ target: plan.target, healthUrl, exists: fsOps.existsSync, fetchImpl });
-  if (!healthy.ok) {
-    if (!state.firstDeploy) { exec('restore', plan.restore(plan.release)); log.push('restored_previous_release'); }
-    throw Object.assign(new Error('HEALTH_CHECK_FAILED'), { code: 'HEALTH_CHECK_FAILED', log, detail: healthy });
+  await runtime?.beforeApply(plan);
+  try {
+    exec('apply', plan.apply);
+    if (state.firstDeploy) fsOps.writeFileSync(`${plan.target}/${MARKER}`, 'runly-web static deploy target\n');
+    log.push('marker');
+    await runtime?.activate();
+    const healthy = await health({ target: plan.target, healthUrl, exists: fsOps.existsSync, fetchImpl });
+    if (!healthy.ok) {
+      throw Object.assign(new Error('HEALTH_CHECK_FAILED'), { code: 'HEALTH_CHECK_FAILED', log, detail: healthy });
+    }
+    await runtime?.health();
+    await runtime?.commit();
+  } catch (error) {
+    const recovery = [];
+    if (!state.firstDeploy) { try { exec('restore', plan.restore(plan.release)); log.push('restored_previous_release'); } catch (e) { recovery.push(e.code); } }
+    try { await runtime?.restore(); } catch (e) { recovery.push(e.code ?? e.message); }
+    throw Object.assign(error, { log, recovery, code: recovery.length ? 'ROLLBACK_FAILED' : error.code ?? 'DEPLOY_FAILED' });
   }
   log.push('healthy');
-  pruneReleases(plan.releases, keep, fsOps);
+  // shortcut: paired backups and hashed assets stay until manual maintenance; add coordinated retention if storage grows.
+  if (!runtime) pruneReleases(plan.releases, keep, fsOps);
   return { log, deletions, firstDeploy: state.firstDeploy, release: state.firstDeploy ? null : plan.release };
 }
 
@@ -106,7 +121,8 @@ export async function health({ target, healthUrl, exists = existsSync, fetchImpl
   if (!files) return { ok: false, reason: 'FILES_MISSING' };
   if (!healthUrl) return { ok: true };
   for (const path of ['/', '/modulos/', '/en/modulos/']) {
-    const response = await fetchImpl(new URL(path, healthUrl), { redirect: 'manual' }).catch(() => null);
+    const response = await fetchImpl(new URL(path, healthUrl), { redirect: 'manual', signal: AbortSignal.timeout(20000) }).catch(() => null);
+    await response?.body?.cancel();
     if (response?.status !== 200) return { ok: false, reason: `HTTP_${response?.status ?? 'UNREACHABLE'}`, path };
   }
   return { ok: true };
@@ -132,6 +148,7 @@ export function adopt({ target, confirm, fsOps }) {
 
 export function rollback({ target, run, fsOps }) {
   const plan = deployPlan({ target });
+  if (fsOps.existsSync(`${plan.target}/${RUNTIME_MARKER}`)) fail('USE_MARKETPLACE_DEPLOY');
   const latest = fsOps.existsSync(plan.releases) ? fsOps.readdirSync(plan.releases).sort().at(-1) : null;
   if (!latest) fail('NO_RELEASE_TO_RESTORE');
   checkTargetState(plan.target, fsOps);

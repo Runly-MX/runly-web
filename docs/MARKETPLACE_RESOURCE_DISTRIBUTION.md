@@ -43,6 +43,8 @@ Artefactos: `dist/client` para el sitio estático y `dist/server` para Node. El 
 
 No se ejecutó push ni despliegue. El 404 público seguirá existiendo hasta activar este cambio en el hosting.
 
+El procedimiento completo de distribución, systemd, Nginx, salud y reversión emparejada está en [MARKETPLACE_HOSTING.md](MARKETPLACE_HOSTING.md). Usar ese despliegue coordinado en lugar de iniciar Node y copiar el estático por separado.
+
 ## Aceptación reproducible
 
 - `pnpm test`: contrato, parser, disponibilidad, identidad, descarga alterada/sobredimensionada y despliegue estático.

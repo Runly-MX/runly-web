@@ -1,6 +1,6 @@
 import { test, expect } from 'vitest';
 import { resolve } from 'node:path';
-import { validateTarget, deployPlan, deploy, rollback, adopt, MARKER, checkTargetState, checkCatalogV1, pruneReleases } from './deploy-static.mjs';
+import { validateTarget, deployPlan, deploy, rollback, adopt, MARKER, RUNTIME_MARKER, checkTargetState, checkCatalogV1, pruneReleases } from './deploy-static.mjs';
 
 const TARGET = '/var/www/runly.mx';
 const PAGES = ['index.html', 'modulos/index.html', 'en/modulos/index.html', 'sitemap-index.xml', 'robots.txt', 'catalog/v1/index.json'];
@@ -32,7 +32,7 @@ test('target guardrails: explicit, absolute, normalized, not broad, not overlapp
 
 test('rsync never deletes outside the target, protects the marker and the catalog mirror; releases live outside', () => {
   const plan = deployPlan({ target: TARGET, owner: 'www-data:www-data', stamp: 's1' });
-  expect(plan.apply).toEqual(['rsync', ['-a', '--delete-after', '--filter', `P ${MARKER}`, '--filter', 'P /catalog/**', '--chown=www-data:www-data', 'dist/client/', `${TARGET}/`]]);
+  expect(plan.apply).toEqual(['rsync', ['-a', '--delete-after', '--filter', `P ${MARKER}`, '--filter', `P ${RUNTIME_MARKER}`, '--filter', 'P /catalog/**', '--chown=www-data:www-data', 'dist/client/', `${TARGET}/`]]);
   expect(plan.dryRun[1]).toContain('--dry-run');
   expect(plan.release).toBe(`${TARGET}.releases/s1`);
   expect(plan.release.startsWith(`${TARGET}/`)).toBe(false);
@@ -85,4 +85,43 @@ test('existing unmarked tree: explicit one-time adoption only for a recognised r
   expect(fs.files.has(`${TARGET}/${MARKER}`)).toBe(true);
   const other = fakeFs({ targetFiles: [] });
   expect(() => adopt({ target: TARGET, confirm: 'ADOPT RUNLY.MX TARGET', fsOps: other })).toThrow('TARGET_NOT_RECOGNISED');
+});
+
+test('paired runtime failures restore static files and runtime, including a partial rsync failure', async () => {
+  for (const failure of ['apply', 'activate', 'health', 'restore']) {
+    const fs = fakeFs(), events = [], r = runner();
+    const runtime = {
+      beforeApply: () => events.push('journal'),
+      activate: () => { events.push('activate'); if (failure === 'activate') throw Error('RESTART_FAILED'); },
+      health: () => { events.push('health'); if (['health', 'restore'].includes(failure)) throw Error('DYNAMIC_HEALTH_FAILED'); },
+      restore: () => { events.push('restore'); if (failure === 'restore') throw Error('RECOVERY_FAILED'); },
+      commit: () => events.push('commit'),
+    };
+    let syncs = 0;
+    const run = (command, args) => { const out = r.run(command, args); if (command === 'rsync' && !args.includes('--dry-run') && ++syncs === 2 && failure === 'apply') return { status: 1 }; return out; };
+    const error = await deploy({ target: TARGET, run, fsOps: fs, stamp: 'pair', skipBuild: true, runtime }).catch(e => e);
+    expect(error).toBeInstanceOf(Error);
+    expect(events.at(-1)).toBe('restore'); expect(events).not.toContain('commit');
+    expect(r.calls.at(-1)).toContain(`${TARGET}.releases/pair/`);
+    expect(r.calls.some(call => call.includes('build'))).toBe(false);
+    if (failure === 'restore') expect(error.code).toBe('ROLLBACK_FAILED');
+  }
+});
+
+test('paired dry-run never activates; success retains the paired backup and old hashed assets', async () => {
+  const fs = fakeFs({ releases: ['old-a', 'old-b'] }), r = runner(), events = [];
+  const runtime = Object.fromEntries(['beforeApply', 'activate', 'health', 'restore', 'commit'].map(key => [key, () => events.push(key)]));
+  await deploy({ target: TARGET, run: r.run, fsOps: fs, dryRun: true, skipBuild: true, runtime });
+  expect(events).toEqual([]);
+  await deploy({ target: TARGET, run: r.run, fsOps: fs, skipBuild: true, runtime, keep: 1 });
+  expect(events).toEqual(['beforeApply', 'activate', 'health', 'commit']);
+  expect(fs.dirs.get(`${TARGET}.releases`)).toEqual(['old-a', 'old-b']);
+  expect(r.calls.at(-1)).toContain('P /_astro/**');
+});
+
+test('legacy static deploy/rollback cannot detach an activated runtime, and release paths reject traversal', async () => {
+  const fs = fakeFs(); fs.files.set(`${TARGET}/${RUNTIME_MARKER}`, 'managed');
+  await expect(deploy({ target: TARGET, run: runner().run, fsOps: fs })).rejects.toThrow('USE_MARKETPLACE_DEPLOY');
+  expect(() => rollback({ target: TARGET, run: runner().run, fsOps: fs })).toThrow('USE_MARKETPLACE_DEPLOY');
+  expect(() => deployPlan({ target: TARGET, stamp: '../outside' })).toThrow('STAMP_INVALID');
 });
