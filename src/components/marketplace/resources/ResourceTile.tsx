@@ -20,7 +20,7 @@ export default function ResourceTile({ resource: r, hubUrl }: { resource: Resour
   const preview = r.previews[0] && !broken ? r.previews[0] : null;
   const unavailable = r.availability !== "available";
   return (
-    <article className={`mk-card group relative mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-slate-200 bg-white transition-shadow hover:shadow-glass focus-within:ring-2 focus-within:ring-orange-500 motion-reduce:transition-none ${unavailable ? "opacity-80" : ""}`} data-type={r.type} data-trust={r.trust} data-availability={r.availability}>
+    <article className={`mk-card group relative mb-4 break-inside-avoid overflow-hidden rounded-2xl border border-slate-200 bg-white transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-glass focus-within:ring-2 focus-within:ring-orange-500 motion-reduce:transition-none motion-reduce:hover:translate-y-0 ${unavailable ? "opacity-80" : ""}`} data-type={r.type} data-trust={r.trust} data-availability={r.availability}>
       <div className={`relative overflow-hidden ${preview ? "bg-slate-100" : `bg-gradient-to-br ${TYPE_COVER[r.type]}`}`} style={{ aspectRatio: preview ? ratio(preview.width, preview.height) : 4 / 3 }} data-mk-preview>
         {preview
           ? <img src={previewUrl(hubUrl, preview)} alt={preview.alt} width={preview.width} height={preview.height} loading="lazy" decoding="async" onError={() => setBroken(true)} className="h-full w-full object-contain transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100" />

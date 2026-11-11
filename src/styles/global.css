@@ -359,3 +359,15 @@
   .doc-card { transition: none; }
   .doc-card:hover, .doc-card:focus-within { transform: none; }
 }
+
+/* Marketplace motion: entrance rise, scroll reveal, soft sheen. All disabled for reduced motion. */
+@keyframes mk-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes mk-sheen { 0% { transform: translateX(-120%) skewX(-18deg); } 100% { transform: translateX(260%) skewX(-18deg); } }
+.mk-rise { animation: mk-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.mk-reveal { opacity: 0; transform: translateY(18px); transition: opacity 600ms cubic-bezier(0.22, 1, 0.36, 1), transform 600ms cubic-bezier(0.22, 1, 0.36, 1); transition-delay: var(--mk-delay, 0ms); }
+.mk-reveal[data-in="true"] { opacity: 1; transform: none; }
+.mk-sheen::after { content: ""; position: absolute; inset: 0; width: 40%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent); animation: mk-sheen 4.5s ease-in-out infinite; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  .mk-rise, .mk-sheen::after { animation: none; }
+  .mk-reveal { opacity: 1; transform: none; transition: none; }
+}

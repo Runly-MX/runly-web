@@ -14,7 +14,9 @@ import { MARKETPLACE_BASE, typePath } from "../../../lib/marketplace-resources/r
 import { T, TYPE_TEXT } from "../../../lib/marketplace-resources/text";
 import { RESOURCE_TYPES, type ListResult, type ResourceSummary, type ResourceType } from "../../../lib/marketplace-resources/types";
 import { Icon, TYPE_ICON } from "./icons";
-import MarketplaceAbout from "./MarketplaceAbout";
+import CollectionShelves from "./CollectionShelves";
+import MarketplaceIntro from "./MarketplaceIntro";
+import { activeShelves } from "../../../lib/marketplace-resources/collections";
 import { FOCUS, ToggleChip } from "./parts";
 import ResourceStateBlock from "./ResourceStateBlock";
 import ResourceTile from "./ResourceTile";
@@ -38,7 +40,6 @@ export default function ResourceGallery({ hubUrl, type: initialType, initialItem
   const [category, setCategory] = useState("");
   const [sort, setSort] = useState<SortKey>("recent");
   const [panel, setPanel] = useState(false);
-  const [about, setAbout] = useState(false);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -57,6 +58,10 @@ export default function ResourceGallery({ hubUrl, type: initialType, initialItem
   const inTab = useMemo(() => all.filter((r) => tab === "all" || r.type === tab), [all, tab]);
   const categories = useMemo(() => categoryFacets(inTab), [inTab]);
   const visible = useMemo(() => sortResources(filterResources(inTab, { query, trust, category }), sort), [inTab, query, trust, category, sort]);
+  // Shelves and the intro belong to the catalog home/type pages (syncUrl), not to a publisher profile.
+  const shelves = useMemo(() => (syncUrl && tab === "all" ? activeShelves(all) : []), [syncUrl, tab, all]);
+  const counts = useMemo(() => Object.fromEntries(RESOURCE_TYPES.map((t) => [t, all.filter((r) => r.type === t && r.availability === "available").length])), [all]);
+  const browsing = !query && !trust.replace("all", "") && !category;
   const activeFilters = (trust !== "all" ? 1 : 0) + (category ? 1 : 0);
   const trusts = TRUSTS.filter((t) => inTab.some((r) => r.trust === t));
   const clear = () => { setQuery(""); setTrust("all"); setCategory(""); };
@@ -69,7 +74,7 @@ export default function ResourceGallery({ hubUrl, type: initialType, initialItem
   const failed = !initialItems && result && result.status !== "ok";
 
   return (
-    <section aria-label={T.eyebrow} data-mk-catalog onKeyDown={(e) => { if (e.key === "Escape" && panel && !about) setPanel(false); }}>
+    <section aria-label={T.eyebrow} data-mk-catalog onKeyDown={(e) => { if (e.key === "Escape" && panel) setPanel(false); }}>
       <form role="search" onSubmit={(e) => e.preventDefault()} className="flex items-center gap-2">
         <label className="relative block min-w-0 flex-1">
           <span className="sr-only">{T.search}</span>
@@ -87,7 +92,7 @@ export default function ResourceGallery({ hubUrl, type: initialType, initialItem
           <Icon name="sliders" className="h-4 w-4" /><span className="hidden sm:inline">Filtros</span>
           {activeFilters > 0 && <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-600 px-1 text-[11px] font-bold text-white">{activeFilters}</span>}
         </button>
-        <button type="button" onClick={() => setAbout(true)} aria-label="Acerca del Marketplace" title="Acerca del Marketplace" className={toolbarBtn}><Icon name="info" className="h-4 w-4" /></button>
+        <a href="#acerca" aria-label="Acerca del Marketplace" title="Acerca del Marketplace" className={toolbarBtn}><Icon name="info" className="h-4 w-4" /></a>
       </form>
 
       {tabs.length > 0 && (
@@ -132,6 +137,8 @@ export default function ResourceGallery({ hubUrl, type: initialType, initialItem
         </aside>
 
         <div className="min-w-0 flex-1" data-mk-grid>
+          {browsing && !loading && !failed && <CollectionShelves shelves={shelves} hubUrl={hubUrl} />}
+          {browsing && shelves.length > 0 && visible.length > 0 && <h2 className="mb-4 text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Todo el catálogo</h2>}
           {loading && (
             <div className="columns-[15rem] gap-4" aria-hidden="true">
               {SKELETON.map((h, i) => <div key={i} className="mb-4 break-inside-avoid animate-pulse rounded-2xl bg-slate-100 motion-reduce:animate-none" style={{ height: h }} />)}
@@ -146,11 +153,11 @@ export default function ResourceGallery({ hubUrl, type: initialType, initialItem
               <button type="button" onClick={clear} data-mk-clear className={`mt-3 min-h-11 rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100 ${FOCUS}`}>{T.clearFilters}</button>
             </div>
           )}
-          {visible.length > 0 && <div className="columns-[15rem] gap-4">{visible.map((r) => <ResourceTile key={r.resourceKey} resource={r} hubUrl={hubUrl} />)}</div>}
+          {visible.length > 0 && <div key={tab} className="mk-rise columns-[15rem] gap-4">{visible.map((r) => <ResourceTile key={r.resourceKey} resource={r} hubUrl={hubUrl} />)}</div>}
         </div>
       </div>
 
-      <MarketplaceAbout open={about} onClose={() => setAbout(false)} />
+      {syncUrl && <MarketplaceIntro counts={counts} />}
     </section>
   );
 }
