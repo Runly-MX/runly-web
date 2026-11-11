@@ -1,7 +1,7 @@
 {
   "source": "runly/docs/developers",
-  "revision": "80627dbad41c7647a7530b870522851fdb562ad7",
-  "dirty": false,
+  "revision": "2361f0b1d2f51a2319747a8bb1c9ba6141076a9a",
+  "dirty": true,
   "files": {
     "api-modulos.md": "ddc327802950dc04161275fadae130133900b0287871e77fa20804edeb4797a0",
     "automatizaciones.md": "b915570aa2bc4d3d0676e810abbd7f51e1b99ba9e549c215c259ee3cffa921f2",
@@ -22,6 +22,7 @@
     "relaciones.md": "d406a832bfa144f38f80bb16a59f862d00bfd17ce03bdf41fff60c9a28c2968f",
     "servicios-y-eventos.md": "ba261a3ef28c7293ecec3b99a096ad7eb0abef3c70e49bfc54943fedfc3bb799",
     "solucion-problemas.md": "ee24af6e4dd47a8f424c8717fe1fc07be21afa4f6a02ee3aa15560a6c8ad1c99",
-    "studio-template-package.md": "4aea1b75c674054b9ce02d77701b1c04c77f2a007e4ad07eabb0f8a4d46de4d0"
+    "studio-template-package.md": "4aea1b75c674054b9ce02d77701b1c04c77f2a007e4ad07eabb0f8a4d46de4d0",
+    "website-template-package.md": "1ac97e28d525e07816fc93b3dc5efab477a62e7457c2e1f778687f944e4a772a"
   }
 }
