@@ -1,6 +1,6 @@
 {
   "source": "runly/docs/developers",
-  "revision": "db6deb300f0835df6d74c6d46198ded1b2a375a2",
+  "revision": "9eb3e92bb7a4b137f850cd9bf435872006a5679c",
   "dirty": false,
   "files": {
     "api-modulos.md": "ddc327802950dc04161275fadae130133900b0287871e77fa20804edeb4797a0",
@@ -23,6 +23,6 @@
     "servicios-y-eventos.md": "ba261a3ef28c7293ecec3b99a096ad7eb0abef3c70e49bfc54943fedfc3bb799",
     "solucion-problemas.md": "ee24af6e4dd47a8f424c8717fe1fc07be21afa4f6a02ee3aa15560a6c8ad1c99",
     "studio-template-package.md": "4aea1b75c674054b9ce02d77701b1c04c77f2a007e4ad07eabb0f8a4d46de4d0",
-    "website-template-package.md": "64cd321e48139aa0c11387084d96bc61a2af8ac5e409d6803696d41f896dc797"
+    "website-template-package.md": "d2b51796fdee6df9a2094988c8ef8ccd0f8127db162937ff7f67ab99c6e0adfc"
   }
 }
