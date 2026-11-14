@@ -1,9 +1,6 @@
 ---
 // src/components/layout/Header.astro
 import ThemeToggle from "./ThemeToggle.astro";
-import { Image } from "astro:assets";
-import logoLight from "../../../public/brand/runly-logo-light.png";
-import logoDark from "../../../public/brand/runly-logo-dark.png";
 import {
   Menu,
   X,
@@ -99,8 +96,8 @@ const mobileRoot = [
 <header class="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/80 backdrop-blur-md transition-all duration-300">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
     <a aria-label="RUNLY" class="flex items-center gap-2" href={`${prefix}/`}>
-      <Image alt="RUNLY - Business in motion" class="rl-show-light h-9 w-auto object-contain" src={logoLight} width={280} format="png" loading="eager" />
-      <Image alt="" aria-hidden="true" class="rl-show-dark h-9 w-auto object-contain" src={logoDark} width={280} format="png" loading="eager" />
+      <img alt="RUNLY - Business in motion" class="rl-show-light h-9 w-auto object-contain" src="/brand/runly-logo-light-560.webp" width="280" height="93" />
+      <img alt="" aria-hidden="true" class="rl-show-dark h-9 w-auto object-contain" src="/brand/runly-logo-dark-560.webp" width="280" height="93" />
     </a>
     <nav class="relative hidden lg:flex items-center gap-4 xl:gap-7 text-sm font-semibold text-slate-600" id="desktopNav">
       <a class="nav-plain-link hover:text-runly-orange transition-colors whitespace-nowrap" href={`${prefix}/#hero`}>{nav.platform}</a>
