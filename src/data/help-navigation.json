@@ -331,6 +331,10 @@
       "icon": "Globe"
     },
     {
+      "path": "/monitors",
+      "icon": "Activity"
+    },
+    {
       "path": "/forms",
       "icon": "FileText"
     }

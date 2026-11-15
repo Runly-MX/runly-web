@@ -1,16 +1,16 @@
 {
   "source": "runly/docs/developers",
-  "revision": "9eb3e92bb7a4b137f850cd9bf435872006a5679c",
+  "revision": "7d9b7efe70e6c0b5763680a08a7c9cd8adb0acf2",
   "dirty": false,
   "files": {
-    "api-modulos.md": "ddc327802950dc04161275fadae130133900b0287871e77fa20804edeb4797a0",
+    "api-modulos.md": "6b8e5aff61a713e8b67497252e6de2dcf67de4b43ed678a539f2e2a54fccb767",
     "automatizaciones.md": "b915570aa2bc4d3d0676e810abbd7f51e1b99ba9e549c215c259ee3cffa921f2",
     "campos.md": "3e35cbda0c30704b1d3ad54524e88c3cb7424a9bbe4f9f508586fee36a51ed76",
     "catalogo-comunitario.md": "243be5948974d1b602be2f4d8803591fd2ea2aaaa73c3a1a6d7a9d6753a0678e",
     "catalogo.md": "af531391bcd2741d1b54fe0bb6ea65f1dc3828db2776d45a6a6649505bc44274",
     "componentes.md": "e7d82aa37cc0868b229242b4e5c5ee605b0824e71d3e2f59e16fb607902e0d3f",
     "conexiones.md": "21702adabebcb7cff6647dc294f78d1619373dcd74719ecabc4c02dc1d5f7577",
-    "diseno-de-pantallas.md": "f0d58e30f95f0933148d3fd6e2c1a73b98e56bd4f2131a7960cde96815e5e48a",
+    "diseno-de-pantallas.md": "3f685b914a548ec77c874b91d36cc14693fc72c25d4ac4b4b845d0c328ba90a3",
     "enlaces-publicos.md": "a2ca23af7c603dd3dfa5799b54cf91d5744c3710b2e0e818f14a4d072252aa84",
     "flujo-zip.md": "6f334db8f1d7dc2ca95eac369b814c3989ab3d131210d4c9c439f6e3d5187141",
     "ia.md": "53b93c89f00ca231f2cf07ed8d07b4e5db401d5b2c88403aaeb90d74b7e08bf4",
@@ -20,7 +20,7 @@
     "mcp.md": "bb8141fd13dc51d4c74eb98e25e675ebee2e388c103265ca79e3f7e8d4e9b5f7",
     "pantallas-react.md": "edd0665247dff8cecaad129c9a95c01bbedf75bb1baaec78df22eeca5b53873c",
     "relaciones.md": "d406a832bfa144f38f80bb16a59f862d00bfd17ce03bdf41fff60c9a28c2968f",
-    "servicios-y-eventos.md": "ba261a3ef28c7293ecec3b99a096ad7eb0abef3c70e49bfc54943fedfc3bb799",
+    "servicios-y-eventos.md": "bf3d283145844547f1fe3d733a3bb3310031d8a2c99d735dfbad80a3b1b56578",
     "solucion-problemas.md": "ee24af6e4dd47a8f424c8717fe1fc07be21afa4f6a02ee3aa15560a6c8ad1c99",
     "studio-template-package.md": "4aea1b75c674054b9ce02d77701b1c04c77f2a007e4ad07eabb0f8a4d46de4d0",
     "website-template-package.md": "d2b51796fdee6df9a2094988c8ef8ccd0f8127db162937ff7f67ab99c6e0adfc"
