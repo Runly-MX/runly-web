@@ -7,6 +7,7 @@ import { ChevronRight } from "@lucide/astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../layout/Header.astro";
 import Footer from "../layout/Footer.astro";
+import DocTools from "./DocTools.astro";
 import DocsSearch from "./DocsSearch.astro";
 import DocsSearchTrigger from "./DocsSearchTrigger.astro";
 import { getDictionary } from "../../i18n";
@@ -63,6 +64,7 @@ const pages = (await getCollection("developers")).sort((a, b) => a.data.order - 
         </nav>
         <h1 class="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">{title}</h1>
         <p class="mt-2 text-base leading-relaxed text-slate-600">{summary}</p>
+        <DocTools class="mt-4" md={`/documentacion/desarrolladores/${slug}.md`} filename={slug} />
         <div class="doc-prose mt-8">
           <slot />
         </div>

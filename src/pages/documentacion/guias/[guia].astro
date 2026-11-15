@@ -11,6 +11,7 @@ import { ArrowLeft, ArrowRight, ChevronRight } from "@lucide/astro";
 import BaseLayout from "../../../layouts/BaseLayout.astro";
 import Header from "../../../components/layout/Header.astro";
 import Footer from "../../../components/layout/Footer.astro";
+import DocTools from "../../../components/docs/DocTools.astro";
 import DocsSearch from "../../../components/docs/DocsSearch.astro";
 import DocsSearchTrigger from "../../../components/docs/DocsSearchTrigger.astro";
 import DocsToc from "../../../components/docs/DocsToc.astro";
@@ -144,5 +145,6 @@ const dict = getDictionary(locale);
     </div>
   </main>
   <Footer locale={locale} footer={dict.footer} />
+  <DocTools />
   <DocsSearch />
 </BaseLayout>

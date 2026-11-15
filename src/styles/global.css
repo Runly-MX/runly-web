@@ -371,3 +371,10 @@
   .mk-rise, .mk-sheen::after { animation: none; }
   .mk-reveal { opacity: 1; transform: none; transition: none; }
 }
+
+/* Code blocks: header bar with language + copy button (added by DocTools). */
+.doc-prose .code-block { margin: 0.85rem 0 1.1rem; border: 1px solid #1d2a4d; border-radius: 0.75rem; background: #0b132b; overflow: hidden; }
+.doc-prose .code-block pre { margin: 0; border-radius: 0; background: transparent; }
+.code-block-bar { display: flex; align-items: center; justify-content: space-between; padding: 0.4rem 0.5rem 0.4rem 1rem; background: #111b38; border-bottom: 1px solid #1d2a4d; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; color: #8d9bbd; }
+.code-block-bar button { border-radius: 0.375rem; padding: 0.25rem 0.6rem; font: inherit; text-transform: none; letter-spacing: 0; color: #cdd6ea; border: 1px solid #2d3d68; background: transparent; cursor: pointer; }
+.code-block-bar button:hover { background: #1d2a4d; color: #fff; }

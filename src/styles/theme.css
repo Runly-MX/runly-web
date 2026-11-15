@@ -198,3 +198,5 @@ html[data-theme="dark"] [data-theme-toggle] button[aria-pressed="true"] { color:
 html[data-theme="dark"] header a[aria-current="page"] { color: #070d1e; }
 #contacto .text-orange-600, #implementacion .text-orange-600 { color: var(--rl-accent); }
 
+html[data-theme="dark"] .doc-prose .code-block { background: #070d1e; }
+html[data-theme="dark"] [data-doc-tools] > a, html[data-theme="dark"] [data-doc-tools] > button { background: var(--rl-surface); }
