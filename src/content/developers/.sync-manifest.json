@@ -1,7 +1,7 @@
 {
   "source": "runly/docs/developers",
-  "revision": "7d9b7efe70e6c0b5763680a08a7c9cd8adb0acf2",
-  "dirty": false,
+  "revision": "68aea92a508ca958d92b602627da791f537f9d5f",
+  "dirty": true,
   "files": {
     "api-modulos.md": "6b8e5aff61a713e8b67497252e6de2dcf67de4b43ed678a539f2e2a54fccb767",
     "automatizaciones.md": "b915570aa2bc4d3d0676e810abbd7f51e1b99ba9e549c215c259ee3cffa921f2",
@@ -20,7 +20,7 @@
     "mcp.md": "bb8141fd13dc51d4c74eb98e25e675ebee2e388c103265ca79e3f7e8d4e9b5f7",
     "pantallas-react.md": "edd0665247dff8cecaad129c9a95c01bbedf75bb1baaec78df22eeca5b53873c",
     "relaciones.md": "d406a832bfa144f38f80bb16a59f862d00bfd17ce03bdf41fff60c9a28c2968f",
-    "servicios-y-eventos.md": "bf3d283145844547f1fe3d733a3bb3310031d8a2c99d735dfbad80a3b1b56578",
+    "servicios-y-eventos.md": "9b40ab0cdd8fd98e62a8adf6ef35ff3ebc4818bbeac7e0fcabc0fc67ae27ea2c",
     "solucion-problemas.md": "ee24af6e4dd47a8f424c8717fe1fc07be21afa4f6a02ee3aa15560a6c8ad1c99",
     "studio-template-package.md": "4aea1b75c674054b9ce02d77701b1c04c77f2a007e4ad07eabb0f8a4d46de4d0",
     "website-template-package.md": "d2b51796fdee6df9a2094988c8ef8ccd0f8127db162937ff7f67ab99c6e0adfc"
