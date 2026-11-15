@@ -30,13 +30,13 @@ const meta = [
     <h2 id="hv2-ai-title" class="hv2-h2 io mt-5 max-w-4xl" style="color:#fff">{s.title}</h2>
     <p class="hv2-lead io mt-6">{s.body}</p>
 
-    <div class="hv2-net io">
+    <div class="hv2-net io" data-par>
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        {pos.map((p) => <path class="hv2-line" d={`M50 50 L${p.x} ${p.y}`} />)}
+        {pos.map((p) => <path class="hv2-line" d={`M50 50 L${p.x} ${p.y}`} data-x={p.x} data-y={p.y} />)}
       </svg>
       <div class="hv2-node hv2-core" style="left:50%;top:50%"><Image src={isotipo} alt="Runly" widths={[160, 320]} sizes="12vw" format="webp" /></div>
       {s.nodes.map((n, i) => (
-        <div class="hv2-node hv2-tile" style={`left:${pos[i].x}%;top:${pos[i].y}%`}>
+        <div class="hv2-node hv2-tile" data-x={pos[i].x} data-y={pos[i].y} style={`left:${pos[i].x}%;top:${pos[i].y}%`}>
           <ShotSlot slotId={meta[i].slot} label={n.name} pendingText={illustrationPending} ratio="4 / 3" chrome={false} illustration sizes="260px" />
           <div class="hv2-tile-cap"><ModuleIcon icon={meta[i].icon} color={meta[i].color} size="md" /><span><b>{n.name}</b><i>{n.kind}</i></span></div>
         </div>
@@ -60,3 +60,35 @@ const meta = [
     </div>
   </div>
 </section>
+
+<script>
+  // Scroll parallax: tiles fly out of the R as the network enters the viewport and
+  // return into it when scrolling back up. Without JS or with reduced motion the
+  // inline styles keep the final (expanded) layout.
+  const net = document.querySelector<HTMLElement>("[data-par]");
+  if (net && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const tiles = [...net.querySelectorAll<HTMLElement>(".hv2-tile")];
+    const lines = [...net.querySelectorAll<SVGPathElement>(".hv2-line")];
+    const update = () => {
+      const r = net.getBoundingClientRect();
+      const raw = Math.min(1, Math.max(0, (innerHeight - r.top) / (innerHeight * 0.65)));
+      const p = 1 - (1 - raw) ** 2;
+      tiles.forEach((t) => {
+        const x = 50 + (Number(t.dataset.x) - 50) * p;
+        const y = 50 + (Number(t.dataset.y) - 50) * p;
+        t.style.left = `${x}%`;
+        t.style.top = `${y}%`;
+        t.style.scale = String(0.35 + 0.65 * p);
+        t.style.opacity = String(p);
+      });
+      lines.forEach((l) => {
+        const x = 50 + (Number(l.dataset.x) - 50) * p;
+        const y = 50 + (Number(l.dataset.y) - 50) * p;
+        l.setAttribute("d", `M50 50 L${x} ${y}`);
+      });
+    };
+    addEventListener("scroll", () => requestAnimationFrame(update), { passive: true });
+    addEventListener("resize", update);
+    update();
+  }
+</script>

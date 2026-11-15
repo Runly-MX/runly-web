@@ -33,7 +33,7 @@ export const es: SiteDictionary = {
     },
     implementation: "Implementación",
     contact: "Contacto",
-    requestDemo: "Solicitar una demostración",
+    requestDemo: "Solicitar demo",
     back: "Volver",
   },
   footer: {

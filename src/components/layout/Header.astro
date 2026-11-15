@@ -87,7 +87,6 @@ const links = [
 // Mobile drawer root: plain links plus one drill-down entry per dropdown,
 // kept in the same order as the desktop nav.
 const mobileRoot = [
-  { kind: "link" as const, href: `${prefix}/#hero`, label: nav.platform },
   ...dropdowns.map((d) => ({ kind: "submenu" as const, id: d.id, label: d.label, count: d.items.length })),
   ...links.map((l) => ({ kind: "link" as const, ...l })),
 ];
@@ -100,7 +99,6 @@ const mobileRoot = [
       <img alt="" aria-hidden="true" class="rl-show-dark h-9 w-auto object-contain" src="/brand/runly-logo-dark-560.webp" width="280" height="93" />
     </a>
     <nav class="relative hidden lg:flex items-center gap-4 xl:gap-7 text-sm font-semibold text-slate-600" id="desktopNav">
-      <a class="nav-plain-link hover:text-runly-orange transition-colors whitespace-nowrap" href={`${prefix}/#hero`}>{nav.platform}</a>
       {dropdowns.map((dropdown) => (
         <button
           class="nav-trigger hover:text-runly-orange transition-colors flex items-center gap-1 whitespace-nowrap"
