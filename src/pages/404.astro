@@ -1,0 +1,122 @@
+---
+// Served by Nginx for any missing path (error_page 403 404 /404.html), so it
+// has no per-locale route: the copy switches to English client-side on /en/*.
+export const prerender = true;
+
+import { Image } from "astro:assets";
+import { ArrowRight, Home, Search, BookOpen, Boxes, LifeBuoy } from "@lucide/astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/layout/Header.astro";
+import Footer from "../components/layout/Footer.astro";
+import DocsSearch from "../components/docs/DocsSearch.astro";
+import { getDictionary } from "../i18n";
+import isotipo from "../assets/home-v2/isotipo-dark.png";
+
+const dict = getDictionary("es");
+const links = [
+  { href: "/", es: "Inicio", en: "Home", icon: Home },
+  { href: "/modulos", es: "Módulos", en: "Modules", icon: Boxes },
+  { href: "/documentacion/modulos", es: "Documentación", en: "Documentation", icon: BookOpen },
+  { href: "/support", es: "Soporte", en: "Support", icon: LifeBuoy },
+];
+---
+
+<BaseLayout title="Página no encontrada — Runly" description="La página que buscas no existe o cambió de lugar." locale="es" path="/404" hasEnglish={false} noindex>
+  <Header locale="es" nav={dict.nav} />
+  <main id="contenido" class="nf">
+    <div class="nf-glow" aria-hidden="true"></div>
+    <div class="nf-grid" aria-hidden="true"></div>
+    <span class="nf-dot nf-d1" aria-hidden="true"></span>
+    <span class="nf-dot nf-d2" aria-hidden="true"></span>
+    <span class="nf-dot nf-d3" aria-hidden="true"></span>
+
+    <div class="nf-inner">
+      <p class="nf-eyebrow" data-es="Error 404" data-en="Error 404">Error 404</p>
+      <div class="nf-code" aria-hidden="true" data-parallax>
+        <span class="nf-digit nf-a">4</span>
+        <span class="nf-orb"><Image src={isotipo} alt="" widths={[160, 320]} sizes="20vw" format="webp" /></span>
+        <span class="nf-digit nf-b">4</span>
+      </div>
+      <h1 class="nf-title" data-es="Esta ruta se salió del mapa." data-en="This route fell off the map.">Esta ruta se salió del mapa.</h1>
+      <p class="nf-lead" data-es="La página que buscas no existe, cambió de lugar o todavía no está publicada. Revisa la dirección o vuelve a un lugar conocido." data-en="The page you are looking for does not exist, moved, or is not published yet. Check the address or head back somewhere familiar.">La página que buscas no existe, cambió de lugar o todavía no está publicada. Revisa la dirección o vuelve a un lugar conocido.</p>
+
+      <div class="nf-actions">
+        <a class="runly-gradient-btn nf-primary" href="/" data-home>
+          <span data-es="Volver al inicio" data-en="Back to home">Volver al inicio</span>
+          <ArrowRight class="h-4 w-4" aria-hidden="true" />
+        </a>
+        <button type="button" class="nf-secondary" data-open-search>
+          <Search class="h-4 w-4" aria-hidden="true" />
+          <span data-es="Buscar en la documentación" data-en="Search the docs">Buscar en la documentación</span>
+        </button>
+      </div>
+
+      <ul class="nf-links">
+        {links.map((l, i) => (
+          <li style={`--i:${i}`}>
+            <a href={l.href} data-path={l.href}><l.icon class="h-4 w-4" aria-hidden="true" /><span data-es={l.es} data-en={l.en}>{l.es}</span></a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </main>
+  <Footer locale="es" footer={dict.footer} />
+  <DocsSearch />
+</BaseLayout>
+
+<style is:global>
+  .nf { position: relative; overflow: hidden; min-height: calc(100vh - 5rem); display: grid; place-items: center; padding: 8rem 1rem 5rem; background: var(--rl-bg); }
+  .nf-glow { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 38%, var(--rl-glow-a), transparent 70%), radial-gradient(ellipse 50% 40% at 80% 90%, var(--rl-glow-b), transparent 70%); animation: nf-breathe 7s ease-in-out infinite; }
+  .nf-grid { position: absolute; inset: 0; background-image: radial-gradient(var(--rl-line) 1px, transparent 1px); background-size: 28px 28px; mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000, transparent 75%); opacity: 0.6; }
+  .nf-dot { position: absolute; border-radius: 9999px; background: #ff5e14; box-shadow: 0 0 24px 6px rgba(255, 94, 20, 0.45); animation: nf-float 9s ease-in-out infinite; }
+  .nf-d1 { width: 10px; height: 10px; left: 14%; top: 30%; }
+  .nf-d2 { width: 6px; height: 6px; right: 18%; top: 24%; animation-delay: -3s; background: #7ea6ff; box-shadow: 0 0 20px 5px rgba(126, 166, 255, 0.4); }
+  .nf-d3 { width: 8px; height: 8px; right: 26%; bottom: 22%; animation-delay: -6s; }
+  .nf-inner { position: relative; z-index: 1; max-width: 40rem; text-align: center; }
+  .nf-inner > * { opacity: 0; transform: translateY(18px); animation: nf-in 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
+  .nf-eyebrow { animation-delay: 0.05s; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; color: var(--rl-accent); }
+  .nf-code { animation-delay: 0.15s; display: flex; align-items: center; justify-content: center; gap: clamp(0.25rem, 2vw, 1rem); margin: 1rem 0 0.5rem; transition: transform 0.2s ease-out; }
+  .nf-digit { font-size: clamp(6rem, 22vw, 12rem); font-weight: 800; line-height: 1; letter-spacing: -0.06em; color: var(--rl-text); text-shadow: 0 0 60px rgba(255, 94, 20, 0.25); }
+  .nf-orb { position: relative; width: clamp(5.5rem, 19vw, 10.5rem); aspect-ratio: 1; display: grid; place-items: center; animation: nf-spin-float 8s ease-in-out infinite; }
+  .nf-orb::before { content: ""; position: absolute; inset: -25%; border-radius: 9999px; background: radial-gradient(circle, rgba(255, 94, 20, 0.35), transparent 65%); }
+  .nf-orb::after { content: ""; position: absolute; inset: -8%; border-radius: 9999px; border: 1px dashed var(--rl-line); animation: nf-orbit 24s linear infinite; }
+  .nf-orb img { position: relative; width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 30px rgba(255, 94, 20, 0.4)); }
+  .nf-title { animation-delay: 0.3s; font-size: clamp(1.6rem, 4vw, 2.4rem); font-weight: 800; letter-spacing: -0.02em; color: var(--rl-text); }
+  .nf-lead { animation-delay: 0.42s; margin-top: 0.9rem; color: var(--rl-text-muted); line-height: 1.7; }
+  .nf-actions { animation-delay: 0.55s; margin-top: 2rem; display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+  .nf-primary { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.4rem; border-radius: 0.5rem; font-weight: 700; font-size: 0.9rem; transition: transform 0.2s, box-shadow 0.2s; }
+  .nf-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -10px rgba(255, 94, 20, 0.6); }
+  .nf-primary svg { transition: transform 0.2s; } .nf-primary:hover svg { transform: translateX(4px); }
+  .nf-secondary { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.2rem; border-radius: 0.5rem; font-weight: 600; font-size: 0.9rem; color: var(--rl-text); border: 1px solid var(--rl-border-strong); background: var(--rl-surface); transition: border-color 0.2s, transform 0.2s; cursor: pointer; }
+  .nf-secondary:hover { border-color: var(--rl-accent-fill); transform: translateY(-2px); }
+  .nf-links { animation-delay: 0.68s; margin-top: 2.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; justify-content: center; }
+  .nf-links a { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; font-weight: 600; color: var(--rl-text-muted); transition: color 0.2s; }
+  .nf-links a:hover { color: var(--rl-accent); }
+  @keyframes nf-in { to { opacity: 1; transform: none; } }
+  @keyframes nf-float { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(14px, -26px); } }
+  @keyframes nf-breathe { 0%, 100% { opacity: 0.8; } 50% { opacity: 1; } }
+  @keyframes nf-spin-float { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-12px) rotate(4deg); } }
+  @keyframes nf-orbit { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .nf *, .nf { animation: none !important; } .nf-inner > * { opacity: 1; transform: none; } }
+</style>
+
+<script>
+  const en = location.pathname.startsWith("/en/");
+  if (en) {
+    document.documentElement.lang = "en";
+    document.querySelectorAll<HTMLElement>("main [data-en]").forEach((el) => { el.textContent = el.dataset.en!; });
+    document.title = "Page not found — Runly";
+    document.querySelectorAll<HTMLAnchorElement>("main [data-path]").forEach((a) => { a.href = "/en" + (a.dataset.path === "/" ? "/" : a.dataset.path); });
+    document.querySelector<HTMLAnchorElement>("main [data-home]")!.href = "/en/";
+  }
+  document.querySelector("[data-open-search]")?.addEventListener("click", () => {
+    document.dispatchEvent(new KeyboardEvent("keydown", { key: "k", ctrlKey: true, bubbles: true }));
+  });
+  const code = document.querySelector<HTMLElement>("[data-parallax]");
+  if (code && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    addEventListener("pointermove", (e) => {
+      const x = (e.clientX / innerWidth - 0.5) * 2, y = (e.clientY / innerHeight - 0.5) * 2;
+      code.style.transform = `translate(${x * 10}px, ${y * 8}px)`;
+    }, { passive: true });
+  }
+</script>
