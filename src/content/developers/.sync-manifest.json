@@ -1,7 +1,7 @@
 {
   "source": "runly/docs/developers",
-  "revision": "5fd39935a665f204ccf143e2cc6afa6215bd9019",
-  "dirty": false,
+  "revision": "abcfaa9596d08f1178c66adc4ae707b9a3b7ec44",
+  "dirty": true,
   "files": {
     "api-modulos.md": "6b8e5aff61a713e8b67497252e6de2dcf67de4b43ed678a539f2e2a54fccb767",
     "automatizaciones.md": "b915570aa2bc4d3d0676e810abbd7f51e1b99ba9e549c215c259ee3cffa921f2",
@@ -23,6 +23,6 @@
     "servicios-y-eventos.md": "9b40ab0cdd8fd98e62a8adf6ef35ff3ebc4818bbeac7e0fcabc0fc67ae27ea2c",
     "solucion-problemas.md": "ee24af6e4dd47a8f424c8717fe1fc07be21afa4f6a02ee3aa15560a6c8ad1c99",
     "studio-template-package.md": "4aea1b75c674054b9ce02d77701b1c04c77f2a007e4ad07eabb0f8a4d46de4d0",
-    "website-template-package.md": "d2b51796fdee6df9a2094988c8ef8ccd0f8127db162937ff7f67ab99c6e0adfc"
+    "website-template-package.md": "193460b279b74c5ffd79bc3c655208a076ee2bae992e270ef6101e6f41d8b68a"
   }
 }
