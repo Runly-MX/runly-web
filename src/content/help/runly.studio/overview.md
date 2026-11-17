@@ -92,3 +92,67 @@ Recargar/cerrar utiliza el aviso del navegador. La copia local dura hasta siete 
 no sustituye a Guardar ni contiene los bytes de imágenes. El portapapeles interno cruza
 diseños del mismo usuario y empresa, pero se pierde al recargar. Para reutilizar una
 imagen nueva en otro diseño necesitas acceso independiente a ese archivo en Files.
+
+**Presentar** (en la barra superior; en el teléfono, en el menú de más opciones) muestra
+el diseño a pantalla completa desde la página en la que estás. Si el dispositivo no
+permite pantalla completa, la presentación ocupa toda la ventana. Avanza con la flecha
+derecha, Espacio, Av Pág o un clic en la mitad derecha; retrocede con la flecha izquierda,
+Re Pág o un clic en la mitad izquierda. En pantallas táctiles desliza a los lados y toca
+para mostrar los controles. **K** reproduce o pausa, **L** repite al terminar y **Esc**
+sale. F5 o Ctrl+Enter abren la presentación desde el editor. Quienes solo pueden ver el
+diseño también pueden presentarlo.
+
+Con la reproducción automática, cada página dura lo indicado en **Formato → Diapositiva**
+(5 segundos si no lo cambias). Ahí también eliges la transición de entrada (fundido,
+deslizamiento o acercamiento) y su duración, o la aplicas a todas las páginas. Si tu
+sistema pide reducir el movimiento, las transiciones se muestran como cambio directo.
+Estos ajustes se guardan en el diseño y se sincronizan con los demás. El paquete
+.runlystudio todavía no los conserva: al descargarlo te pedirá confirmarlo.
+
+**Animar**: selecciona un elemento (o un grupo) y, en **Propiedades → Animación**, pulsa
+**Animar**. Elige una **Entrada** (aparecer, desvanecer, deslizar, escalar, girar o
+rebotar), un **Énfasis** (pulso, giro, sacudida o salto, con repeticiones) y una
+**Salida**, con su duración, retraso desde el inicio de la diapositiva y curva. En un
+grupo, todos sus elementos giran y escalan alrededor del centro del grupo. **Previsualizar
+página** reproduce la página y te deja arrastrar el tiempo a cualquier instante. Las
+animaciones se reproducen en **Presentar**, se guardan, se sincronizan y se deshacen como
+cualquier cambio; no modifican el diseño: al terminar, cada elemento queda en su lugar. Si
+un efecto termina después de la duración de la diapositiva, se corta al presentar sin
+cambiar sus valores. Un elemento bloqueado no se puede animar hasta desbloquearlo.
+
+**Línea de tiempo** (barra superior; en el teléfono, en el menú) aparece bajo el lienzo con
+una pista por elemento. En modo **Animación** el lienzo muestra el instante del cabezal:
+arrastra un elemento para crear o actualizar su keyframe de posición en ese instante (el
+diseño base no se mueve); vuelve a **Diseño** para editar el diseño. Los segmentos de
+entrada, énfasis y salida se arrastran para cambiar su retraso y se estiran por los extremos
+para cambiar su duración; doble clic abre sus propiedades. Selecciona un keyframe (rombo)
+para editar posición, rotación, opacidad, escala y curva, copiarlo, pegarlo en el cabezal o
+eliminarlo. Con el foco en la línea de tiempo: Espacio reproduce, Inicio/Fin, flechas mueven
+el cabezal (Mayús, 1 s), [ y ] saltan entre keyframes, K añade uno y Supr lo elimina. El imán
+ajusta a décimas de segundo y a los bordes cercanos (Alt lo desactiva al arrastrar). Mover
+el cabezal o hacer zoom no modifica el diseño; cada arrastre se deshace en un paso. Al cambiar
+el tamaño de la página con «escalar contenido», los keyframes de posición se escalan igual que
+los elementos. Si dos personas editan los keyframes del mismo elemento a la vez, se conserva el
+último cambio.
+
+**Video y GIF**: en **Descargar** elige **Video MP4**, **Video WebM** o **GIF animado**. Se
+generan con las mismas animaciones, keyframes, transiciones y duraciones que ves en
+**Presentar**, una página tras otra. Puedes elegir las páginas, la resolución, los fotogramas
+por segundo, la calidad del video y si el GIF se repite; el resumen muestra la duración, los
+fotogramas y un tamaño aproximado. El archivo se genera en tu dispositivo: deja la pestaña
+abierta, sigue el porcentaje y cancela cuando quieras (no se guarda nada). Los videos no tienen
+sonido y duran como máximo 2 minutos; el GIF, 20 segundos y 800 px, con 256 colores (las fotos y
+degradados pueden verse con bandas). Si el navegador no codifica el formato de forma acelerada,
+se usa una codificación compatible más lenta. Exportar no modifica el diseño.
+
+**PowerPoint**: en **Descargar** elige **PowerPoint (PPTX)**. Cada página es una diapositiva
+en el mismo orden, y los textos, formas, líneas y fotos llegan como elementos independientes
+que puedes editar, mover y recolorear. Antes de descargar, el resumen indica cuántos elementos
+serán editables y cuáles se incluyen como imagen (por ejemplo, fotos con máscara o ajustes,
+degradados, iconos y códigos QR). Las animaciones de los elementos no se convierten: cada uno
+queda en su posición del diseño. Solo el fundido se conserva como transición; deslizar y
+acercar cambian de diapositiva sin efecto. PowerPoint usa un solo tamaño de diapositiva, así
+que las páginas con otra proporción se centran con franjas negras. Si quieres conservar el
+movimiento, marca **Añadir una diapositiva con la reproducción animada (MP4)**: se agrega al
+final un video como el de Presentar, sin cambiar las diapositivas editables. Las fotos privadas
+se incluyen dentro del archivo, sin enlaces; las fuentes no se incrustan.
