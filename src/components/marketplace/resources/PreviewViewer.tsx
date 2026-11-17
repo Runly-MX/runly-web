@@ -39,13 +39,27 @@ export default function PreviewViewer({ items, index, onIndex, open, onClose, hu
   const current = items[Math.min(index, items.length - 1)];
   const many = items.length > 1;
 
+  const [orient, setOrient] = useState({ r: 0, fx: false, fy: false });
+  const orientRef = useRef(orient);
+  orientRef.current = orient;
+  const quarter = () => Math.abs(orientRef.current.r) % 180 === 90;
+  // A quarter turn swaps width and height, so shrink the fitted image until the rotated box fits too.
+  const fitK = useCallback(() => {
+    const el = img.current, box = stage.current;
+    if (!el || !box || !quarter()) return 1;
+    return Math.min(1, (box.clientWidth * 0.94) / el.offsetHeight, (box.clientHeight * 0.94) / el.offsetWidth);
+  }, []);
   // Keep the pan inside the zoomed image (never lose it off-screen).
   const bound = useCallback((s: number, x: number, y: number) => {
     const el = img.current, box = stage.current;
     if (!el || !box || s <= 1) return { s: 1, x: 0, y: 0 };
-    const mx = Math.max(0, (el.offsetWidth * s - box.clientWidth) / 2), my = Math.max(0, (el.offsetHeight * s - box.clientHeight) / 2);
+    const k = fitK() * s, [w, h] = quarter() ? [el.offsetHeight, el.offsetWidth] : [el.offsetWidth, el.offsetHeight];
+    const mx = Math.max(0, (w * k - box.clientWidth) / 2), my = Math.max(0, (h * k - box.clientHeight) / 2);
     return { s, x: clamp(x, -mx, mx), y: clamp(y, -my, my) };
-  }, []);
+  }, [fitK]);
+  const rotate = (d: number) => { setOrient((o) => ({ ...o, r: o.r + d })); setView({ s: 1, x: 0, y: 0 }); };
+  const flip = (axis: "fx" | "fy") => setOrient((o) => ({ ...o, [axis]: !o[axis] }));
+  const resetAll = () => { setOrient({ r: 0, fx: false, fy: false }); setView({ s: 1, x: 0, y: 0 }); };
   const zoomAt = useCallback((next: number, fx = 0, fy = 0) => {
     const { s, x, y } = viewRef.current;
     const ns = clamp(next, 1, MAX), k = ns / s;
@@ -62,7 +76,7 @@ export default function PreviewViewer({ items, index, onIndex, open, onClose, hu
     if (!open && d.open) d.close();
   }, [open]);
   useEffect(() => { setCanFull(typeof document !== "undefined" && !!document.fullscreenEnabled); }, []);
-  useEffect(() => { reset(); setLoaded(false); }, [index, open, reset]);
+  useEffect(() => { reset(); setOrient({ r: 0, fx: false, fy: false }); setLoaded(false); }, [index, open, reset]);
   useEffect(() => { if (img.current?.complete && img.current.naturalWidth > 0) setLoaded(true); });
   useEffect(() => {
     if (!open) return;
@@ -103,8 +117,12 @@ export default function PreviewViewer({ items, index, onIndex, open, onClose, hu
       case "End": if (many) go(items.length - 1); break;
       case "+": case "=": zoomAt(viewRef.current.s * 1.4); break;
       case "-": case "_": zoomAt(viewRef.current.s / 1.4); break;
-      case "0": reset(); break;
+      case "0": resetAll(); break;
       case "1": if (img.current) zoomAt(img.current.naturalWidth / img.current.offsetWidth || 1); break;
+      case "r": rotate(90); break;
+      case "R": rotate(-90); break;
+      case "h": case "H": flip("fx"); break;
+      case "v": case "V": flip("fy"); break;
       case "f": case "F": if (canFull) toggleFull(); break;
       default: return;
     }
@@ -192,7 +210,7 @@ export default function PreviewViewer({ items, index, onIndex, open, onClose, hu
                   draggable={false}
                   onLoad={() => setLoaded(true)}
                   onError={() => onFail(current.sha256)}
-                  style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.s})`, cursor: view.s > 1 ? "grab" : "zoom-in" }}
+                  style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.s * fitK()}) scale(${orient.fx ? -1 : 1}, ${orient.fy ? -1 : 1}) rotate(${orient.r}deg)`, cursor: view.s > 1 ? "grab" : "zoom-in" }}
                   className={`block h-auto max-h-full w-auto max-w-full object-contain ${loaded ? "opacity-100" : "opacity-0"}`}
                 />
               )}
@@ -225,7 +243,17 @@ export default function PreviewViewer({ items, index, onIndex, open, onClose, hu
               <button type="button" onClick={() => zoomAt(viewRef.current.s * 1.4)} disabled={view.s >= MAX} aria-label={G.zoomIn} title={G.zoomIn} className={TOOL}><Icon name="plus" className="h-3.5 w-3.5" /></button>
             </div>
             <div className="mx-0.5 h-4 w-px bg-white/15" />
-            <button type="button" onClick={reset} aria-label={G.fit} title={G.fit} className={TOOL}><Icon name="fit" className="h-3.5 w-3.5" /></button>
+            <div className="flex items-center rounded-lg bg-white/[0.06] p-0.5">
+              <button type="button" onClick={() => rotate(-90)} aria-label={G.rotateLeft} title={G.rotateLeft} className={TOOL}><Icon name="rotateCcw" className="h-3.5 w-3.5" /></button>
+              <button type="button" onClick={() => rotate(90)} aria-label={G.rotateRight} title={G.rotateRight} className={TOOL}><Icon name="rotateCw" className="h-3.5 w-3.5" /></button>
+            </div>
+            <div className="mx-0.5 h-4 w-px bg-white/15" />
+            <div className="flex items-center rounded-lg bg-white/[0.06] p-0.5">
+              <button type="button" onClick={() => flip("fx")} aria-pressed={orient.fx} aria-label={G.flipH} title={G.flipH} className={`${TOOL} ${orient.fx ? "bg-white/15 text-white" : ""}`}><Icon name="flipH" className="h-3.5 w-3.5" /></button>
+              <button type="button" onClick={() => flip("fy")} aria-pressed={orient.fy} aria-label={G.flipV} title={G.flipV} className={`${TOOL} ${orient.fy ? "bg-white/15 text-white" : ""}`}><Icon name="flipV" className="h-3.5 w-3.5" /></button>
+            </div>
+            <div className="mx-0.5 h-4 w-px bg-white/15" />
+            <button type="button" onClick={resetAll} aria-label={G.resetAll} title={G.resetAll} className={TOOL}><Icon name="refresh" className="h-3.5 w-3.5" /></button>
           </div>
           <p className="sr-only" aria-live="polite">{G.keysHint}</p>
         </div>
