@@ -14,7 +14,10 @@ import { Icon, type IconName } from "./icons";
 const G = T.gallery;
 const MAX = 6;
 const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
-const BTN = "flex h-11 min-w-11 items-center justify-center rounded-full bg-[#ffffff1a] px-3 text-sm font-semibold text-white transition-colors hover:bg-[#ffffff33] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:opacity-40 motion-reduce:transition-none";
+// Same chrome as the ERP AdvancedFileViewer: small ghost bar buttons, glass overlays.
+const BAR = "flex h-9 w-9 sm:h-7 sm:w-7 shrink-0 items-center justify-center rounded-lg text-white/60 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:cursor-not-allowed disabled:opacity-30 motion-reduce:transition-none";
+const TOOL = "flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center rounded-md text-white/60 transition-colors hover:bg-white/10 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 disabled:cursor-not-allowed disabled:opacity-30";
+const GLASS = "border border-white/15 bg-white/10 backdrop-blur-xl backdrop-saturate-150 shadow-lg";
 
 interface Props { items: Preview[]; index: number; onIndex: (i: number) => void; open: boolean; onClose: () => void; hubUrl?: string | null; failed: Record<string, boolean>; onFail: (sha: string) => void }
 
@@ -49,7 +52,8 @@ export default function PreviewViewer({ items, index, onIndex, open, onClose, hu
     setView(bound(ns, fx - (fx - x) * k, fy - (fy - y) * k));
   }, [bound]);
   const reset = useCallback(() => setView({ s: 1, x: 0, y: 0 }), []);
-  const go = useCallback((n: number) => { onIndex((n + items.length) % items.length); }, [items.length, onIndex]);
+  const go = useCallback((n: number) => { if (n >= 0 && n < items.length) onIndex(n); }, [items.length, onIndex]);
+  const [thumbsOpen, setThumbsOpen] = useState(true);
 
   useEffect(() => {
     const d = dialog.current;
@@ -109,6 +113,8 @@ export default function PreviewViewer({ items, index, onIndex, open, onClose, hu
 
   const rel = (e: React.PointerEvent) => { const r = stage.current!.getBoundingClientRect(); return { x: e.clientX - r.left - r.width / 2, y: e.clientY - r.top - r.height / 2 }; };
   const onDown = (e: React.PointerEvent) => {
+    // Capturing a pointer that starts on an overlaid button retargets its click to the stage.
+    if ((e.target as HTMLElement).closest("button")) return;
     stage.current?.setPointerCapture(e.pointerId);
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     const g = gesture.current;
@@ -144,22 +150,30 @@ export default function PreviewViewer({ items, index, onIndex, open, onClose, hu
   };
 
   const pct = Math.round(view.s * 100);
+  const canPrev = index > 0, canNext = index < items.length - 1;
   const nav = (dir: -1 | 1, icon: IconName, label: string) => (
-    <button type="button" onClick={() => go(index + dir)} aria-label={label} className={`absolute top-1/2 hidden -translate-y-1/2 sm:flex ${dir < 0 ? "left-3" : "right-3"} ${BTN} h-12 w-12 bg-[#0b132bcc]`}><Icon name={icon} className="h-5 w-5" /></button>
+    <button type="button" onClick={() => go(index + dir)} aria-label={label} title={label} className={`absolute top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl border border-white/10 bg-white/10 text-white/70 backdrop-blur-md transition-colors hover:bg-white/15 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 sm:flex ${dir < 0 ? "left-3" : "right-3"}`}><Icon name={icon} className="h-5 w-5" /></button>
   );
 
   return (
-    <dialog ref={dialog} aria-label={G.enlarged} onClose={onClose} onKeyDown={onKey} className="fixed inset-0 m-0 h-dvh max-h-none w-dvw max-w-none border-0 bg-[#05080f] p-0 text-white backdrop:bg-black" data-viewer>
+    <dialog ref={dialog} aria-label={G.enlarged} onClose={onClose} onKeyDown={onKey} className="fixed inset-0 m-0 h-dvh max-h-none w-dvw max-w-none border-0 bg-white/15 p-0 text-white backdrop-blur-[24px] backdrop-saturate-[1.4] backdrop:bg-black/40" data-viewer>
       {open && (
-        <div ref={frame} className="flex h-full w-full flex-col bg-[#05080f]">
-          <div className="flex items-center gap-2 px-3 py-2 sm:px-4">
-            <p className="min-w-0 flex-1 truncate text-sm font-semibold" title={current.alt}>{current.alt}{many && <span className="font-normal text-[#aab4cc]"> · {G.position(index + 1, items.length)}</span>}</p>
-            <button type="button" onClick={() => zoomAt(viewRef.current.s / 1.4)} disabled={view.s <= 1} aria-label={G.zoomOut} className={BTN}><Icon name="zoomOut" className="h-5 w-5" /></button>
-            <button type="button" onClick={reset} aria-label={G.fit} title={G.fit} className={`${BTN} hidden w-16 tabular-nums sm:flex`}>{view.s === 1 ? G.fitShort : G.zoomLevel(pct)}</button>
-            <button type="button" onClick={() => zoomAt(viewRef.current.s * 1.4)} disabled={view.s >= MAX} aria-label={G.zoomIn} className={BTN}><Icon name="zoomIn" className="h-5 w-5" /></button>
-            <button type="button" onClick={reset} aria-label={G.fit} title={G.fit} className={`${BTN} sm:hidden`}><Icon name="fit" className="h-5 w-5" /></button>
-            {canFull && <button type="button" onClick={toggleFull} aria-pressed={full} aria-label={full ? G.exitFullscreen : G.fullscreen} title={full ? G.exitFullscreen : G.fullscreen} className={BTN}><Icon name={full ? "shrink" : "expand"} className="h-5 w-5" /></button>}
-            <button type="button" onClick={close} aria-label={G.close} className={BTN} autoFocus><Icon name="x" className="h-5 w-5" /></button>
+        // Fullscreen has no page behind it to blur, so it falls back to a solid surface.
+        <div ref={frame} className="flex h-full w-full flex-col [&:fullscreen]:bg-[#0f172a]">
+          <div className="flex h-12 shrink-0 items-center gap-2 border-b border-white/10 bg-white/[0.04] px-3">
+            <p className="min-w-0 flex-1 truncate text-[13px] font-medium" title={current.alt}>{current.alt}</p>
+            {many && (
+              <div className="flex shrink-0 items-center gap-0.5">
+                <button type="button" onClick={() => go(index - 1)} disabled={!canPrev} aria-label={G.previous} title={G.previous} className={BAR}><Icon name="left" className="h-4 w-4" /></button>
+                <span className="min-w-11 select-none text-center text-[11px] tabular-nums text-white/60">{index + 1} / {items.length}</span>
+                <button type="button" onClick={() => go(index + 1)} disabled={!canNext} aria-label={G.next} title={G.next} className={BAR}><Icon name="right" className="h-4 w-4" /></button>
+              </div>
+            )}
+            <div className="flex shrink-0 items-center gap-0.5">
+              {canFull && <button type="button" onClick={toggleFull} aria-pressed={full} aria-label={full ? G.exitFullscreen : G.fullscreen} title={full ? G.exitFullscreen : G.fullscreen} className={BAR}><Icon name={full ? "shrink" : "expand"} className="h-3.5 w-3.5" /></button>}
+              <div className="mx-1 h-3.5 w-px bg-white/15" />
+              <button type="button" onClick={close} aria-label={G.close} title={G.close} className={BAR} autoFocus><Icon name="x" className="h-4 w-4" /></button>
+            </div>
           </div>
 
           <div ref={stage} className="relative min-h-0 flex-1 touch-none select-none overflow-hidden" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp} data-viewer-stage>
@@ -184,18 +198,35 @@ export default function PreviewViewer({ items, index, onIndex, open, onClose, hu
               )}
             </div>
             {!loaded && !failed[current.sha256] && <div className="pointer-events-none absolute inset-0 flex items-center justify-center" role="status" aria-label={G.loading}><span className="h-8 w-8 animate-spin rounded-full border-2 border-[#ffffff40] border-t-orange-400 motion-reduce:animate-none" /></div>}
-            {many && <>{nav(-1, "left", G.previous)}{nav(1, "right", G.next)}</>}
+            {many && canPrev && nav(-1, "left", G.previous)}
+            {many && canNext && nav(1, "right", G.next)}
+            {many && (thumbsOpen ? (
+              <div className={`absolute bottom-3 left-1/2 z-20 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 items-center gap-1.5 p-1.5 ${GLASS} rounded-2xl`}>
+                <div ref={strip} role="group" aria-label={G.thumbsLabel} className="flex items-center gap-2 overflow-x-auto p-0.5">
+                  {items.map((p, i) => (
+                    <button key={p.sha256} type="button" onClick={() => onIndex(i)} aria-current={i === index} aria-label={G.show(i + 1, p.alt)} className={`h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-white/5 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 ${i === index ? "ring-2 ring-orange-400" : "opacity-50 hover:opacity-90"}`}>
+                      {failed[p.sha256] ? <span className="flex h-full items-center justify-center text-white/50"><Icon name="imageOff" className="h-5 w-5" /></span> : <img src={previewUrl(hubUrl, p)} alt="" loading="lazy" decoding="async" draggable={false} onError={() => onFail(p.sha256)} className="h-full w-full object-cover" />}
+                    </button>
+                  ))}
+                </div>
+                <button type="button" onClick={() => setThumbsOpen(false)} aria-label={G.hideThumbs} title={G.hideThumbs} className={`${BAR} h-8 w-8`}><Icon name="down" className="h-4 w-4" /></button>
+              </div>
+            ) : (
+              <button type="button" onClick={() => setThumbsOpen(true)} aria-label={G.showThumbs} title={G.showThumbs} className={`absolute bottom-3 left-1/2 z-20 flex h-8 -translate-x-1/2 items-center gap-1.5 rounded-full px-3 text-[11px] text-white/70 hover:text-white ${GLASS}`}>
+                <Icon name="up" className="h-3.5 w-3.5" />{index + 1} / {items.length}
+              </button>
+            ))}
           </div>
 
-          {many && (
-            <div ref={strip} role="group" aria-label={G.thumbsLabel} className="flex gap-2 overflow-x-auto px-3 py-3 sm:justify-center">
-              {items.map((p, i) => (
-                <button key={p.sha256} type="button" onClick={() => onIndex(i)} aria-current={i === index} aria-label={G.show(i + 1, p.alt)} className={`h-14 w-20 shrink-0 overflow-hidden rounded-lg border-2 bg-[#ffffff14] focus:outline-none focus-visible:ring-2 focus-visible:ring-orange-400 sm:h-16 sm:w-24 ${i === index ? "border-orange-400" : "border-transparent opacity-70 hover:opacity-100"}`}>
-                  {failed[p.sha256] ? <span className="flex h-full items-center justify-center text-[#aab4cc]"><Icon name="imageOff" className="h-5 w-5" /></span> : <img src={previewUrl(hubUrl, p)} alt="" loading="lazy" decoding="async" onError={() => onFail(p.sha256)} className="h-full w-full object-contain" />}
-                </button>
-              ))}
+          <div className="flex h-12 shrink-0 items-center justify-center gap-1.5 border-t border-white/10 bg-white/[0.04] px-3">
+            <div className="flex items-center rounded-lg bg-white/[0.06] p-0.5">
+              <button type="button" onClick={() => zoomAt(viewRef.current.s / 1.4)} disabled={view.s <= 1} aria-label={G.zoomOut} title={G.zoomOut} className={TOOL}><Icon name="minus" className="h-3.5 w-3.5" /></button>
+              <button type="button" onClick={reset} aria-label={G.resetZoom} title={G.resetZoom} className="h-7 min-w-13 px-2 text-[11px] tabular-nums text-white/60 transition-colors hover:text-white">{G.zoomLevel(pct)}</button>
+              <button type="button" onClick={() => zoomAt(viewRef.current.s * 1.4)} disabled={view.s >= MAX} aria-label={G.zoomIn} title={G.zoomIn} className={TOOL}><Icon name="plus" className="h-3.5 w-3.5" /></button>
             </div>
-          )}
+            <div className="mx-0.5 h-4 w-px bg-white/15" />
+            <button type="button" onClick={reset} aria-label={G.fit} title={G.fit} className={TOOL}><Icon name="fit" className="h-3.5 w-3.5" /></button>
+          </div>
           <p className="sr-only" aria-live="polite">{G.keysHint}</p>
         </div>
       )}
