@@ -1,6 +1,6 @@
 {
   "source": "runly/docs/developers",
-  "revision": "fd16dc513d6a223aed084b825c8caa93c279b939",
+  "revision": "f396df4b7e2d5e6623d7ea182d5279bea7fc8f68",
   "dirty": false,
   "files": {
     "api-modulos.md": "6b8e5aff61a713e8b67497252e6de2dcf67de4b43ed678a539f2e2a54fccb767",
@@ -12,11 +12,11 @@
     "conexiones.md": "21702adabebcb7cff6647dc294f78d1619373dcd74719ecabc4c02dc1d5f7577",
     "diseno-de-pantallas.md": "3f685b914a548ec77c874b91d36cc14693fc72c25d4ac4b4b845d0c328ba90a3",
     "enlaces-publicos.md": "a2ca23af7c603dd3dfa5799b54cf91d5744c3710b2e0e818f14a4d072252aa84",
-    "flujo-zip.md": "6f334db8f1d7dc2ca95eac369b814c3989ab3d131210d4c9c439f6e3d5187141",
+    "flujo-zip.md": "a002e0fc9b0cb2eee6828b3da1604850f753768afaf29eec50834072a0109e44",
     "ia.md": "53b93c89f00ca231f2cf07ed8d07b4e5db401d5b2c88403aaeb90d74b7e08bf4",
     "iconos.md": "93a3a7f4b0253d8118777a68bdc932b98f0743a3dec307a3c6ab14ee85306c32",
     "index.md": "9f228626af7d0843dc2f7849433abf569a7a317b188dc2aa171418656b607d95",
-    "librerias.md": "26b73bce869c6a04617aeda0935c93c1ef832d318c8264ba5a6c3fbba6377901",
+    "librerias.md": "7f5e372eb960370e436a6c2bf0debf97c70a71ac066859cd3bc0fbc22ff2ded4",
     "mcp.md": "bb8141fd13dc51d4c74eb98e25e675ebee2e388c103265ca79e3f7e8d4e9b5f7",
     "pantallas-react.md": "edd0665247dff8cecaad129c9a95c01bbedf75bb1baaec78df22eeca5b53873c",
     "relaciones.md": "d406a832bfa144f38f80bb16a59f862d00bfd17ce03bdf41fff60c9a28c2968f",

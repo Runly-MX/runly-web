@@ -141,6 +141,10 @@
       "icon": "Armchair"
     },
     {
+      "path": "/app/m/runly.pos/pos/reservas",
+      "icon": "CalendarCheck"
+    },
+    {
       "path": "/app/m/runly.pos/pos/cocina",
       "icon": "ChefHat"
     },
@@ -421,12 +425,52 @@
       "icon": "BookOpen"
     },
     {
+      "path": "/assessments",
+      "icon": "ClipboardList"
+    },
+    {
       "path": "/review",
       "icon": "ClipboardCheck"
     },
     {
+      "path": "/results",
+      "icon": "BarChart3"
+    },
+    {
       "path": "/certificates",
       "icon": "Award"
+    }
+  ],
+  "runly.bookings": [
+    {
+      "path": "/rooms",
+      "icon": "DoorOpen"
+    },
+    {
+      "path": "/spaces",
+      "icon": "CalendarClock"
+    },
+    {
+      "path": "/agenda",
+      "icon": "CalendarDays"
+    },
+    {
+      "path": "/reservations",
+      "icon": "ListChecks"
+    },
+    {
+      "path": "/resources",
+      "icon": "Users"
+    }
+  ],
+  "runly.ticketing": [
+    {
+      "path": "/events",
+      "icon": "Ticket"
+    },
+    {
+      "path": "/checkin",
+      "icon": "ScanLine"
     }
   ],
   "runly.chat": [
